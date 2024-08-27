@@ -1,0 +1,49 @@
+services:
+    frontend:
+        image: sk-pilipog-youth-hub-frontend:dev
+        build:
+            context: ./frontend
+            dockerfile: Dockerfile
+        restart: always
+        volumes:
+            - ./frontend:/app
+        environment:
+            HOST: '0.0.0.0'
+        ports:
+            - 3000:3000
+
+    backend:
+        image: sk-pilipog-youth-hub-backend:dev
+        build:
+            context: ./backend
+            dockerfile: Dockerfile
+        restart: always
+        volumes:
+            - ./backend:/var/www/html
+        ports:
+            - 8000:8000
+
+    database:
+        platform: linux/x86_64
+        image: mysql:9
+        restart: always
+        volumes:
+            - ./storage/db-data:/var/lib/mysql
+        environment:
+            MYSQL_DATABASE: ${DB_DATABASE}
+            MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+            MYSQL_USER: ${DB_USERNAME}
+            MYSQL_PASSWORD: ${DB_PASSWORD}
+
+    phpmyadmin:
+        platform: linux/amd64
+        image: phpmyadmin:5
+        restart: always
+        depends_on:
+            - database
+        environment:
+            PMA_HOST: database
+            MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+        ports:
+            - 8001:80
+
