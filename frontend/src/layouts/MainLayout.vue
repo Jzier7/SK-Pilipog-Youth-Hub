@@ -31,7 +31,7 @@
           Essential Links
         </q-item-label>
 
-        <EssentialLink
+        <SideNav
           v-for="link in linksList"
           :key="link.title"
           v-bind="link"
@@ -47,7 +47,7 @@
 
 <script>
 import { defineComponent, ref } from 'vue'
-import EssentialLink from 'components/EssentialLink.vue'
+import SideNav from 'components/SideNav'
 
 const linksList = [
   {
@@ -98,7 +98,7 @@ export default defineComponent({
   name: 'MainLayout',
 
   components: {
-    EssentialLink
+    SideNav
   },
 
   data () {
