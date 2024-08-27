@@ -1,49 +1,31 @@
 <template>
-  <q-item
-    clickable
-    tag="a"
-    target="_blank"
-    :href="link"
+  <q-drawer
+    :model-value="drawerOpen"
+    show-if-above
+    bordered
+    @update:model-value="$emit('update:drawerOpen', $event)"
   >
-    <q-item-section
-      v-if="icon"
-      avatar
-    >
-      <q-icon :name="icon" />
-    </q-item-section>
-
-    <q-item-section>
-      <q-item-label>{{ title }}</q-item-label>
-      <q-item-label caption>{{ caption }}</q-item-label>
-    </q-item-section>
-  </q-item>
+    <q-list>
+      <q-item-label header>
+        Essential Links
+      </q-item-label>
+    </q-list>
+  </q-drawer>
 </template>
 
 <script>
-import { defineComponent } from 'vue'
 
-export default defineComponent({
+export default {
   name: 'SideNav',
   props: {
-    title: {
-      type: String,
+    links: {
+      type: Array,
       required: true
     },
-
-    caption: {
-      type: String,
-      default: ''
-    },
-
-    link: {
-      type: String,
-      default: '#'
-    },
-
-    icon: {
-      type: String,
-      default: ''
+    drawerOpen: {
+      type: Boolean,
+      required: true
     }
   }
-})
+}
 </script>
