@@ -47,7 +47,7 @@
 
 <script>
 import { defineComponent, ref } from 'vue'
-import SideNav from 'components/SideNav'
+import SideNav from 'components/SideNav/SideNav.vue'
 
 const linksList = [
   {
