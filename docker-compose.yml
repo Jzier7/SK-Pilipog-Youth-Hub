@@ -6,7 +6,7 @@ services:
             dockerfile: Dockerfile
         restart: always
         volumes:
-            - ./frontend:/app
+            - ./frontend:/home/node
         environment:
             HOST: '0.0.0.0'
         ports:

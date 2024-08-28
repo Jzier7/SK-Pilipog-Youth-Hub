@@ -2,7 +2,7 @@ import SignIn from 'pages/Auth/SignIn.vue'
 
 // User Pages
 import User from 'layouts/UserLayout.vue'
-import Home from 'pages/User/Home.vue'
+import Home from 'pages/User/UserHome.vue'
 
 // Admin Pages
 import Admin from 'layouts/AdminLayout.vue'
