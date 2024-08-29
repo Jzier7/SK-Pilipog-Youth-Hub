@@ -1,66 +1,72 @@
 <template>
-  <div class="flex items-center justify-center min-h-screen bg-gray-100">
-    <div class="w-full max-w-md p-6 bg-white rounded-lg shadow-md">
-      <h2 class="mb-6 text-2xl font-bold text-center text-gray-800">Login</h2>
-
-      <form @submit.prevent="handleLogin">
-        <div class="mb-4">
-          <label for="email" class="block mb-2 text-sm font-medium text-gray-700">Email</label>
-          <input
-            type="email"
-            id="email"
-            v-model="email"
-            required
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-500"
-            placeholder="you@example.com"
-          />
-        </div>
-
-        <div class="mb-6">
-          <label for="password" class="block mb-2 text-sm font-medium text-gray-700">Password</label>
-          <input
-            type="password"
-            id="password"
-            v-model="password"
-            required
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-500"
-            placeholder="********"
-          />
-        </div>
-
-        <button
-          type="submit"
-          class="w-full px-4 py-2 text-white bg-blue-500 rounded-md hover:bg-blue-600 focus:outline-none focus:ring focus:ring-blue-300"
+  <q-layout>
+    <q-page-container>
+      <q-page class="flex justify-center items-center w-full bg-website">
+        <q-form
+          @submit="onSubmit"
+          @reset="onReset"
+          class="row shadow-xl md:w-2/4 w-full"
         >
-          Login
-        </button>
-      </form>
+          <div class="col-12 col-md-7 q-pa-lg">
+            <div class="full-height flex flex-center column q-py-xl">
+              <img src="~/assets/logo.png" alt="Logo" class="h-auto w-1/2 py-2" />
+              <h2 class="text-center font-black">SIGN IN TO SK PILIPOG YOUTH HUB</h2>
 
-      <p class="mt-4 text-sm text-center text-gray-600">
-        <a href="#" class="text-blue-500 hover:underline">Forgot your password?</a>
-      </p>
-    </div>
-  </div>
+              <span class="w-3/4">
+                <CustomInput v-model="email" label="Email" type="email" />
+                <CustomInput v-model="password" label="Password" type="password" />
+              </span>
+
+              <span class="w-3/4 flex justify-between">
+                <CustomCheckbox v-model="rememberMe" label="Remember Me" />
+                <CustomButtonLink label="Forgot Password?" :onClick="forgotPassword" />
+
+                <CustomButton label="Sign in" type="submit" />
+              </span>
+            </div>
+          </div>
+
+          <div class="col-12 col-md-5 q-pa-lg bg-primary text-white">
+            <div class="full-height flex flex-center column">
+              <h4 class="text-center">Don't Have an Account Yet?</h4>
+              <p class="text-center">Let's get you all set up!</p>
+              <span class="w-3/4">
+                <CustomButton label="Sign up" type="reset" btnClass="secondary-btn" :onClick="navigateToSignUp" />
+              </span>
+            </div>
+          </div>
+        </q-form>
+      </q-page>
+    </q-page-container>
+  </q-layout>
 </template>
 
 <script>
+import { defineAsyncComponent } from 'vue'
+
 export default {
+  name: 'SignIn',
+  components: {
+    CustomButton: defineAsyncComponent(() => import('components/Widgets/CustomButton.vue')),
+    CustomButtonLink: defineAsyncComponent(() => import('components/Widgets/CustomButtonLink.vue')),
+    CustomInput: defineAsyncComponent(() => import('components/Widgets/CustomInput.vue')),
+    CustomCheckbox: defineAsyncComponent(() => import('components/Widgets/CustomCheckbox.vue')),
+  },
   data() {
     return {
       email: '',
-      password: ''
+      password: '',
+      rememberMe: false,
     };
   },
   methods: {
-    handleLogin() {
-      // Handle login logic here
-      console.log('Logging in with:', this.email, this.password);
+    signIn() {
+    },
+    navigateToSignUp() {
+      this.$router.push('/signup');
+    },
+    forgotPassword() {
     }
   }
-};
+}
 </script>
-
-<style scoped>
-/* You can add any custom styles here */
-</style>
-

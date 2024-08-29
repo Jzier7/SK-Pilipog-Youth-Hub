@@ -10,16 +10,23 @@
         @click="$emit('toggle-drawer')"
       />
       <q-toolbar-title>
-        Quasar App
+        PILIPOG YOUTH HUB
       </q-toolbar-title>
-      <div>Quasar v{{ version }}</div>
+      <span class="flex items-center">
+        <CustomButtonLink label="logout" color="white" />
+      </span>
     </q-toolbar>
   </q-header>
 </template>
 
 <script>
+import { defineAsyncComponent } from 'vue';
+
 export default {
   name: 'AppHeader',
+  components: {
+    CustomButtonLink: defineAsyncComponent(() => import('components/Widgets/CustomButtonLink.vue')),
+  },
   props: {
     version: {
       type: String,

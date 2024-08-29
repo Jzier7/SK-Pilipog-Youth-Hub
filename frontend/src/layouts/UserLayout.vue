@@ -1,5 +1,5 @@
 <template>
-  <q-layout view="lHh Lpr lFf">
+  <q-layout view="hHh lpr lfr">
     <AppHeader :version="$q.version" @toggle-drawer="toggleLeftDrawer" />
     <SideNav :links="linksList" :drawerOpen="leftDrawerOpen" @update:drawerOpen="leftDrawerOpen = $event" />
 

@@ -1,35 +1,34 @@
-import SignIn from 'pages/Auth/SignIn.vue'
-
-// User Pages
-import User from 'layouts/UserLayout.vue'
-import Home from 'pages/User/UserHome.vue'
-
-// Admin Pages
-import Admin from 'layouts/AdminLayout.vue'
-import Dashboard from 'pages/Admin/AdminDashboard.vue'
-
 const routes = [
-
   {
     path: '/',
-    component: SignIn,
+    component: () => import('pages/Auth/SignIn.vue'),
+  },
+
+  {
+    path: '/signup',
+    component: () => import('pages/Auth/SignUp.vue'),
+  },
+
+  {
+    path: '/forgot-password',
+    component: () => import('pages/Auth/ForgotPassword.vue'),
   },
 
   // User Routes
   {
     path: '/user',
-    component: User,
+    component: () => import('layouts/UserLayout.vue'),
     children: [
-      { path: '/home', component: Home }
+      { path: 'home', component: () => import('pages/User/UserHome.vue') }
     ]
   },
 
   // Admin Routes
   {
     path: '/admin',
-    component: Admin,
+    component: () => import('layouts/AdminLayout.vue'),
     children: [
-      { path: '/dashboard', component: Dashboard }
+      { path: 'dashboard', component: () => import('pages/Admin/AdminDashboard.vue') }
     ]
   },
 
