@@ -1,8 +1,5 @@
 FROM node:22-alpine
 
-RUN apk add --no-cache \
-    bash
-
 # Set the working directory
 WORKDIR /app
 
