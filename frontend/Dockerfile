@@ -1,7 +1,7 @@
 FROM node:22-alpine
 
 # Set the working directory
-WORKDIR /home/node
+WORKDIR /app
 
 # Copy package files to the working directory
 COPY package*.json ./
@@ -10,7 +10,7 @@ COPY package*.json ./
 RUN npm i -g @quasar/cli
 
 # Copy the rest of your application code into the container
-COPY . .
+COPY . ./
 
 # Install dependencies
 RUN npm install
