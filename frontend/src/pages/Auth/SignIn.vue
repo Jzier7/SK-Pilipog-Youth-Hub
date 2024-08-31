@@ -10,14 +10,15 @@
           <div class="col-12 col-md-7 q-pa-lg">
             <div class="full-height flex flex-center column q-py-xl">
               <img src="~/assets/logo.png" alt="Logo" class="h-auto w-1/2 py-2" />
-              <h2 class="text-center font-black">SIGN IN TO SK PILIPOG YOUTH HUB</h2>
+              <h2 class="text-center text-primary">SK PILIPOG YOUTH HUB</h2>
 
-              <span class="w-3/4">
+              <span class="w-3/4 mt-4">
+                <p class="text-start text-primary">Sign in to your account</p>
                 <CustomInput v-model="email" label="Email" type="email" />
                 <CustomInput v-model="password" label="Password" type="password" />
               </span>
 
-              <span class="w-3/4 flex justify-between">
+              <span class="w-3/4 flex justify-between q-mt-md">
                 <CustomCheckbox v-model="rememberMe" label="Remember Me" />
                 <CustomButtonLink label="Forgot Password?" :onClick="forgotPassword" />
 
@@ -63,6 +64,7 @@ export default {
     signIn() {
     },
     navigateToSignUp() {
+      //NOTE: temporary routing
       this.$router.push('/signup');
     },
     forgotPassword() {

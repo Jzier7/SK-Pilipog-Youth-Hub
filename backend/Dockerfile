@@ -10,7 +10,6 @@ RUN apk add --no-cache \
     libjpeg-turbo-dev \
     freetype-dev \
     curl \
-    bash \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install mysqli pdo pdo_mysql zip gd
 
@@ -24,6 +23,6 @@ WORKDIR /var/www/html
 # Copy application files
 COPY . /var/www/html/
 
-CMD bash -c "composer install && php artisan serve --host=0.0.0.0 --port 8000"
+CMD sh -c "composer install && php artisan serve --host=0.0.0.0 --port 8000"
 
 EXPOSE 8000

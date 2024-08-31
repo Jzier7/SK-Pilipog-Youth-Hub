@@ -4,18 +4,18 @@
 
 // Define the font-face
 @font-face {
-  font-family: 'Poppins';
-  src: url('./fonts/Poppins-Regular.woff') format('woff');
+  font-family: 'Montserrat';
+  src: url('./fonts/Montserrat-Regular.woff') format('woff');
 }
 
 // Apply the font globally
 body, html {
-  font-family: 'Poppins', sans-serif;
+  font-family: 'Montserrat', sans-serif;
 }
 
 // Optional: Create a specific class if needed
 .primary-font {
-  font-family: 'Poppins';
+  font-family: 'Montserrat';
 }
 
 // Typography styles

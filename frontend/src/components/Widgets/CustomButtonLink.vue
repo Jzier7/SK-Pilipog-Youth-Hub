@@ -1,7 +1,7 @@
 <template>
   <q-btn
     :label="label"
-    :class="`${btnClass} q-mt-md lowercase`"
+    :class="`${btnClass} lowercase`"
     flat
     :color="color"
     @click="onClick"
