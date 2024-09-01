@@ -46,10 +46,8 @@
 </template>
 
 <script>
-import { defineAsyncComponent } from 'vue'
-import { ref } from 'vue'
-import { api } from 'boot/axios'
-import { useQuasar } from 'quasar'
+import { defineAsyncComponent } from 'vue';
+import authService from '../../services/authService';
 
 export default {
   name: 'SignUp',
@@ -62,53 +60,50 @@ export default {
   data() {
     return {
       form: {},
-      errors: {}
+      errors: {},
     };
   },
-  watch:{
-    form:{
-      handler(value, oldValue){
-        this.errors = {}
+  watch: {
+    form: {
+      handler(value, oldValue) {
+        this.errors = {};
       },
-      deep: true
-    }
-
+      deep: true,
+    },
   },
   methods: {
-    signUp() {
-    },
     navigateToSignIn() {
-      //NOTE: temporary routing
       this.$router.push('/');
     },
+    async onSubmit() {
+      try {
+        const response = await authService.register(this.form);
+        console.log('Registration successful:', response);
 
-    async onSubmit(){
-      await api.get('/sanctum/csrf-cookie')
-      await api.post('/api/register', this.form)
-        .then((response) => {
-          // data.value = response.data
-      })
-      .catch((err) => {
-        const { data, status, statusText } = err.response
-        const { errors } = data
-        this.errors = errors
-      })
+        // Optionally, you can log in the user immediately after registration
+        // const user = await authService.getUser();
+        // console.log('User:', user);
+      } catch (err) {
+        const { data } = err.response;
+        this.errors = data.errors || {};
+        console.error(err);
+      }
 
       /**
-       * test to verify if the logged user can send request
-       * to a sanctum protected api
+       * Test to verify if the logged user can send request to a sanctum protected API
        *
-       * NOTE: You can remove this
+       * NOTE: You can remove this if not needed
        */
-      await api.get('api/user', this.form)
-        .then((response) => {
-          const { data } = response
-          console.log('user:', data)
-      })
+      try {
+        const user = await authService.getUser();
+        console.log('User:', user);
+      } catch (err) {
+        console.error('Failed to fetch user:', err);
+      }
     },
-    onReset(){
-
+    onReset() {
     },
-  }
-}
+  },
+};
 </script>
+
