@@ -22,18 +22,18 @@
               <h2 class="text-center font-black">Sign up for an Account</h2>
 
               <div class="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
-                <CustomInput v-model="firstName" label="Firstname" inputClass="col-span-2 md:col-span-1" />
-                <CustomInput v-model="lastName" label="Last name" inputClass="col-span-2 md:col-span-1" />
-                <CustomInput v-model="middleName" label="Middle name" inputClass="col-span-2 md:col-span-1" />
-                <CustomInput v-model="birthdate" label="Birthdate" type="date" inputClass="col-span-2 md:col-span-1" />
-                <CustomInput v-model="gender" label="Gender" inputClass="col-span-2 md:col-span-1" />
-                <CustomInput v-model="purok" label="Purok" inputClass="col-span-2 md:col-span-1" />
-                <CustomSelect v-model="activeVoter" label="Active Voter?" :options="['Yes', 'No']" selectClass="col-span-2 md:col-span-1" />
-                <CustomUploader label="Upload Image" v-model="uploadedFiles" uploaderClass="col-span-2"/>
-                <CustomInput v-model="email" label="Email" type="email" inputClass="col-span-2 md:col-span-1" />
-                <CustomInput v-model="username" label="Username" inputClass="col-span-2 md:col-span-1" />
-                <CustomInput v-model="password" label="Password" type="password" inputClass="col-span-2 md:col-span-1" />
-                <CustomInput v-model="confirmPassword" label="Confirm Password" type="password" inputClass="col-span-2 md:col-span-1" />
+                <CustomInput :errorMessage="errors.first_name ? errors.first_name[0] : ''" :modelValue="form.first_name ?? ''" v-model="form.first_name" label="First Name" inputClass="col-span-2 md:col-span-1" />
+                <CustomInput :errorMessage="errors.last_name ? errors.last_name[0] : ''" :modelValue="form.last_name ?? ''" v-model="form.last_name" label="Last name" inputClass="col-span-2 md:col-span-1" />
+                <CustomInput :errorMessage="errors.middle_name ? errors.middle_name[0] : ''" :modelValue="form.middle_name ?? ''" v-model="form.middle_name" label="Middle name" inputClass="col-span-2 md:col-span-1" />
+                <CustomInput :errorMessage="errors.birthdate ? errors.birthdate[0] : ''" :modelValue="form.birthdate ?? ''" v-model="form.birthdate" label="Birthdate" type="date" inputClass="col-span-2 md:col-span-1" />
+                <CustomInput :errorMessage="errors.gender ? errors.gender[0] : ''" :modelValue="form.gender ?? ''" v-model="form.gender" label="Gender" inputClass="col-span-2 md:col-span-1" />
+                <CustomInput :errorMessage="errors.purok ? errors.purok[0] : ''" :modelValue="form.purok ?? ''" v-model="form.purok" label="Purok" inputClass="col-span-2 md:col-span-1" />
+                <CustomSelect :errorMessage="errors.active_voter ? errors.active_voter[0] : ''" :modelValue="form.active_voter ?? ''" v-model="form.active_voter" label="Active Voter?" :options="['Yes', 'No']" selectClass="col-span-2 md:col-span-1" />
+                <CustomUploader label="Upload Image" v-model="form.uploadedFiles" uploaderClass="col-span-2"/>
+                <CustomInput :errorMessage="errors.email ? errors.email[0] : ''" :modelValue="form.email ?? ''" v-model="form.email" label="Email" type="email" inputClass="col-span-2 md:col-span-1" />
+                <CustomInput :errorMessage="errors.username ? errors.username[0] : ''" :modelValue="form.username ?? ''" v-model="form.username" label="Username" inputClass="col-span-2 md:col-span-1" />
+                <CustomInput :errorMessage="errors.password ? errors.password[0] : ''" :modelValue="form.password ?? ''" v-model="form.password" label="Password" type="password" inputClass="col-span-2 md:col-span-1" />
+                <CustomInput :errorMessage="errors.confirm_password ? errors.confirm_password[0] : ''" :modelValue="form.confirm_password ?? ''" v-model="form.confirm_password" label="Confirm Password" type="password" inputClass="col-span-2 md:col-span-1" />
               </div>
 
               <CustomButton label="Sign up" type="submit" />
@@ -47,6 +47,9 @@
 
 <script>
 import { defineAsyncComponent } from 'vue'
+import { ref } from 'vue'
+import { api } from 'boot/axios'
+import { useQuasar } from 'quasar'
 
 export default {
   name: 'SignUp',
@@ -58,25 +61,53 @@ export default {
   },
   data() {
     return {
-      firstName: '',
-      middleName: '',
-      lastName: '',
-      birthdate: '',
-      gender: '',
-      email: '',
-      purok: '',
-      activeVoter: '',
-      username: '',
-      password: '',
-      confirmPassword: '',
+      form: {},
+      errors: {}
     };
+  },
+  watch:{
+    form:{
+      handler(value, oldValue){
+        this.errors = {}
+      },
+      deep: true
+    }
+
   },
   methods: {
     signUp() {
     },
     navigateToSignIn() {
       this.$router.push('/');
-    }
+    },
+
+    async onSubmit(){
+      await api.get('/sanctum/csrf-cookie')
+      await api.post('/api/register', this.form)
+        .then((response) => {
+          // data.value = response.data
+      })
+      .catch((err) => {
+        const { data, status, statusText } = err.response
+        const { errors } = data
+        this.errors = errors
+      })
+
+      /**
+       * test to verify if the logged user can send request
+       * to a sanctum protected api
+       *
+       * NOTE: You can remove this
+       */
+      await api.get('api/user', this.form)
+        .then((response) => {
+          const { data } = response
+          console.log('user:', data)
+      })
+    },
+    onReset(){
+
+    },
   }
 }
 </script>

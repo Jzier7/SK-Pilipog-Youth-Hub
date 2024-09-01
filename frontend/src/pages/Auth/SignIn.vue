@@ -13,8 +13,8 @@
               <h2 class="text-center font-black">SIGN IN TO SK PILIPOG YOUTH HUB</h2>
 
               <span class="w-3/4">
-                <CustomInput v-model="email" label="Email" type="email" />
-                <CustomInput v-model="password" label="Password" type="password" />
+                <CustomInput v-model="form.email" label="Email" type="email" />
+                <CustomInput v-model="form.password" label="Password" type="password" />
               </span>
 
               <span class="w-3/4 flex justify-between">
@@ -43,6 +43,7 @@
 
 <script>
 import { defineAsyncComponent } from 'vue'
+import { api } from 'boot/axios'
 
 export default {
   name: 'SignIn',
@@ -54,13 +55,28 @@ export default {
   },
   data() {
     return {
-      email: '',
-      password: '',
+      form: {},
       rememberMe: false,
     };
   },
   methods: {
-    signIn() {
+    async onSubmit() {
+
+      await api.get('/sanctum/csrf-cookie')
+      await api.post('/api/login', this.form).then(res => {
+        const { data } = res
+        const { message, body } = data
+        console.log(message, body)
+      })
+
+      /**
+       * test to verify if the logged user can send request
+       * to a sanctum protected api
+       *
+       * NOTE: You can remove this
+       */
+      await api.get('/api/user')
+
     },
     navigateToSignUp() {
       this.$router.push('/signup');
