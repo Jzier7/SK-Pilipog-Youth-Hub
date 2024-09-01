@@ -11,49 +11,58 @@
 </template>
 
 <script>
-import { defineComponent, defineAsyncComponent } from 'vue';
+import { defineComponent, ref, defineAsyncComponent } from 'vue';
 
 const menuList = [
   {
-    icon: 'home',
-    label: 'Home',
-    path: '/user/home',
+    icon: 'dashboard',
+    label: 'Dashboard',
+    separator: false
+  },
+  {
+    icon: 'campaign',
+    label: 'Announcement',
     separator: false
   },
   {
     icon: 'forum',
     label: 'Forum',
-    path: '/user/forum',
     separator: false
   },
   {
     icon: 'event',
     label: 'Event',
-    path: '/user/event',
     separator: true
   },
   {
     icon: 'assignment_ind',
     label: 'SK Official',
-    path: '/user/sk-official',
     separator: false
   },
   {
     icon: 'badge',
     label: 'Merit Board',
-    path: '/user/sk-official',
+    separator: false
+  },
+  {
+    icon: 'recent_actors',
+    label: 'User Registry',
     separator: true
   },
   {
-    icon: 'person',
-    label: 'My Account',
-    path: '/user/my-account',
+    icon: 'manage_accounts',
+    label: 'Admin Account',
+    separator: false
+  },
+  {
+    icon: 'manage_accounts',
+    label: 'User Account',
     separator: false
   },
 ]
 
 export default defineComponent({
-  name: 'AdminLayout',
+  name: 'SuperAdminLayout',
   components: {
     AppHeader: defineAsyncComponent(() => import('components/AppHeader/AppHeader.vue')),
     SideNav: defineAsyncComponent(() => import('components/SideNav/SideNav.vue')),
@@ -71,3 +80,4 @@ export default defineComponent({
   }
 });
 </script>
+

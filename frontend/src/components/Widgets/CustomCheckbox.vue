@@ -3,7 +3,7 @@
     v-model="inputValue"
     :label="label"
     color="dark"
-    :class="`${inputClass} q-mt-md text-dark`"
+    :class="`${inputClass} text-dark`"
   />
 </template>
 

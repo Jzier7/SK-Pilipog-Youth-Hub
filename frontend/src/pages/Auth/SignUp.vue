@@ -78,6 +78,7 @@ export default {
     signUp() {
     },
     navigateToSignIn() {
+      //NOTE: temporary routing
       this.$router.push('/');
     },
 

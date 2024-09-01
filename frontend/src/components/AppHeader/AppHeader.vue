@@ -1,5 +1,5 @@
 <template>
-  <q-header elevated>
+  <q-header elevated class="py-3">
     <q-toolbar>
       <q-btn
         flat
@@ -12,9 +12,7 @@
       <q-toolbar-title>
         PILIPOG YOUTH HUB
       </q-toolbar-title>
-      <span class="flex items-center">
-        <CustomButtonLink label="logout" color="white" />
-      </span>
+      <CustomButtonLink icon="logout" label="logout" color="white" class="py-2" />
     </q-toolbar>
   </q-header>
 </template>
