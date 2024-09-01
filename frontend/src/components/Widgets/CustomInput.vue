@@ -1,11 +1,13 @@
 <template>
   <q-input
-    :v-model="inputValue"
+    v-model="inputValue"
     :label="label"
     :type="type"
     :outlined="outlined"
     :standout="standout"
     :class="`${inputClass} q-mt-md w-full`"
+    :error-message="errorMessage"
+    :error="errorMessage !== '' ?  true : false"
   />
 </template>
 
@@ -41,6 +43,10 @@ export default {
       type: String,
       default: '',
     },
+    errorMessage: {
+      type: String,
+      default: ''
+    }
   },
   computed: {
     inputValue: {

@@ -1,10 +1,12 @@
 <template>
   <q-select
-    :v-model="selectValue"
+    v-model="selectValue"
     :label="label"
     :outlined="outlined"
     :options="options"
     :class="`${selectClass}`"
+    :error-message="errorMessage"
+    :error="errorMessage !== '' ?  true : false"
   />
 </template>
 
@@ -32,6 +34,10 @@ export default {
       type: String,
       default: '',
     },
+    errorMessage: {
+      type: String,
+      default: ''
+    }
   },
   computed: {
     selectValue: {

@@ -14,5 +14,6 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return response()->json(['message' => 'sk-pilipog-youth-hub-api']);
+    /* return view('welcome'); */
 });
