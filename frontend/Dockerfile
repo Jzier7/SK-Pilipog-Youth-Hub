@@ -15,6 +15,8 @@ COPY . ./
 # Install dependencies
 RUN npm install
 
+RUN npm install dotenv --save
+
 # Specify the command to run your application
 CMD sh -c "quasar dev --host=0.0.0.0 --port 3000"
 
