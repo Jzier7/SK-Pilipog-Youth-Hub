@@ -33,6 +33,8 @@ class RegisterRequest extends FormRequest
             'username' => 'required',
             'password' => ['required', 'min:8'],
             'confirm_password' => ['required', 'same:password'],
+            'files' => ['nullable', 'array', 'max:1'],
+            'files.*' => ['nullable', 'file', 'image', 'max:' . env('MAX_FILE_UPLOAD_SIZE', '5000')]
         ];
     }
 
