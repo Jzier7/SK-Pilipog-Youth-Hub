@@ -43,7 +43,7 @@ class AuthController extends Controller
     public function logout(LogoutRequest $request): JsonResponse
     {
         $data = $request->validated();
-        $response = $this->authRepository->login($data);
+        $response = $this->authRepository->logout($data);
         return $this->authRepository->getJsonResponse($response);
     }
 
