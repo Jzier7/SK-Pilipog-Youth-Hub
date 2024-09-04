@@ -1,16 +1,16 @@
 <template>
-  <q-page>
-    <div class="wrapper">
-      <div class="item" v-for="(team, index) in teams" :key="index">
-        <div class="item-parent">
-          <p>{{ team.name }}</p>
-        </div>
-        <div class="item-childrens">
-          <div class="item-child" v-for="(child, childIndex) in team.children" :key="childIndex">
-            <TournamentBracket :child="child" />
-          </div>
-        </div>
-      </div>
+  <q-page padding>
+    <div class="q-mb-md">
+      <q-toolbar class="q-pa-none">
+        <q-toolbar-title>
+          <h3 class="text-primary">EVENT</h3>
+          <span class="text-[13px]">{{ formattedDateRange }}</span>
+        </q-toolbar-title>
+      </q-toolbar>
+    </div>
+
+    <div>
+      <BracketTree />
     </div>
   </q-page>
 </template>
@@ -20,115 +20,58 @@ import { defineAsyncComponent } from 'vue';
 
 export default {
   components: {
-    TournamentBracket: defineAsyncComponent(() => import('components/Bracket/TournamentBracket.vue')),
+    BracketTree: defineAsyncComponent(() => import('components/Bracket/BracketTree.vue')),
   },
   data() {
     return {
-      teams: [
-        {
-          name: 'Team A',
-          children: [
-            {
-              name: 'Team A.1',
-              children: [
-                { name: 'Team A.1.1' },
-                { name: 'Team A.1.2' }
-              ]
-            },
-            { name: 'Team A.2' }
-          ]
-        },
-      ]
-    };
+      visibleColumns: ['id', 'name'],
+      selectedCategory: 'All',
+      categories: ['All', 'Basketball', 'Volleyball', 'Mobile Legends'],
+      columns: [
+        { name: 'id', label: 'ID', align: 'center', field: 'id' },
+        { name: 'name', label: 'Team Name', align: 'center', field: 'name' }
+      ],
+      rows: [
+        { id: 1, name: 'Team A', category: 'Basketball' },
+        { id: 2, name: 'Team B', category: 'Basketball' },
+        { id: 3, name: 'Team C', category: 'Volleyball' },
+        { id: 4, name: 'Team D', category: 'Volleyball' },
+        { id: 5, name: 'Team E', category: 'Mobile Legends' },
+        { id: 6, name: 'Team F', category: 'Mobile Legends' }
+      ],
+      leagueName: 'Summer League',
+      startDate: 'March 24, 2024',
+      endDate: 'April 24, 2024'
+    }
+  },
+  computed: {
+    tableTitle() {
+      return `${this.leagueName} Teams`;
+    },
+    formattedDateRange() {
+      return `${this.startDate} - ${this.endDate}`;
+    },
+    filteredRows() {
+      if (this.selectedCategory === 'All') {
+        return this.rows;
+      }
+      return this.rows.filter(row => row.category === this.selectedCategory);
+    }
+  },
+  methods: {
+    filterRows() {
+      console.log('Filter method called. Selected Category:', this.selectedCategory);
+    },
+    addTeam() {
+      console.log('Add button clicked');
+    }
   }
-};
+}
 </script>
 
 <style lang="scss" scoped>
-$side-margin: 50px;
-$vertical-margin: 10px;
-
-.wrapper {
-  display: flex;
-  height: 600px;
-  justify-content: center;
-}
-
-.item {
-  display: flex;
-  flex-direction: row-reverse;
-
-  p {
-    padding: 20px;
-    margin: 0;
-    color: white;
-    background-color: $primary;
-    border-radius: .5rem;
-  }
-
-  &-parent {
-    position: relative;
-    margin-left: $side-margin;
-    display: flex;
-    align-items: center;
-
-    &:after {
-      position: absolute;
-      content: '';
-      width: $side-margin / 2;
-      height: 2px;
-      left: 0;
-      top: 50%;
-      background-color: $secondary;
-      transform: translateX(-100%);
-    }
-  }
-
-  &-childrens {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-  }
-
-  &-child {
-    display: flex;
-    align-items: flex-start;
-    justify-content: flex-end;
-    margin-top: $vertical-margin;
-    margin-bottom: $vertical-margin;
-    position: relative;
-
-    &:before {
-      content: '';
-      position: absolute;
-      background-color: $secondary;
-      right: 0;
-      top: 50%;
-      transform: translateX(100%);
-      width: 25px;
-      height: 2px;
-    }
-
-    &:after {
-      content: '';
-      position: absolute;
-      background-color: $secondary;
-      right: -$side-margin / 2;
-      height: calc(50% + 22px);
-      width: 2px;
-      top: 50%;
-    }
-
-    &:last-child {
-      &:after {
-        transform: translateY(-100%);
-      }
-    }
-
-    &:only-child:after {
-      display: none;
-    }
-  }
+::v-deep .q-table__top {
+  background-color: $primary;
+  color: white;
 }
 </style>
-

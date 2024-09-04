@@ -37,18 +37,43 @@
         </div>
         <div>
           <p>
-            Tuod, natigmantan gayud sa mga Pilipinon ang imong pagmhal ug
-            dedikadi nga serbisyo publiko. Kami mapasalamatan sa imong dedikasyon
-            ug kontribusyon sa atong barangay.
+            Tinood, gibati gayud sa mga Pilipino ang imong gugma ug dedikadong serbisyo publiko. Kami nagapasalamat sa imong pagpahinungod ug kontribusyon alang sa atong barangay.
           </p>
         </div>
       </q-card-section>
 
       <q-card-actions align="right">
-        <q-btn flat icon="chat_bubble_outline" class="q-ml-sm">
-          <q-badge color="primary" floating>1</q-badge>
+        <q-btn flat icon="chat_bubble_outline" class="q-ml-sm" @click="toggleComments">
+          <q-badge color="primary" floating>{{ comments.length }}</q-badge>
         </q-btn>
       </q-card-actions>
+
+      <q-slide-transition>
+        <div v-if="showComments">
+          <q-card-section class="bg-grey-2 q-pa-md">
+            <div v-for="(comment, index) in comments" :key="index" class="q-mb-sm">
+              <div class="text-body2"><strong>{{ comment.author }}</strong></div>
+              <div class="text-caption text-grey">{{ comment.time }}</div>
+              <div>{{ comment.text }}</div>
+            </div>
+            <q-input
+              filled
+              type="textarea"
+              placeholder="Add a comment..."
+              v-model="newComment"
+              class="bg-white text-black q-mt-md"
+            />
+            <div class="text-right q-mt-sm">
+              <q-btn
+                label="COMMENT"
+                color="primary"
+                text-color="white"
+                @click="submitComment"
+              />
+            </div>
+          </q-card-section>
+        </div>
+      </q-slide-transition>
     </q-card>
   </q-page>
 </template>
@@ -58,11 +83,35 @@ export default {
   data() {
     return {
       newPost: '',
+      newComment: '',
+      showComments: false,
+      comments: [
+        {
+          author: 'Jane Doe',
+          time: '1 hour ago',
+          text: 'Great post! Thanks for sharing.',
+        },
+      ],
     }
   },
   methods: {
     submitPost() {
-    }
-  }
+      // Logic to submit a new post
+    },
+    toggleComments() {
+      this.showComments = !this.showComments;
+    },
+    submitComment() {
+      if (this.newComment.trim() !== '') {
+        this.comments.push({
+          author: 'You',
+          time: 'Just now',
+          text: this.newComment,
+        });
+        this.newComment = '';
+      }
+    },
+  },
 }
 </script>
+
