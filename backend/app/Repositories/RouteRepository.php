@@ -16,9 +16,20 @@ class RouteRepository extends JsonResponseFormat
     public function index(array $data): array
     {
         $routes = Route::all();
+        $route_group = [];
+
+        foreach ($routes as $route) {
+            $prefix = explode('/', $route->uri)[1];
+            if (isset($route_group[$prefix])) {
+                $route_group[$prefix][] = $route;
+            } else {
+                $route_group[$prefix] = [$route];
+            }
+        }
+
         return [
             'message' => 'These are the data.',
-            'body' => $routes
+            'body' => $route_group
         ];
     }
 }

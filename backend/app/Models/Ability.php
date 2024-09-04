@@ -10,6 +10,11 @@ class Ability extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'role_id',
+        'route_id'
+    ];
+
     public function route(): HasOne
     {
         return $this->hasOne(Route::class, 'id', 'route_id');

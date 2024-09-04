@@ -27,9 +27,10 @@ class RoleMiddleware extends JsonResponseFormat
         $abilities = DB::table('abilities')
             ->leftJoin('routes', 'routes.id', '=', 'abilities.route_id')
             ->where('role_id', $user->role_id)
-            ->pluck('routes.uri')->toArray();
+            ->where('routes.uri', $path)
+            ->pluck('routes.uri')->first();
 
-        if (!in_array($path, $abilities))
+        if (!$abilities)
             return $this->getJsonResponse([
                 'message' => 'Unauthorized',
                 'status' => 401
