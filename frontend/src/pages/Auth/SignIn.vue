@@ -42,8 +42,8 @@
 </template>
 
 <script>
-import { defineAsyncComponent } from 'vue'
-import { api } from 'boot/axios'
+import { defineAsyncComponent } from 'vue';
+import authService from '../../services/authService';
 
 export default {
   name: 'SignIn',
@@ -57,33 +57,33 @@ export default {
     return {
       form: {},
       rememberMe: false,
+      errors: {},
     };
   },
   methods: {
     async onSubmit() {
+      try {
+        const { message, body } = await authService.login(this.form);
+        console.log(message, body);
 
-      await api.get('/sanctum/csrf-cookie')
-      await api.post('/api/login', this.form).then(res => {
-        const { data } = res
-        const { message, body } = data
-        console.log(message, body)
-      })
-
-      /**
-       * test to verify if the logged user can send request
-       * to a sanctum protected api
-       *
-       * NOTE: You can remove this
-       */
-      await api.get('/api/user')
-
+        const user = await authService.getUser();
+        console.log('User:', user);
+      } catch (error) {
+        console.error(error);
+        if (error.response) {
+          this.errors = error.response.data.errors || {};
+        } else {
+          this.errors = { general: 'An error occurred. Please try again.' };
+        }
+      }
     },
     navigateToSignUp() {
-      //NOTE: temporary routing
       this.$router.push('/signup');
     },
     forgotPassword() {
-    }
-  }
-}
+      // Implement forgot password logic
+    },
+  },
+};
 </script>
+

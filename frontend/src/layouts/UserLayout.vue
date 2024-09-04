@@ -41,7 +41,7 @@ const menuList = [
   {
     icon: 'badge',
     label: 'Merit Board',
-    path: '/user/sk-official',
+    path: '/user/merit-board',
     separator: true
   },
   {

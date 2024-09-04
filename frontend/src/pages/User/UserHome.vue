@@ -1,17 +1,17 @@
 <template>
   <q-page padding>
 
-    <q-card class="q-my-lg">
+    <q-card class="q-my-lg bg-primary" flat bordered>
       <q-card-section>
         <q-toolbar class="q-pa-none">
           <q-toolbar-title>
-            <h2 class="text-primary">Hi! John Wilche</h2>
+            <h2 class="text-white">Hi! John Wilche</h2>
           </q-toolbar-title>
         </q-toolbar>
       </q-card-section>
     </q-card>
 
-    <q-card>
+    <q-card flat bordered>
       <q-card-section>
         <q-table :rows="rows" :columns="columns" flat>
           <template v-slot:top>

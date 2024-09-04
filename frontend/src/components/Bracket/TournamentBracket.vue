@@ -1,45 +1,25 @@
 <template>
-  <q-page>
-    <div class="wrapper">
-      <div class="item" v-for="(team, index) in teams" :key="index">
-        <div class="item-parent">
-          <p>{{ team.name }}</p>
-        </div>
-        <div class="item-childrens">
-          <div class="item-child" v-for="(child, childIndex) in team.children" :key="childIndex">
-            <TournamentBracket :child="child" />
-          </div>
+  <div class="item-child">
+    <div class="item">
+      <div class="item-parent">
+        <p>{{ child.name }}</p>
+      </div>
+      <div class="item-childrens" v-if="child.children">
+        <div class="item-child" v-for="(subChild, subChildIndex) in child.children" :key="subChildIndex">
+          <ChildComponent :child="subChild" />
         </div>
       </div>
     </div>
-  </q-page>
+  </div>
 </template>
 
 <script>
-import { defineAsyncComponent } from 'vue';
-
 export default {
-  components: {
-    TournamentBracket: defineAsyncComponent(() => import('components/Bracket/TournamentBracket.vue')),
-  },
-  data() {
-    return {
-      teams: [
-        {
-          name: 'Team A',
-          children: [
-            {
-              name: 'Team A.1',
-              children: [
-                { name: 'Team A.1.1' },
-                { name: 'Team A.1.2' }
-              ]
-            },
-            { name: 'Team A.2' }
-          ]
-        },
-      ]
-    };
+  props: {
+    child: {
+      type: Object,
+      required: true
+    }
   }
 };
 </script>
@@ -131,4 +111,5 @@ $vertical-margin: 10px;
   }
 }
 </style>
+
 
