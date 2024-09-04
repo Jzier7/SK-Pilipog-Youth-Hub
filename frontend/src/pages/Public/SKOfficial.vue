@@ -23,7 +23,13 @@
         >
           <q-card-section>
             <div class="image-container">
-              <img :src="official.image" alt="Official Image" class="official-image" />
+              <img
+                v-if="official.image"
+                :src="official.image"
+                alt="Official Image"
+                class="official-image"
+              />
+              <q-icon v-else name="person" size="100px" class="text-primary" />
             </div>
             <h3 class="text-primary">{{ official.name }}</h3>
             <div class="text-subtitle1">{{ official.position }}</div>
@@ -41,7 +47,13 @@
           >
             <q-card-section>
               <div class="image-container">
-                <img :src="official.image" alt="Official Image" class="official-image" />
+                <img
+                  v-if="official.image"
+                  :src="official.image"
+                  alt="Official Image"
+                  class="official-image"
+                />
+                <q-icon v-else name="person" size="100px" class="text-primary" />
               </div>
               <h3 class="text-primary">{{ official.name }}</h3>
               <div class="text-subtitle1">{{ official.position }}</div>
@@ -59,10 +71,10 @@ export default {
     return {
       barangayName: 'Barangay Example',
       officials: [
-        { id: 1, name: 'Juan Dela Cruz', position: 'SK Chairman' },
-        { id: 2, name: 'Maria Santos', position: 'Kagawad' },
-        { id: 3, name: 'Pedro Reyes', position: 'Kagawad' },
-        { id: 4, name: 'Josefa Garcia', position: 'Kagawad' }
+        { id: 1, name: 'Juan Dela Cruz', position: 'SK Chairman', image: null },
+        { id: 2, name: 'Maria Santos', position: 'Kagawad', image: null },
+        { id: 3, name: 'Pedro Reyes', position: 'Kagawad', image: null },
+        { id: 4, name: 'Josefa Garcia', position: 'Kagawad', image: null }
       ],
       startDate: 'January 1, 2024',
       endDate: 'December 31, 2024'
@@ -99,25 +111,26 @@ export default {
 
 .image-container {
   display: flex;
-  justify-content: center; /* Center the image horizontally */
+  justify-content: center;
 }
 
 .official-image {
   width: 100px;
   height: 100px;
-  border-radius: 50%; /* Make the image circular */
-  margin-bottom: 10px; /* Spacing below the image */
+  border-radius: 50%;
+  margin-bottom: 10px;
 }
 
 .toolbar-title {
-  flex-grow: 1; /* Make it take up all available space */
-  text-align: center; /* Center text */
+  flex-grow: 1;
+  text-align: center;
 }
 
 .q-page {
   display: flex;
   flex-direction: column;
-  align-items: center; /* Center horizontally */
-  justify-content: center; /* Center vertically */
+  align-items: center;
+  justify-content: center;
 }
 </style>
+

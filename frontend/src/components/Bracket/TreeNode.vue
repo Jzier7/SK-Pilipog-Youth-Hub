@@ -1,13 +1,13 @@
 <template>
-  <div class="item-child">
-    <div class="item">
-      <div class="item-parent">
-        <p>{{ child.name }}</p>
-      </div>
-      <div class="item-childrens" v-if="child.children">
-        <div class="item-child" v-for="(subChild, subChildIndex) in child.children" :key="subChildIndex">
-          <ChildComponent :child="subChild" />
-        </div>
+  <div class="item">
+    <div class="item-parent">
+      <p class="text-info">{{ node.id }}</p>
+      <p class="text-white">{{ node.label }}</p>
+      <p class="text-info">{{ node.score }}</p>
+    </div>
+    <div v-if="node.children && node.children.length" class="item-childrens">
+      <div v-for="(child, index) in node.children" :key="index" class="item-child">
+        <TreeNode :node="child" />
       </div>
     </div>
   </div>
@@ -15,8 +15,9 @@
 
 <script>
 export default {
+  name: 'TreeNode',
   props: {
-    child: {
+    node: {
       type: Object,
       required: true
     }
@@ -28,12 +29,6 @@ export default {
 $side-margin: 50px;
 $vertical-margin: 10px;
 
-.wrapper {
-  display: flex;
-  height: 600px;
-  justify-content: center;
-}
-
 .item {
   display: flex;
   flex-direction: row-reverse;
@@ -41,9 +36,8 @@ $vertical-margin: 10px;
   p {
     padding: 20px;
     margin: 0;
-    color: white;
+    white-space: nowrap;
     background-color: $primary;
-    border-radius: .5rem;
   }
 
   &-parent {
@@ -62,6 +56,13 @@ $vertical-margin: 10px;
       background-color: $secondary;
       transform: translateX(-100%);
     }
+
+    &:only-child {
+      &:after {
+        display: none;
+      }
+    }
+
   }
 
   &-childrens {
@@ -111,5 +112,4 @@ $vertical-margin: 10px;
   }
 }
 </style>
-
 
