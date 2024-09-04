@@ -47,7 +47,7 @@
 
 <script>
 import { defineAsyncComponent } from 'vue';
-import authService from '../../services/authService';
+import authService from '../../src/authService';
 
 export default {
   name: 'SignUp',

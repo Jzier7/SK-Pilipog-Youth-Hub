@@ -17,46 +17,55 @@ const menuList = [
   {
     icon: 'dashboard',
     label: 'Dashboard',
+    path: '/superadmin/dashboard',
     separator: false
   },
   {
     icon: 'campaign',
     label: 'Announcement',
+    path: '/superadmin/announcement',
     separator: false
   },
   {
     icon: 'forum',
     label: 'Forum',
+    path: '/superadmin/forum',
     separator: false
   },
   {
     icon: 'event',
     label: 'Event',
+    path: '/superadmin/event',
     separator: true
   },
   {
     icon: 'assignment_ind',
     label: 'SK Official',
+    path: '/superadmin/sk-official',
     separator: false
   },
   {
     icon: 'badge',
     label: 'Merit Board',
+    path: '/superadmin/merit-board',
     separator: false
   },
   {
     icon: 'recent_actors',
     label: 'User Registry',
+    path: '/superadmin/user-registry',
     separator: true
   },
   {
     icon: 'manage_accounts',
     label: 'Admin Account',
+    path: '/superadmin/admin-accounts',
     separator: false
   },
   {
     icon: 'manage_accounts',
     label: 'User Account',
+    path: '/superadmin/user-accounts',
     separator: false
   },
 ]

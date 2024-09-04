@@ -21,8 +21,9 @@
           <q-btn
             label="POST"
             color="white"
+            text-color="primary"
             @click="submitPost"
-            class="q-ma-none text-primary"
+            class="q-ma-none lowercase"
           />
         </div>
       </q-card-section>

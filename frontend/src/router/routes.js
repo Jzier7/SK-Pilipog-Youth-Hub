@@ -20,7 +20,7 @@ const routes = [
     component: () => import('layouts/UserLayout.vue'),
     children: [
       { path: 'home', component: () => import('pages/User/UserHome.vue') },
-      { path: 'forum', component: () => import('pages/Public/PublicForum.vue') },
+      { path: 'forum', component: () => import('pages/Public/PublicForum/PublicForum.vue') },
       { path: 'event', component: () => import('pages/Public/PublicEvent.vue') },
       { path: 'sk-official', component: () => import('pages/Public/SKOfficial.vue') },
       { path: 'merit-board', component: () => import('pages/Public/MeritBoard.vue') },
@@ -34,9 +34,9 @@ const routes = [
     component: () => import('layouts/AdminLayout.vue'),
     children: [
       { path: 'dashboard', component: () => import('pages/Admin/AdminDashboard.vue') },
-      { path: 'announcement', component: () => import('pages/Admin/Announcement.vue') },
-      { path: 'forum', component: () => import('pages/Public/Forum.vue') },
-      { path: 'event', component: () => import('pages/Public/Event.vue') },
+      { path: 'announcement', component: () => import('pages/Admin/AdminAnnouncement.vue') },
+      { path: 'forum', component: () => import('pages/Public/PublicForum/PublicForum.vue') },
+      { path: 'event', component: () => import('pages/Public/PublicEvent.vue') },
       { path: 'sk-official', component: () => import('pages/Public/SKOfficial.vue') },
       { path: 'merit-board', component: () => import('pages/Public/MeritBoard.vue') },
       { path: 'user-registry', component: () => import('pages/Admin/UserRegistry.vue') },
@@ -50,12 +50,12 @@ const routes = [
     component: () => import('layouts/SuperAdminLayout.vue'),
     children: [
       { path: 'dashboard', component: () => import('pages/Admin/AdminDashboard.vue') },
-      { path: 'announcement', component: () => import('pages/Admin/Announcement.vue') },
-      { path: 'forum', component: () => import('pages/Public/Forum.vue') },
-      { path: 'event', component: () => import('pages/Public/Event.vue') },
+      { path: 'announcement', component: () => import('pages/Admin/AdminAnnouncement.vue') },
+      { path: 'forum', component: () => import('pages/Public/PublicForum/PublicForum.vue') },
+      { path: 'event', component: () => import('pages/Public/PublicEvent.vue') },
       { path: 'sk-official', component: () => import('pages/Public/SKOfficial.vue') },
       { path: 'merit-board', component: () => import('pages/Public/MeritBoard.vue') },
-      { path: 'user-registry', component: () => import('pages/SuperAdmin/UserRegistry.vue') },
+      { path: 'user-registry', component: () => import('pages/Admin/UserRegistry.vue') },
       { path: 'admin-accounts', component: () => import('pages/SuperAdmin/AdminAccounts.vue') },
       { path: 'user-accounts', component: () => import('pages/SuperAdmin/UserAccounts.vue') },
     ]

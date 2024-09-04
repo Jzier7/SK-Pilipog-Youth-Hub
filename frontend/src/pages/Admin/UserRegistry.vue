@@ -3,7 +3,7 @@
     <div class="q-mb-md">
       <q-toolbar class="q-pa-none">
         <q-toolbar-title>
-          <h3 class="text-primary">ADMIN ACCOUNTS</h3>
+          <h3 class="text-primary">USER REGISTRY</h3>
         </q-toolbar-title>
       </q-toolbar>
     </div>
@@ -120,5 +120,3 @@ export default {
   color: white;
 }
 </style>
-
-
