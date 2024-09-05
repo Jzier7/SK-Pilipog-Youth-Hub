@@ -12,13 +12,15 @@
       <q-toolbar-title>
         PILIPOG YOUTH HUB
       </q-toolbar-title>
-      <CustomButtonLink icon="logout" label="logout" color="white" class="py-2" />
+      <CustomButtonLink icon="logout" label="logout" color="white" class="py-2" :onClick="logout" />
     </q-toolbar>
   </q-header>
 </template>
 
 <script>
+import { Notify } from 'quasar'
 import { defineAsyncComponent } from 'vue';
+import authService from '../../services/authService.js';
 
 export default {
   name: 'AppHeader',
@@ -29,6 +31,20 @@ export default {
     version: {
       type: String,
       required: true
+    }
+  },
+  methods: {
+    async logout() {
+      //NOTE: temporary
+      const { message, body } = await authService.logout(this.form);
+
+      Notify.create({
+        type: 'positive',
+        position: 'top',
+        message: message
+      })
+
+      this.$router.push('/');
     }
   }
 }

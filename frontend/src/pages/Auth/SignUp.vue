@@ -29,7 +29,7 @@
                 <CustomInput :errorMessage="errors.gender ? errors.gender[0] : ''" :modelValue="form.gender ?? ''" v-model="form.gender" label="Gender" inputClass="col-span-2 md:col-span-1" />
                 <CustomInput :errorMessage="errors.purok ? errors.purok[0] : ''" :modelValue="form.purok ?? ''" v-model="form.purok" label="Purok" inputClass="col-span-2 md:col-span-1" />
                 <CustomSelect :errorMessage="errors.active_voter ? errors.active_voter[0] : ''" :modelValue="form.active_voter ?? ''" v-model="form.active_voter" label="Active Voter?" :options="['Yes', 'No']" selectClass="col-span-2 md:col-span-1" />
-                <CustomUploader label="Upload Image" v-model="form.uploadedFiles" uploaderClass="col-span-2"/>
+                <CustomUploader label="Upload Image" :modelValue="form.uploadedFiles" uploaderClass="col-span-2"/>
                 <CustomInput :errorMessage="errors.email ? errors.email[0] : ''" :modelValue="form.email ?? ''" v-model="form.email" label="Email" type="email" inputClass="col-span-2 md:col-span-1" />
                 <CustomInput :errorMessage="errors.username ? errors.username[0] : ''" :modelValue="form.username ?? ''" v-model="form.username" label="Username" inputClass="col-span-2 md:col-span-1" />
                 <CustomInput :errorMessage="errors.password ? errors.password[0] : ''" :modelValue="form.password ?? ''" v-model="form.password" label="Password" type="password" inputClass="col-span-2 md:col-span-1" />
@@ -46,8 +46,9 @@
 </template>
 
 <script>
+import { Notify } from 'quasar'
 import { defineAsyncComponent } from 'vue';
-import authService from '../../src/authService';
+import authService from '../../services/authService';
 
 export default {
   name: 'SignUp',
@@ -59,7 +60,20 @@ export default {
   },
   data() {
     return {
-      form: {},
+      form: {
+        first_name: '',
+        last_name: '',
+        middle_name: '',
+        birthdate: '',
+        gender: '',
+        purok: '',
+        active_voter: '',
+        files: [],
+        email: '',
+        username: '',
+        password: '',
+        confirm_password: '',
+      },
       errors: {},
     };
   },
@@ -77,8 +91,16 @@ export default {
     },
     async onSubmit() {
       try {
-        const response = await authService.register(this.form);
-        console.log('Registration successful:', response);
+        console.log(this.form)
+        const { message, body } = await authService.register(this.form);
+
+        Notify.create({
+          type: 'positive',
+          position: 'top',
+          message: message
+        })
+
+        this.$router.push('/');
 
         // Optionally, you can log in the user immediately after registration
         // const user = await authService.getUser();
@@ -87,18 +109,6 @@ export default {
         const { data } = err.response;
         this.errors = data.errors || {};
         console.error(err);
-      }
-
-      /**
-       * Test to verify if the logged user can send request to a sanctum protected API
-       *
-       * NOTE: You can remove this if not needed
-       */
-      try {
-        const user = await authService.getUser();
-        console.log('User:', user);
-      } catch (err) {
-        console.error('Failed to fetch user:', err);
       }
     },
     onReset() {
