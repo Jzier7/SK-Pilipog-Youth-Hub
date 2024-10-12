@@ -4,7 +4,6 @@ namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\User>
@@ -12,9 +11,14 @@ use Illuminate\Support\Str;
 class UserFactory extends Factory
 {
     /**
-     * The current password being used by the factory.
+     * Predefined purok values.
      */
-    protected static ?string $password;
+    private array $puroks = [
+        'Purok 1',
+        'Purok 2',
+        'Purok 3',
+        'Purok 4',
+    ];
 
     /**
      * Define the model's default state.
@@ -24,11 +28,18 @@ class UserFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => fake()->name(),
-            'email' => fake()->unique()->safeEmail(),
-            'email_verified_at' => now(),
-            'password' => static::$password ??= Hash::make('password'),
-            'remember_token' => Str::random(10),
+            'first_name' => $this->faker->firstName,
+            'middle_name' => $this->faker->optional()->lastName,
+            'last_name' => $this->faker->lastName,
+            'birthdate' => $this->faker->date('Y-m-d'),
+            'gender' => $this->faker->randomElement(['Male', 'Female']),
+            'purok' => $this->faker->randomElement($this->puroks),
+            'active_voter' => $this->faker->boolean,
+            'email' => $this->faker->unique()->safeEmail,
+            'username' => $this->faker->unique()->userName,
+            'password' => Hash::make('password'),
+            'created_at' => now(),
+            'updated_at' => now(),
         ];
     }
 
@@ -42,3 +53,4 @@ class UserFactory extends Factory
         ]);
     }
 }
+

@@ -6,7 +6,9 @@
     :options="options"
     :class="`${selectClass}`"
     :error-message="errorMessage"
-    :error="errorMessage !== '' ?  true : false"
+    :error="errorMessage !== '' ? true : false"
+    emit-value
+    map-options
   />
 </template>
 

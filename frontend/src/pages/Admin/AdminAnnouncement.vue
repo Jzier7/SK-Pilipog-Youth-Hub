@@ -8,54 +8,191 @@
       </q-toolbar>
     </div>
 
-    <q-card flat bordered class="q-pa-md text-white">
+    <div class="row justify-between">
+      <q-btn
+        dense
+        label="Add Announcement"
+        color="primary"
+        @click="openAddModal"
+        style="text-transform: capitalize;"
+      ></q-btn>
 
-      <q-form>
-        <!-- Title -->
-        <q-input filled v-model="title" label="Title" class="q-mb-md" color='primary'></q-input>
-
-        <!-- Frame (Dropdown) -->
-        <q-select filled v-model="selectedCategory" :options="categories" label="categories" class="q-mb-md" color='primary'></q-select>
-
-        <!-- Announcement Textarea -->
+      <form @submit.prevent="fetchAnnouncements">
         <q-input
-          filled
-          v-model="announcement"
-          label="Announcement"
-          type="textarea"
-          rows="6"
-          class="q-mb-md"
-        ></q-input>
+          rounded
+          outlined
+          dense
+          v-model="search"
+          placeholder="Search Announcements"
+          @input="filterAnnouncements"
+          color="primary"
+        >
+          <template v-slot:prepend>
+            <q-icon name="search" />
+          </template>
+        </q-input>
+      </form>
+    </div>
 
-        <!-- Action Buttons -->
-        <div class="row justify-end">
-          <q-btn label="Publish" color="primary" @click="publish"></q-btn>
-        </div>
-      </q-form>
-    </q-card>
+    <div class="q-mt-md">
+      <div v-if="announcements.length === 0" class="row justify-center q-ma-lg">
+        <p>No announcements found.</p>
+      </div>
+      <q-card
+        v-for="announcement in announcements"
+        :key="announcement.id"
+        flat
+        bordered
+        class="q-pa-md q-mb-md border border-gray-300 rounded-lg shadow-lg"
+      >
+        <q-card-section class="overflow-hidden">
+          <h2 class="text-h6 font-bold text-primary">{{ announcement.title }}</h2>
+          <p class="text-body2 text-gray-700">{{ announcement.category.name }}</p>
+          <p class="text-body2 text-gray-500 text-sm">{{ timeAgo(announcement.created_at) }}</p>
+          <q-separator class="my-2" />
+          <div class="overflow-hidden max-h-10">
+            <p class="text-body2 text-ellipsis" v-html="announcement.content"></p>
+          </div>
+        </q-card-section>
+
+        <q-card-actions class="row justify-end">
+          <q-btn
+            label="View"
+            color="secondary"
+            @click="openViewModal(announcement)"
+            style="text-transform: capitalize;"
+            class="q-mr-md"
+          />
+          <q-btn
+            label="Edit"
+            color="primary"
+            @click="openEditModal(announcement)"
+            style="text-transform: capitalize;"
+            class="q-mr-md"
+          />
+          <q-btn
+            label="Delete"
+            color="negative"
+            style="text-transform: capitalize;"
+            @click="openDeleteModal(announcement)"
+          />
+        </q-card-actions>
+      </q-card>
+    </div>
+
+    <div class="row justify-center q-mt-md">
+      <q-pagination
+        v-model="currentPage"
+        :max="lastPage"
+        @update:model-value="updatePage"
+        direction-links
+      />
+    </div>
+
+    <AddAnnouncementModal :fetchAnnouncements="fetchAnnouncements"/>
+    <EditAnnouncementModal :fetchAnnouncements="fetchAnnouncements" :editData="announcementData"/>
+    <DeleteAnnouncementModal :fetchAnnouncements="fetchAnnouncements" :deleteData="announcementData"/>
+    <ViewAnnouncementModal :viewData="announcementData"/>
   </q-page>
 </template>
 
 <script>
+import { defineAsyncComponent } from 'vue';
+import { useModalStore } from 'src/stores/modules/modalStore';
+import announcementService from 'src/services/announcementService';
+import dateMixin from 'src/utils/mixins/dateMixin'
+
 export default {
+  components: {
+    AddAnnouncementModal: defineAsyncComponent(() => import('components/Modals/Announcement/AddAnnouncement.vue')),
+    EditAnnouncementModal: defineAsyncComponent(() => import('components/Modals/Announcement/EditAnnouncement.vue')),
+    DeleteAnnouncementModal: defineAsyncComponent(() => import('components/Modals/Announcement/DeleteAnnouncement.vue')),
+    ViewAnnouncementModal: defineAsyncComponent(() => import('components/Modals/Announcement/ViewAnnouncement.vue')),
+  },
+  mixins: [dateMixin],
   data() {
     return {
-      title: '',
-      selectedCategory: '',
-      categories: [
-        'Category 1',
-        'Category 2',
-        'Category 3',
-      ],
-      announcement: '',
+      announcements: [],
+      announcementData: [],
+      search: '',
+      currentPage: 1,
+      pageSize: 5,
+      lastPage: 1,
+      total: 0,
+      orderBy: 'desc',
+      debounceTimeout: null,
     };
   },
-  methods: {
-    cancel() {
+  watch: {
+    search(newVal) {
+      this.currentPage = 1;
+
+      clearTimeout(this.debounceTimeout);
+
+      this.debounceTimeout = setTimeout(() => {
+        this.fetchAnnouncements();
+      }, 1000);
     },
-    publish() {
-    }
-  }
+  },
+  mounted() {
+    this.fetchAnnouncements();
+  },
+  methods: {
+    openAddModal() {
+      const modalStore = useModalStore();
+      modalStore.setShowAddAnnouncementModal(true);
+    },
+    openEditModal(editData) {
+      this.announcementData = editData;
+
+      const modalStore = useModalStore();
+      modalStore.setShowEditAnnouncementModal(true);
+    },
+    openDeleteModal(deleteData) {
+      this.announcementData = deleteData;
+
+      const modalStore = useModalStore();
+      modalStore.setShowDeleteAnnouncementModal(true);
+    },
+    openViewModal(viewData) {
+      this.announcementData = viewData;
+
+      const modalStore = useModalStore();
+      modalStore.setShowViewAnnouncementModal(true);
+    },
+    updatePage(page) {
+      this.currentPage = page;
+      this.fetchAnnouncements();
+    },
+    filterAnnouncements() {
+      this.fetchAnnouncements();
+    },
+    async fetchAnnouncements() {
+      try {
+        const response = await announcementService.getAllAnnouncement({
+          search: this.search,
+          currentPage: this.currentPage,
+          pageSize: this.pageSize,
+          orderBy: this.orderBy
+        });
+        this.announcements = response.data.body || [];
+
+        const details = response.data.details;
+        if (details) {
+          this.currentPage = details.current_page || 1;
+          this.lastPage = details.last_page || 1;
+          this.total = details.total || 0;
+        }
+      } catch (error) {
+        console.error('Error fetching announcements:', error);
+      }
+    },
+  },
 };
 </script>
 
+<style scoped>
+.q-card {
+  margin-top: 16px;
+}
+</style>

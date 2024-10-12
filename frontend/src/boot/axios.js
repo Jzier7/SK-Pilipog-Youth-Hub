@@ -20,7 +20,7 @@ const api = axios.create({
 })
 
 // catch unauthenticated requests and redirect to login page
-/* api.interceptors.response.use(
+api.interceptors.response.use(
   function (response) {
     return response;
   },
@@ -35,7 +35,7 @@ const api = axios.create({
     }
     return Promise.reject(error);
   }
-); */
+);
 
 export default boot(({ app }) => {
   // for use inside Vue files (Options API) through this.$axios and this.$api

@@ -38,6 +38,8 @@
 </template>
 
 <script>
+import { useUserStore } from 'src/stores/modules/userStore';
+
 export default {
   name: 'SideNav',
   props: {
@@ -57,14 +59,20 @@ export default {
   data() {
     return {
       drawer: false,
-      userName: 'John Wilche',
+      userName: '',
     }
   },
   methods: {
     navigateTo(path) {
       this.$router.push(path);
     }
-  }
+  },
+  created() {
+    const userStore = useUserStore();
+    userStore.fetchUser().then(() => {
+      this.userName = userStore.userData.first_name + ' ' + userStore.userData.last_name;
+    });
+  },
 }
 </script>
 

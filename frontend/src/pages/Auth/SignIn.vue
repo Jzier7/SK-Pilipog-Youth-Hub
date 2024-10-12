@@ -44,7 +44,8 @@
 <script>
 import { Notify } from 'quasar'
 import { defineAsyncComponent } from 'vue';
-import authService from '../../services/authService.js';
+import { useAuthStore } from 'src/stores/modules/authStore';
+import { USER_ROLES } from 'src/utils/constants'
 
 export default {
   name: 'SignIn',
@@ -64,18 +65,18 @@ export default {
   methods: {
     async onSubmit() {
       try {
-        const { message, body } = await authService.login(this.form);
+        const authStore = useAuthStore();
+        const { data, message } = await authStore.login(this.form);
 
         Notify.create({
           type: 'positive',
           position: 'top',
           message: message
-        })
+        });
 
-        //NOTE: temporary
-        if (body.role_id === 1) {
+        if (data?.role.slug === USER_ROLES.SUPERADMIN) {
           this.$router.push('/superadmin/dashboard');
-        } else if (body.role_id === 2) {
+        } else if (data?.role.slug === USER_ROLES.ADMIN) {
           this.$router.push('/admin/dashboard');
         } else {
           this.$router.push('/user/home');
@@ -85,13 +86,12 @@ export default {
         console.error(error);
         if (error.response) {
           this.errors = error.response.data.errors || {};
-
         } else {
           Notify.create({
             type: 'negative',
             position: 'top',
             message: 'An error occurred. Please try again.'
-          })
+          });
         }
       }
     },

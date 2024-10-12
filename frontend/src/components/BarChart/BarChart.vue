@@ -3,16 +3,19 @@
 </template>
 
 <script>
-import { defineComponent } from 'vue'
+import { defineComponent, watch, nextTick } from 'vue';
 
 export default defineComponent({
   name: 'BarChart',
+  props: {
+    data: {
+      type: Array,
+      required: true
+    }
+  },
   data() {
     return {
-      series: [{
-            name: 'Number of People',
-            data: [150, 200, 100, 250, 300, 350, 400, 500, 600, 700, 800, 900]
-          }],
+      series: [],
       chartOptions: {
         chart: {
           height: 350,
@@ -40,7 +43,7 @@ export default defineComponent({
           }
         },
         xaxis: {
-          categories: ["Location A", "Location B", "Location C", "Location D", "Location E", "Location F", "Location G", "Location H", "Location I", "Location J", "Location K", "Location L"],
+          categories: [],
           position: 'bottom',
           axisBorder: {
             show: false
@@ -56,9 +59,10 @@ export default defineComponent({
           labels: {
             show: true,
           },
+          max: undefined,
         },
         title: {
-          text: 'Number of People per Location in the Barangay',
+          text: 'Number of People per Purok in the Barangay',
           floating: true,
           offsetY: 10,
           align: 'center',
@@ -69,6 +73,36 @@ export default defineComponent({
       },
     }
   },
-})
+  mounted() {
+    nextTick(() => {
+      this.updateChartData(this.data);
+    });
+  },
+  watch: {
+    data: {
+      deep: true,
+      immediate: true,
+      handler(newData) {
+        if (newData && newData.length > 0) {
+          this.updateChartData(newData);
+        }
+      }
+    }
+  },
+  methods: {
+    updateChartData(newData) {
+      this.series = [{
+        name: 'Number of People',
+        data: newData.map(item => item.count)
+      }];
+
+      this.chartOptions.xaxis.categories = newData.map(item => item.purok);
+
+      const maxCount = Math.max(...newData.map(item => item.count));
+      const range = maxCount - Math.min(...newData.map(item => item.count));
+      this.chartOptions.yaxis.max = range > 5 ? maxCount + Math.ceil(range * 0.1) : maxCount;
+    }
+  }
+});
 </script>
 

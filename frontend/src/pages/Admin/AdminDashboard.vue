@@ -4,7 +4,7 @@
       <q-card-section>
         <q-toolbar class="q-pa-none">
           <q-toolbar-title>
-            <h2 class="text-white">Hi! John Wilche</h2>
+            <h2 class="text-white">Hi! {{ userData.first_name }}</h2>
           </q-toolbar-title>
         </q-toolbar>
       </q-card-section>
@@ -19,7 +19,7 @@
               <q-icon name="people" size="5rem" class="q-mr-lg" color="primary" />
               <div class="place-content-center">
                 <div class="text-h6">Number of Voters</div>
-                <div class="text-subtitle1 text-grey-7">{{ numberOfVoters }} Registered Voters</div>
+                <div class="text-subtitle1 text-grey-7">{{ votersCount }} Registered Voters</div>
               </div>
             </div>
           </q-card-section>
@@ -41,39 +41,21 @@
           </q-card-section>
         </q-card>
       </div>
-
-      <!-- Recent Announcement Card -->
-      <div class="col">
-        <q-card flat bordered class="full-height">
-          <q-card-section>
-            <div class="row place-content-center">
-              <q-icon name="announcement" size="5rem" class="q-mr-lg" color="primary" />
-              <div class="place-content-center">
-                <div class="text-h6">Recent Announcement</div>
-                <div class="text-subtitle1 text-grey-7">{{ recentAnnouncement.title }}</div>
-                <div class="text-body2 text-grey-6">{{ recentAnnouncement.details }}</div>
-              </div>
-            </div>
-          </q-card-section>
-        </q-card>
-      </div>
     </div>
 
     <div class="q-mt-lg">
       <q-card flat bordered class="full-height">
         <q-card-section>
-          <div>
-            <BarChart />
-          </div>
+          <BarChart v-if="usersCountPerPurok.length" :data="usersCountPerPurok" />
         </q-card-section>
       </q-card>
     </div>
-
   </q-page>
 </template>
 
 <script>
 import { defineAsyncComponent } from 'vue';
+import { useUserStore } from 'src/stores/modules/userStore';
 
 export default {
   components: {
@@ -81,16 +63,27 @@ export default {
   },
   data() {
     return {
-      numberOfVoters: 1234,
+      userData: {},
+      votersCount: 0,
+      usersCountPerPurok: [],
       upcomingEvent: {
         title: 'Community Meeting',
         date: 'September 15, 2024'
       },
-      recentAnnouncement: {
-        title: 'New Voting Guidelines Released',
-        details: 'Check the latest updates on our website.'
-      }
     };
+  },
+  async mounted() {
+    const userStore = useUserStore();
+
+    await userStore.fetchUser();
+    this.userData = userStore.userData;
+
+    await userStore.fetchVotersCount();
+    this.votersCount = userStore.votersCount;
+
+    await userStore.fetchUsersCountPerPurok();
+    this.usersCountPerPurok = userStore.usersCountPerPurok;
   }
 };
 </script>
+

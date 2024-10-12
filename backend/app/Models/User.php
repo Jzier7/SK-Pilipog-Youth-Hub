@@ -9,6 +9,7 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use App\Models\File;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class User extends Authenticatable
@@ -64,4 +65,15 @@ class User extends Authenticatable
     {
         return $this->hasOne(Role::class, 'id', 'role_id');
     }
+
+    public function announcements(): HasMany
+    {
+        return $this->hasMany(Announcement::class, 'author_id', 'id');
+    }
+
+    public function isSuperAdmin(): bool
+    {
+        return $this->role_id === 1;
+    }
+
 }

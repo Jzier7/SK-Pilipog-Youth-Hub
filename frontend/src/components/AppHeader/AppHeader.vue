@@ -20,7 +20,7 @@
 <script>
 import { Notify } from 'quasar'
 import { defineAsyncComponent } from 'vue';
-import authService from '../../services/authService.js';
+import { useAuthStore } from 'src/stores/modules/authStore';
 
 export default {
   name: 'AppHeader',
@@ -35,8 +35,8 @@ export default {
   },
   methods: {
     async logout() {
-      //NOTE: temporary
-      const { message, body } = await authService.logout(this.form);
+      const authStore = useAuthStore();
+      const { message, data } = await authStore.logout();
 
       Notify.create({
         type: 'positive',
