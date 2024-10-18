@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests\Announcement;
+namespace App\Http\Requests\Purok;
 
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -29,4 +29,3 @@ class RetrieveAll extends FormRequest
         ];
     }
 }
-

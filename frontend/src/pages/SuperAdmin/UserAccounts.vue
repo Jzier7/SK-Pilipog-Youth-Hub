@@ -12,27 +12,38 @@
       <div class="q-mb-md q-gutter-sm flex items-center">
         <q-space />
         <q-input
+          rounded
           outlined
           dense
-          color='primary'
+          color="primary"
           v-model="search"
-          placeholder="Search"
-          @input="filterRows"
+          placeholder="Search by name or email"
+          @input="filterUsers"
           class="q-mr-sm"
         >
-        <template v-slot:prepend>
-          <q-icon name="search" />
-        </template>
+          <template v-slot:prepend>
+            <q-icon name="search" />
+          </template>
         </q-input>
       </div>
 
       <q-table
         flat
         bordered
-        :rows="filteredRows"
+        :rows="users"
         :columns="columns"
         row-key="id"
+        :pagination="{ rowsPerPage: pageSize }"
+        hide-bottom
       >
+        <template v-slot:header="props">
+          <q-tr :props="props">
+            <q-th v-for="col in props.cols" :key="col.name" :props="props" class="text-primary text-bold">
+              {{ col.label }}
+            </q-th>
+          </q-tr>
+        </template>
+
         <template v-slot:body-cell-actions="props">
           <q-td :props="props" align="center">
             <q-btn
@@ -40,82 +51,127 @@
               dense
               icon="edit"
               color="primary"
-              @click="editUser(props.row)"
+              @click="openEditModal(props.row)"
             />
             <q-btn
               flat
               dense
               icon="delete"
               color="negative"
-              @click="deleteUser(props.row)"
+              @click="openDeleteModal(props.row)"
             />
           </q-td>
         </template>
       </q-table>
+
+      <div class="row justify-end q-mt-md">
+        <q-pagination
+          v-model="currentPage"
+          :max="lastPage"
+          @update:model-value="updatePage"
+          direction-links
+        />
+      </div>
     </div>
+
+    <EditUserModal :fetchUsers="fetchUsers" :editData="userData" />
+    <DeleteUserModal :fetchUsers="fetchUsers" :deleteData="userData" />
   </q-page>
 </template>
 
 <script>
+import { defineAsyncComponent } from 'vue';
+import { useModalStore } from 'src/stores/modules/modalStore';
+import userService from 'src/services/userService';
+
 export default {
+  components: {
+    EditUserModal: defineAsyncComponent(() => import('components/Modals/User/EditUser.vue')),
+    DeleteUserModal: defineAsyncComponent(() => import('components/Modals/User/DeleteUser.vue')),
+  },
   data() {
     return {
+      users: [],
+      userData: [],
       search: '',
+      currentPage: 1,
+      pageSize: 12,
+      lastPage: 1,
+      activeVoter: 1,
+      total: 0,
+      debounceTimeout: null,
       columns: [
-        { name: 'firstname', label: 'First Name', align: 'center', field: 'firstname' },
-        { name: 'middlename', label: 'Middle Name', align: 'center', field: 'middlename' },
-        { name: 'lastname', label: 'Last Name', align: 'center', field: 'lastname' },
+        { name: 'firstname', label: 'First Name', align: 'center', field: 'first_name' },
+        { name: 'middlename', label: 'Middle Name', align: 'center', field: 'middle_name' },
+        { name: 'lastname', label: 'Last Name', align: 'center', field: 'last_name' },
         { name: 'birthdate', label: 'Birthdate', align: 'center', field: 'birthdate' },
         { name: 'gender', label: 'Gender', align: 'center', field: 'gender' },
         { name: 'email', label: 'Email', align: 'center', field: 'email' },
-        { name: 'purok', label: 'Purok', align: 'center', field: 'purok' },
-        { name: 'proof_of_voter', label: 'Proof of Voter', align: 'center', field: 'proof_of_voter' },
+        { name: 'purok', label: 'Purok', align: 'center', field: row => row.purok?.name || 'N/A' },
         { name: 'username', label: 'Username', align: 'center', field: 'username' },
-        { name: 'actions', label: 'Actions', align: 'center', field: 'actions' }
+        { name: 'actions', label: 'Actions', align: 'center', field: 'actions' },
       ],
-      rows: [
-        {
-          id: 1, firstname: 'John', middlename: 'A.', lastname: 'Doe', birthdate: '1990-01-01',
-          gender: 'Male', email: 'john@example.com', purok: '1', proof_of_voter: 'Yes', username: 'john.doe'
-        },
-        {
-          id: 2, firstname: 'Jane', middlename: 'B.', lastname: 'Smith', birthdate: '1992-02-02',
-          gender: 'Female', email: 'jane@example.com', purok: '2', proof_of_voter: 'No', username: 'jane.smith'
-        }
-        // Add more rows as needed
-      ]
     };
   },
-  computed: {
-    filteredRows() {
-      const searchLower = this.search.toLowerCase();
-      return this.rows.filter(row => {
-        return (
-          row.firstname.toLowerCase().includes(searchLower) ||
-          row.middlename.toLowerCase().includes(searchLower) ||
-          row.lastname.toLowerCase().includes(searchLower) ||
-          row.email.toLowerCase().includes(searchLower) ||
-          row.username.toLowerCase().includes(searchLower)
-        );
-      });
-    }
+  watch: {
+    search(newVal) {
+      clearTimeout(this.debounceTimeout);
+      this.debounceTimeout = setTimeout(() => {
+        this.fetchUsers();
+      }, 1000);
+    },
+  },
+  mounted() {
+    this.fetchUsers();
   },
   methods: {
-    filterRows() {
-      console.log('Search input:', this.search);
+    openEditModal(editData) {
+      this.userData = editData
+
+      const modalStore = useModalStore();
+      modalStore.setShowEditUserModal(true);
     },
-    editUser(row) {
-      console.log('Edit button clicked for:', row);
+    openDeleteModal(deleteData) {
+      this.userData = deleteData;
+
+      const modalStore = useModalStore();
+      modalStore.setShowDeleteUserModal(true);
     },
-    deleteUser(row) {
-      console.log('Delete button clicked for:', row);
-    }
-  }
+    openProofOfVoterModal(data) {
+      this.userData = data;
+
+      const modalStore = useModalStore();
+      modalStore.setShowProofOfVoterModal(true);
+    },
+    updatePage(page) {
+      this.currentPage = page;
+      this.fetchUsers();
+    },
+    async fetchUsers() {
+      try {
+        const response = await userService.getAllUser({
+          search: this.search,
+          currentPage: this.currentPage,
+          pageSize: this.pageSize,
+          activeVoter: this.activeVoter
+        });
+        this.users = response.data.body || [];
+        this.lastPage = response.data.details.last_page || 1;
+        this.total = response.data.details.total || 0;
+      } catch (error) {
+        console.error('Error fetching users:', error);
+      }
+    },
+  },
 };
 </script>
 
 <style lang="scss" scoped>
-::v-deep .q-table__top {
+.text-bold {
+  font-weight: bold;
+}
+
+.q-pagination .q-btn {
   background-color: $primary;
   color: white;
 }

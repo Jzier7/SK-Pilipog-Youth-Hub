@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "description": "A Quasar Project",
   "productName": "SK Pilipog Youth Hub",
-  "author": "Jhuvizier Yamaguchi <tech18@sumomedia.co>",
+  "author": "secret",
   "private": true,
   "scripts": {
     "lint": "eslint --ext .js,.vue ./",
@@ -28,9 +28,9 @@
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^8.1.0",
     "eslint-plugin-vue": "^9.0.0",
-    "postcss": "^8.4.41",
+    "postcss": "^8.4.47",
     "prettier": "^2.5.1",
-    "tailwindcss": "^3.4.10",
+    "tailwindcss": "^3.4.13",
     "vite-plugin-checker": "^0.7.1"
   },
   "engines": {

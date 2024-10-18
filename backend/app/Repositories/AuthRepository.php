@@ -57,6 +57,9 @@ class AuthRepository extends JsonResponseFormat
             unset($data['files']);
             $data['role_id'] = 3;
 
+            $data['purok_id'] = $data['purok'];
+            unset($data['purok']);
+
             $user = User::create($data);
 
             if ($files) {

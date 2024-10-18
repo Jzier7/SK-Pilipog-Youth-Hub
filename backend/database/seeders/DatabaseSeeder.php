@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
         // ]);
 
         $this->call([
+            PurokSeeder::class,
             UserSeeder::class,
             CategorySeeder::class,
             AnnouncementSeeder::class,

@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\Category\RetrieveAllRequest;
+use App\Http\Requests\Category\RetrieveAll;
 use App\Repositories\CategoryRepository;
 use Illuminate\Http\JsonResponse;
 
@@ -22,7 +22,7 @@ class CategoryController extends Controller
      *
      * @return Illuminate\Http\JsonResponse The category data in JSON format.
      */
-    public function retrieveAll(RetrieveAllRequest $request): JsonResponse
+    public function retrieveAll(RetrieveAll $request): JsonResponse
     {
         $params = [
             'search' => $request->input('search'),

@@ -4,3 +4,8 @@ export const USER_ROLES = {
   USER: 'user',
   GUEST: 'guest'
 };
+
+export const USER_STATUS = {
+  APPROVED: 'approved',
+  REJECTED: 'rejected'
+}

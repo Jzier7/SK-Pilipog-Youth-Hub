@@ -1,12 +1,11 @@
 <?php
 
-namespace App\Http\Requests\Announcement;
+namespace App\Http\Requests\User;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
-use App\Models\Announcement;
 
-class Delete extends FormRequest
+class UpdateStatus extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -19,9 +18,7 @@ class Delete extends FormRequest
             return true;
         }
 
-        $announcement = Announcement::find($this->id);
-
-        return $announcement && $announcement->author_id === $user->id;
+        return false;
     }
 
     /**
@@ -32,14 +29,15 @@ class Delete extends FormRequest
     public function rules(): array
     {
         return [
-            'id' => ['required', 'integer', 'exists:announcements,id'],
+            'id' => ['required', 'integer', 'exists:users,id'],
+            'status' => ['nullable', 'string'],
         ];
     }
 
     public function messages(): array
     {
         return [
-            'id.exists' => 'Announcement does not exist.',
+            'id.exists' => 'User does not exist.',
         ];
     }
 }

@@ -4,7 +4,7 @@
       <div class="text-primary">
         <h2 class="font-bold">{{ localForm.title }}</h2>
         <p class="text-gray-700">{{ localForm.categoryName }}</p>
-        <div v-html="localForm.content" class="editor q-mb-md"></div>
+        <div v-html="localForm.content" class="q-mb-md"></div>
       </div>
       <div class="row justify-end">
         <q-btn label="Close" color="negative" @click="closeModal"></q-btn>
@@ -50,10 +50,3 @@ export default {
   },
 };
 </script>
-
-<style lang="scss" scoped>
-.editor {
-  color: $primary;
-}
-</style>
-

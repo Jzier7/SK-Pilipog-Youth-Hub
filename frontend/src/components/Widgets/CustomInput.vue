@@ -5,7 +5,7 @@
     :type="type"
     :outlined="outlined"
     :standout="standout"
-    :class="`${inputClass} q-mt-md w-full`"
+    :class="`${inputClass} w-full`"
     :error-message="errorMessage"
     :error="errorMessage !== '' ?  true : false"
   />

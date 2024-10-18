@@ -28,13 +28,12 @@ class RegisterRequest extends FormRequest
             'birthdate' => ['required', 'date'],
             'gender' => 'required',
             'purok' => 'required',
-            'active_voter' => ['required', 'boolean'],
             'email' => ['required', 'unique:users,email'],
             'username' => 'required',
             'password' => ['required', 'min:8'],
             'confirm_password' => ['required', 'same:password'],
-            'files' => ['nullable', 'array', 'max:1'],
-            'files.*' => ['nullable', 'file', 'image', 'max:' . env('MAX_FILE_UPLOAD_SIZE', '5000')]
+            'files' => ['required', 'array', 'max:1'],
+            'files.*' => ['required', 'file', 'image', 'max:' . env('MAX_FILE_UPLOAD_SIZE', '5000')]
         ];
     }
 
@@ -50,15 +49,4 @@ class RegisterRequest extends FormRequest
         ];
     }
 
-    /**
-     * Prep data for validation
-     *
-     * @return void
-     */
-    public function prepareForValidation(): void
-    {
-        $this->merge([
-            'active_voter' => $this->active_voter == 'Yes' ? 1 : 0,
-        ]);
-    }
 }

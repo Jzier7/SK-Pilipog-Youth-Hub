@@ -32,10 +32,10 @@ class Update extends FormRequest
     public function rules(): array
     {
         return [
-            'id' => 'required|integer|exists:announcements,id',
-            'title' => 'required|string|max:255',
-            'category' => 'required|integer|exists:categories,id',
-            'content' => 'required|string',
+            'id' => ['required', 'integer', 'exists:announcements,id'],
+            'title' => ['required', 'string', 'max:255'],
+            'category' => ['required', 'integer', 'exists:categories,id'],
+            'content' => ['required', 'string'],
         ];
     }
 
@@ -43,7 +43,7 @@ class Update extends FormRequest
     {
         return [
             'id.exists' => 'Announcement does not exist.',
-            'category.exists' => 'Category does not exist.'
+            'category.exists' => 'Category does not exist.',
         ];
     }
 }

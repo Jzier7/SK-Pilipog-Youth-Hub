@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\Category;
+namespace App\Http\Requests\User;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class RetrieveAllRequest extends FormRequest
+class RetrieveAllUsers extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,9 +22,12 @@ class RetrieveAllRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'search' => 'nullable|string|max:255',
-            'currentPage' => 'nullable|integer|min:1',
-            'pageSize' => 'nullable|integer|min:1|max:100',
+            'search' => ['nullable', 'string', 'max:255'],
+            'currentPage' => ['nullable', 'integer', 'min:1'],
+            'pageSize' => ['nullable', 'integer', 'min:1', 'max:100'],
+            'orderBy' => ['nullable', 'string', 'max:255'],
+            'activeVoter' => ['nullable', 'boolean'],
         ];
     }
 }
+

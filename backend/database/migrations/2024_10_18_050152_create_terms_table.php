@@ -11,11 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('officials', function (Blueprint $table) {
+        Schema::create('terms', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('position');
+            $table->date('start_date');
+            $table->date('end_date');
+            $table->unsignedBigInteger('official_id')->nullable();
             $table->timestamps();
+
+            $table->foreign('official_id')->references('id')->on('officials')->onDelete('cascade');
         });
     }
 
@@ -24,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('officials');
+        Schema::dropIfExists('terms');
     }
 };

@@ -40,8 +40,6 @@ return new class extends Migration
             'last_name' => 'User',
             'birthdate' => '2002-01-01',
             'gender' => 'Male',
-            'purok' => 'Purok',
-            'active_voter' => true,
             'email' => 'admin@admin.com',
             'username' => 'admin.admin',
             'password' => Hash::make('password'),

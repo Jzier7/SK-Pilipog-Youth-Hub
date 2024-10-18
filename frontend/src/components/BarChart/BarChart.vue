@@ -96,7 +96,7 @@ export default defineComponent({
         data: newData.map(item => item.count)
       }];
 
-      this.chartOptions.xaxis.categories = newData.map(item => item.purok);
+      this.chartOptions.xaxis.categories = newData.map(item => item.name);
 
       const maxCount = Math.max(...newData.map(item => item.count));
       const range = maxCount - Math.min(...newData.map(item => item.count));

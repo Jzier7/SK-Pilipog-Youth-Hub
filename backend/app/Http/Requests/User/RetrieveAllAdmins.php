@@ -1,17 +1,25 @@
 <?php
 
-namespace App\Http\Requests\Announcement;
+namespace App\Http\Requests\User;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Auth;
 
-class RetrieveAll extends FormRequest
+class RetrieveAllAdmins extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        return true;
+
+        $user = Auth::user();
+
+        if ($user && $user->isSuperAdmin()) {
+            return true;
+        }
+
+        return false;
     }
 
     /**

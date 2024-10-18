@@ -19,21 +19,30 @@
 
           <div class="col-12 col-md-7 q-pa-lg">
             <div class="full-height flex flex-center column q-py-sm">
-              <h2 class="text-center font-black">Sign up for an Account</h2>
+              <h2 class="text-center text-primary">Sign up for an Account</h2>
 
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
-                <CustomInput :errorMessage="errors.first_name ? errors.first_name[0] : ''" :modelValue="form.first_name ?? ''" v-model="form.first_name" label="First Name" inputClass="col-span-2 md:col-span-1" />
-                <CustomInput :errorMessage="errors.last_name ? errors.last_name[0] : ''" :modelValue="form.last_name ?? ''" v-model="form.last_name" label="Last name" inputClass="col-span-2 md:col-span-1" />
-                <CustomInput :errorMessage="errors.middle_name ? errors.middle_name[0] : ''" :modelValue="form.middle_name ?? ''" v-model="form.middle_name" label="Middle name" inputClass="col-span-2 md:col-span-1" />
-                <CustomInput :errorMessage="errors.birthdate ? errors.birthdate[0] : ''" :modelValue="form.birthdate ?? ''" v-model="form.birthdate" label="Birthdate" type="date" inputClass="col-span-2 md:col-span-1" />
-                <CustomInput :errorMessage="errors.gender ? errors.gender[0] : ''" :modelValue="form.gender ?? ''" v-model="form.gender" label="Gender" inputClass="col-span-2 md:col-span-1" />
-                <CustomInput :errorMessage="errors.purok ? errors.purok[0] : ''" :modelValue="form.purok ?? ''" v-model="form.purok" label="Purok" inputClass="col-span-2 md:col-span-1" />
-                <CustomSelect :errorMessage="errors.active_voter ? errors.active_voter[0] : ''" :modelValue="form.active_voter ?? ''" v-model="form.active_voter" label="Active Voter?" :options="['Yes', 'No']" selectClass="col-span-2 md:col-span-1" />
-                <CustomUploader label="Upload Image" :modelValue="form.uploadedFiles" uploaderClass="col-span-2"/>
-                <CustomInput :errorMessage="errors.email ? errors.email[0] : ''" :modelValue="form.email ?? ''" v-model="form.email" label="Email" type="email" inputClass="col-span-2 md:col-span-1" />
-                <CustomInput :errorMessage="errors.username ? errors.username[0] : ''" :modelValue="form.username ?? ''" v-model="form.username" label="Username" inputClass="col-span-2 md:col-span-1" />
-                <CustomInput :errorMessage="errors.password ? errors.password[0] : ''" :modelValue="form.password ?? ''" v-model="form.password" label="Password" type="password" inputClass="col-span-2 md:col-span-1" />
-                <CustomInput :errorMessage="errors.confirm_password ? errors.confirm_password[0] : ''" :modelValue="form.confirm_password ?? ''" v-model="form.confirm_password" label="Confirm Password" type="password" inputClass="col-span-2 md:col-span-1" />
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4 w-full q-pt-md">
+                <CustomInput :errorMessage="errors.first_name ? errors.first_name[0] : ''" v-model="form.first_name" label="First Name" inputClass="col-span-2 md:col-span-1" />
+                <CustomInput :errorMessage="errors.last_name ? errors.last_name[0] : ''" v-model="form.last_name" label="Last Name" inputClass="col-span-2 md:col-span-1" />
+                <CustomInput :errorMessage="errors.middle_name ? errors.middle_name[0] : ''" v-model="form.middle_name" label="Middle Name" inputClass="col-span-2 md:col-span-1" />
+                <CustomInput :errorMessage="errors.birthdate ? errors.birthdate[0] : ''" v-model="form.birthdate" label="Birthdate" type="date" inputClass="col-span-2 md:col-span-1" />
+                <CustomInput :errorMessage="errors.gender ? errors.gender[0] : ''" v-model="form.gender" label="Gender" inputClass="col-span-2 md:col-span-1" />
+                <CustomSelect
+                  v-model="form.purok"
+                  :options="purokData.map(purok => ({ label: purok.name, value: purok.id }))"
+                  label="Purok"
+                  :errorMessage="errors.purok ? errors.purok[0] : ''"
+                />
+                <CustomUploader
+                  label="Proof of Voter"
+                  v-model="form.files"
+                  :errorMessage="errors.files ? errors.files[0] : ''"
+                  uploaderClass="col-span-2"
+                />
+                <CustomInput :errorMessage="errors.email ? errors.email[0] : ''" v-model="form.email" label="Email" type="email" inputClass="col-span-2 md:col-span-1" />
+                <CustomInput :errorMessage="errors.username ? errors.username[0] : ''" v-model="form.username" label="Username" inputClass="col-span-2 md:col-span-1" />
+                <CustomInput :errorMessage="errors.password ? errors.password[0] : ''" v-model="form.password" label="Password" type="password" inputClass="col-span-2 md:col-span-1" />
+                <CustomInput :errorMessage="errors.confirm_password ? errors.confirm_password[0] : ''" v-model="form.confirm_password" label="Confirm Password" type="password" inputClass="col-span-2 md:col-span-1" />
               </div>
 
               <CustomButton label="Sign up" type="submit" />
@@ -46,17 +55,18 @@
 </template>
 
 <script>
-import { Notify } from 'quasar'
+import { Notify } from 'quasar';
 import { defineAsyncComponent } from 'vue';
 import authService from '../../services/authService';
+import purokService from 'src/services/purokService';
 
 export default {
   name: 'SignUp',
   components: {
     CustomButton: defineAsyncComponent(() => import('components/Widgets/CustomButton.vue')),
     CustomInput: defineAsyncComponent(() => import('components/Widgets/CustomInput.vue')),
-    CustomSelect: defineAsyncComponent(() => import('components/Widgets/CustomSelect.vue')),
     CustomUploader: defineAsyncComponent(() => import('components/Widgets/CustomUploader.vue')),
+    CustomSelect: defineAsyncComponent(() => import('components/Widgets/CustomSelect.vue')),
   },
   data() {
     return {
@@ -67,13 +77,13 @@ export default {
         birthdate: '',
         gender: '',
         purok: '',
-        active_voter: '',
         files: [],
         email: '',
         username: '',
         password: '',
         confirm_password: '',
       },
+      purokData: [],
       errors: {},
     };
   },
@@ -85,35 +95,50 @@ export default {
       deep: true,
     },
   },
+  mounted() {
+    this.fetchPurok();
+  },
   methods: {
     navigateToSignIn() {
       this.$router.push('/');
     },
     async onSubmit() {
       try {
-        console.log(this.form)
-        const { message, body } = await authService.register(this.form);
+        const formData = new FormData();
+
+        Object.keys(this.form).forEach((key) => {
+          if (key === 'files' && this.form.files.length > 0) {
+            this.form.files.forEach((file, index) => {
+              formData.append(`files[${index}]`, file);
+            });
+          } else {
+            formData.append(key, this.form[key]);
+          }
+        });
+
+        const { message } = await authService.register(formData);
 
         Notify.create({
           type: 'positive',
           position: 'top',
-          message: message
-        })
+          message: message,
+        });
 
         this.$router.push('/');
-
-        // Optionally, you can log in the user immediately after registration
-        // const user = await authService.getUser();
-        // console.log('User:', user);
       } catch (err) {
         const { data } = err.response;
         this.errors = data.errors || {};
-        console.error(err);
       }
     },
-    onReset() {
+    async fetchPurok() {
+      try {
+        const response = await purokService.getAllPurok();
+        this.purokData = response.data.body || [];
+      } catch (error) {
+        console.error('Error fetching purok:', error);
+      }
     },
-  },
+  }
 };
 </script>
 

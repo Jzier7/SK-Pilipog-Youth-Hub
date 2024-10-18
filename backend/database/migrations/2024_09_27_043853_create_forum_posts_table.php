@@ -13,11 +13,11 @@ return new class extends Migration
     {
         Schema::create('forum_posts', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('author_id');
+            $table->unsignedBigInteger('author_id')->nullable();
             $table->longText('post');
             $table->timestamps();
 
-            $table->foreign('author_id')->references('id')->on('users');
+            $table->foreign('author_id')->references('id')->on('users')->onDelete('set null');
         });
     }
 

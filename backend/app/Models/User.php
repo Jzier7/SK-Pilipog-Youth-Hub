@@ -8,6 +8,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use App\Models\File;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
@@ -27,7 +28,7 @@ class User extends Authenticatable
         'last_name',
         'birthdate',
         'gender',
-        'purok',
+        'purok_id',
         'active_voter',
         'email',
         'username',
@@ -64,6 +65,11 @@ class User extends Authenticatable
     public function role(): HasOne
     {
         return $this->hasOne(Role::class, 'id', 'role_id');
+    }
+
+    public function purok(): BelongsTo
+    {
+        return $this->belongsTo(Purok::class, 'purok_id');
     }
 
     public function announcements(): HasMany

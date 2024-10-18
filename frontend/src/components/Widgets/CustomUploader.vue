@@ -1,11 +1,15 @@
 <template>
-  <q-uploader
-    :label="label"
-    :color="color"
-    :hide-upload-btn="hideUploadBtn"
-    :class="`${uploaderClass} q-mt-md w-full`"
-    v-model="files"
-  />
+  <div :class="`${uploaderClass} w-full`">
+    <q-uploader
+      :label="label"
+      :color="color"
+      :hide-upload-btn="hideUploadBtn"
+      class="w-full"
+      v-model="files"
+      @added="onFilesAdded"
+    />
+    <span v-if="errorMessage" class="text-negative text-xs px-4">{{ errorMessage }}</span>
+  </div>
 </template>
 
 <script>
@@ -32,6 +36,10 @@ export default {
       type: Array,
       default: () => [],
     },
+    errorMessage: {
+      type: String,
+      default: '',
+    },
   },
   data() {
     return {
@@ -49,6 +57,11 @@ export default {
       this.$emit('update:modelValue', newValue);
     },
   },
+  methods: {
+    onFilesAdded(files) {
+      this.files = files;
+      this.$emit('update:modelValue', files);
+    },
+  },
 }
 </script>
-

@@ -4,21 +4,14 @@ namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
+use App\Models\Purok;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\User>
  */
 class UserFactory extends Factory
 {
-    /**
-     * Predefined purok values.
-     */
-    private array $puroks = [
-        'Purok 1',
-        'Purok 2',
-        'Purok 3',
-        'Purok 4',
-    ];
+    protected $model = \App\Models\User::class;
 
     /**
      * Define the model's default state.
@@ -33,16 +26,14 @@ class UserFactory extends Factory
             'last_name' => $this->faker->lastName,
             'birthdate' => $this->faker->date('Y-m-d'),
             'gender' => $this->faker->randomElement(['Male', 'Female']),
-            'purok' => $this->faker->randomElement($this->puroks),
-            'active_voter' => $this->faker->boolean,
             'email' => $this->faker->unique()->safeEmail,
             'username' => $this->faker->unique()->userName,
             'password' => Hash::make('password'),
             'created_at' => now(),
             'updated_at' => now(),
+            'purok_id' => Purok::pluck('id')->random(),
         ];
     }
-
     /**
      * Indicate that the model's email address should be unverified.
      */

@@ -4,7 +4,7 @@
       <q-card-section>
         <q-toolbar class="q-pa-none">
           <q-toolbar-title>
-            <h2 class="text-white">Hi! {{ userData.first_name }}</h2>
+            <h2 class="text-white">Hi! {{ userData.username }}</h2>
           </q-toolbar-title>
         </q-toolbar>
       </q-card-section>

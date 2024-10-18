@@ -6,6 +6,11 @@ export const useModalStore = defineStore('modal', {
     showEditAnnouncementModal: false,
     showDeleteAnnouncementModal: false,
     showViewAnnouncementModal: false,
+
+    showAddUserModal: false,
+    showEditUserModal: false,
+    showDeleteUserModal: false,
+    showProofOfVoterModal: false,
   }),
   actions: {
 
@@ -21,6 +26,20 @@ export const useModalStore = defineStore('modal', {
     },
     setShowViewAnnouncementModal(params) {
       this.showViewAnnouncementModal = params;
+    },
+
+    //User
+    setShowAddUserModal(params) {
+      this.showAddUserModal = params;
+    },
+    setShowEditUserModal(params) {
+      this.showEditUserModal = params;
+    },
+    setShowDeleteUserModal(params) {
+      this.showDeleteUserModal = params;
+    },
+    setShowProofOfVoterModal(params) {
+      this.showProofOfVoterModal = params;
     },
 
   },

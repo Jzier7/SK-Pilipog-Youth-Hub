@@ -13,14 +13,23 @@
               <h2 class="text-center text-primary">SK PILIPOG YOUTH HUB</h2>
 
               <span class="w-3/4">
-                <CustomInput v-model="form.email" label="Email" type="email" />
-                <CustomInput v-model="form.password" label="Password" type="password" />
+                <CustomInput
+                  :errorMessage="errors.email ? errors.email[0] : ''"
+                  v-model="form.email"
+                  label="Email"
+                  type="email"
+                />
+                <CustomInput
+                  :errorMessage="errors.password ? errors.password[0] : ''"
+                  v-model="form.password"
+                  label="Password"
+                  type="password"
+                />
               </span>
 
               <span class="w-3/4 flex justify-between q-mt-md">
                 <CustomCheckbox v-model="rememberMe" label="Remember Me" />
                 <CustomButtonLink label="Forgot Password?" :onClick="forgotPassword" />
-
                 <CustomButton label="Sign in" type="submit" />
               </span>
             </div>
@@ -31,7 +40,12 @@
               <h4 class="text-center">Don't Have an Account Yet?</h4>
               <p class="text-center">Let's get you all set up!</p>
               <span class="w-3/4">
-                <CustomButton label="Sign up" type="reset" btnClass="secondary-btn" :onClick="navigateToSignUp" />
+                <CustomButton
+                  label="Sign up"
+                  type="reset"
+                  btnClass="secondary-btn"
+                  :onClick="navigateToSignUp"
+                />
               </span>
             </div>
           </div>
@@ -45,7 +59,7 @@
 import { Notify } from 'quasar'
 import { defineAsyncComponent } from 'vue';
 import { useAuthStore } from 'src/stores/modules/authStore';
-import { USER_ROLES } from 'src/utils/constants'
+import { USER_ROLES } from 'src/utils/constants';
 
 export default {
   name: 'SignIn',
@@ -57,13 +71,23 @@ export default {
   },
   data() {
     return {
-      form: {},
+      form: {
+        email: '',
+        password: '',
+      },
       rememberMe: false,
       errors: {},
     };
   },
   methods: {
     async onSubmit() {
+      this.errors = {}; // Reset errors
+
+      // Perform validation
+      if (!this.validateForm()) {
+        return; // Stop the submission if validation fails
+      }
+
       try {
         const authStore = useAuthStore();
         const { data, message } = await authStore.login(this.form);
@@ -94,6 +118,31 @@ export default {
           });
         }
       }
+    },
+    validateForm() {
+      let isValid = true;
+
+      if (!this.form.email) {
+        this.errors.email = ['Email is required.'];
+        isValid = false;
+      } else if (!this.isEmailValid(this.form.email)) {
+        this.errors.email = ['Email is not valid.'];
+        isValid = false;
+      }
+
+      if (!this.form.password) {
+        this.errors.password = ['Password is required.'];
+        isValid = false;
+      } else if (this.form.password.length < 6) {
+        this.errors.password = ['Password must be at least 6 characters long.'];
+        isValid = false;
+      }
+
+      return isValid;
+    },
+    isEmailValid(email) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      return emailRegex.test(email);
     },
     navigateToSignUp() {
       this.$router.push('/signup');
