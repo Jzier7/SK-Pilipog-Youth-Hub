@@ -26,6 +26,7 @@ class DatabaseSeeder extends Seeder
             AnnouncementSeeder::class,
             ForumPostSeeder::class,
             EventSeeder::class,
+            TermSeeder::class,
             OfficialSeeder::class,
         ]);
 

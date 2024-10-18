@@ -3,7 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\Official;
-use App\Models\User;
+use App\Models\Term;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class OfficialFactory extends Factory
@@ -13,12 +13,12 @@ class OfficialFactory extends Factory
     public function definition(): array
     {
         return [
-            'user_id' => User::inRandomOrder()->first()->id,
+            'name' => $this->faker->name,
             'position' => $this->faker->jobTitle,
+            'term_id' => Term::inRandomOrder()->first()->id,
             'created_at' => now(),
             'updated_at' => now(),
         ];
     }
 }
-
 

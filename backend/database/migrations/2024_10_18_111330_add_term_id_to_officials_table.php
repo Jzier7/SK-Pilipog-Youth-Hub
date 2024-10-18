@@ -11,12 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('terms', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->date('start_date');
-            $table->date('end_date');
-            $table->timestamps();
+        Schema::table('officials', function (Blueprint $table) {
+            $table->unsignedBigInteger('term_id')->nullable()->after('position');
+
+            $table->foreign('term_id')->references('id')->on('terms')->onDelete('cascade');
         });
     }
 
@@ -25,6 +23,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('terms');
+        Schema::table('officials', function (Blueprint $table) {
+            //
+        });
     }
 };
