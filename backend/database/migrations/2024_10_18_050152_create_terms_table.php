@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('terms', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
+            $table->boolean('is_active')->default(0);
             $table->date('start_date');
             $table->date('end_date');
             $table->timestamps();

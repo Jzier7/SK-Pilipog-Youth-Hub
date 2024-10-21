@@ -3,6 +3,8 @@
 namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+
+use App\Models\Position;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -27,6 +29,7 @@ class DatabaseSeeder extends Seeder
             ForumPostSeeder::class,
             EventSeeder::class,
             TermSeeder::class,
+            PositionSeeder::class,
             OfficialSeeder::class,
         ]);
 

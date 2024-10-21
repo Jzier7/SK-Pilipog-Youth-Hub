@@ -5,13 +5,11 @@
 
       <div v-if="localForm.length > 0" class="q-my-md text-center">
         <img
-          v-if="getMediaURL(localForm[0]) !== 'No proof of voter available.'"
           :src="getMediaURL(localForm[0])"
           alt="Proof of Voter"
           style="max-width: 100%; max-height: 400px;"
           @click="openLightbox"
         />
-        <p v-else>{{ getMediaURL(localForm[0]) }}</p>
       </div>
 
       <div v-else class="q-my-md text-center">

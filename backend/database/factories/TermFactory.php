@@ -23,7 +23,6 @@ class TermFactory extends Factory
         $endDate = $this->faker->dateTimeBetween($startDate, '+1 year')->format('Y-m-d');
 
         return [
-            'name' => $this->faker->word,
             'start_date' => $startDate,
             'end_date' => $endDate,
         ];

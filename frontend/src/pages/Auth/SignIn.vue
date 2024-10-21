@@ -4,7 +4,6 @@
       <q-page class="flex justify-center items-center w-full bg-website">
         <q-form
           @submit="onSubmit"
-          @reset="onReset"
           class="row shadow-xl md:w-2/4 w-full"
         >
           <div class="col-12 col-md-7 q-pa-lg">
@@ -81,33 +80,38 @@ export default {
   },
   methods: {
     async onSubmit() {
-      this.errors = {}; // Reset errors
+      this.errors = {};
 
-      // Perform validation
       if (!this.validateForm()) {
-        return; // Stop the submission if validation fails
+        return;
       }
 
       try {
         const authStore = useAuthStore();
-        const { data, message } = await authStore.login(this.form);
+        const { data, message, status } = await authStore.login(this.form);
 
-        Notify.create({
-          type: 'positive',
-          position: 'top',
-          message: message
-        });
-
-        if (data?.role.slug === USER_ROLES.SUPERADMIN) {
-          this.$router.push('/superadmin/dashboard');
-        } else if (data?.role.slug === USER_ROLES.ADMIN) {
-          this.$router.push('/admin/dashboard');
+        if (status === 401) {
+          Notify.create({
+            type: 'negative',
+            position: 'top',
+            message: message
+          });
         } else {
-          this.$router.push('/user/home');
-        }
+          Notify.create({
+            type: 'positive',
+            position: 'top',
+            message: message
+          });
 
+          if (data?.role.slug === USER_ROLES.SUPERADMIN) {
+            this.$router.push('/superadmin/dashboard');
+          } else if (data?.role.slug === USER_ROLES.ADMIN) {
+            this.$router.push('/admin/dashboard');
+          } else {
+            this.$router.push('/user/home');
+          }
+        }
       } catch (error) {
-        console.error(error);
         if (error.response) {
           this.errors = error.response.data.errors || {};
         } else {

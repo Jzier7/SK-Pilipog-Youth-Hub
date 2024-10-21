@@ -11,7 +11,6 @@ const userService = {
     return response;
   },
 
-
   async getAllAdmin(params) {
     const response = await api.get('/api/users/retrieve/all/admins', { params });
     return response;

@@ -43,7 +43,6 @@ class Store extends FormRequest
     public function messages(): array
     {
         return [
-            'id.exists' => 'User does not exist.',
             'birthdate.date' => 'Birthdate must be a valid date.',
             'gender.in' => 'Gender must be one of the following: Male, Female',
             'username.unique' => 'Username has already been taken.',

@@ -29,23 +29,20 @@ export default {
             break;
           case 'h':
             options.hour = 'numeric';
-            options.hour12 = true; // 12-hour format
+            options.hour12 = true;
             break;
           case 'mm':
             options.minute = '2-digit';
             break;
           case 'a':
-            options.hour12 = true; // 12-hour format for AM/PM
+            options.hour12 = true;
             break;
           default:
             break;
         }
       });
 
-      const datePart = new Date(date).toLocaleString('en-US', options);
-      const timePart = this.formatTime(date);
-
-      return `${datePart} at ${timePart}`;
+      return new Date(date).toLocaleString('en-US', options);
     },
     formatTime(date) {
       const options = {
@@ -54,6 +51,17 @@ export default {
         hour12: true
       };
       return new Date(date).toLocaleString('en-US', options).replace(',', '');
+    },
+    formatDateTime(date) {
+      const options = {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true
+      };
+      return new Date(date).toLocaleString('en-US', options);
     },
     timeAgo(date) {
       const now = new Date();
@@ -74,12 +82,9 @@ export default {
         interval = Math.floor(seconds / 60); // Minutes
         if (interval >= 1) return interval + " minute" + (interval > 1 ? "s" : "") + " ago";
         return "just now";
-      } else if (seconds < oneYearInSeconds) {
-        return this.formatDate(announcementDate, 'D MMMM YYYY');
       } else {
-        return this.formatDate(announcementDate, 'D MMMM YYYY');
+        return this.formatDateTime(announcementDate);
       }
     },
   },
 };
-

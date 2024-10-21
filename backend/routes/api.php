@@ -8,6 +8,9 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\PurokController;
+use App\Http\Controllers\OfficialController;
+use App\Http\Controllers\TermController;
+use App\Http\Controllers\PositionController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth:sanctum', 'role.guard'])->group(function () {
@@ -74,6 +77,29 @@ Route::middleware(['auth:sanctum', 'role.guard'])->group(function () {
             Route::get('all', [CategoryController::class, 'retrieveAll']);
             Route::get('one', [CategoryController::class, 'retrieveOne']);
         });
+    });
+
+    Route::prefix('official')->group(function () {
+        Route::post('store', [OfficialController::class, 'store']);
+        Route::patch('update', [OfficialController::class, 'update']);
+        Route::delete('delete', [OfficialController::class, 'delete']);
+        Route::get('retrieve', [OfficialController::class, 'retrieve']);
+    });
+
+    Route::prefix('position')->group(function () {
+        Route::post('store', [PositionController::class, 'store']);
+        Route::patch('update', [PositionController::class, 'update']);
+        Route::delete('delete', [PositionController::class, 'delete']);
+        Route::get('retrieve', [PositionController::class, 'retrieve']);
+    });
+
+    Route::prefix('term')->group(function () {
+        Route::post('store', [TermController::class, 'store']);
+        Route::patch('update', [TermController::class, 'update']);
+        Route::delete('delete', [TermController::class, 'delete']);
+        Route::get('retrieve', [TermController::class, 'retrieve']);
+
+        Route::patch('update/status', [TermController::class, 'updateStatus']);
     });
 });
 

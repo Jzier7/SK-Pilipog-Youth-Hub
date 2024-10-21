@@ -13,7 +13,8 @@ export const useAuthStore = defineStore('auth', {
 
         return {
           data: response.body,
-          message: response.message
+          message: response.message,
+          status: response.status
         };
 
       } catch (error) {
@@ -21,7 +22,8 @@ export const useAuthStore = defineStore('auth', {
 
         return {
           data: null,
-          message: 'Login failed, please check your credentials'
+          message: 'Login failed, please check your credentials',
+          status: error.status
         };
 
       }

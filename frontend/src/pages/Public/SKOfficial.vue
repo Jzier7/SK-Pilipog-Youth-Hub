@@ -13,34 +13,11 @@
       <div class="q-mb-md flex items-center"></div>
 
       <div class="flex flex-col items-center">
-        <q-card
-          v-for="official in skChairman"
-          :key="official.id"
-          class="q-pa-md q-mb-md q-ma-sm"
-          flat
-          bordered
-          style="width: 200px; text-align: center;"
-        >
-          <q-card-section>
-            <div class="image-container">
-              <img
-                v-if="official.image"
-                :src="official.image"
-                alt="Official Image"
-                class="official-image"
-              />
-              <q-icon v-else name="person" size="100px" class="text-primary" />
-            </div>
-            <h3 class="text-primary">{{ official.name }}</h3>
-            <div class="text-subtitle1">{{ official.position }}</div>
-          </q-card-section>
-        </q-card>
-
-        <div class="flex flex-wrap justify-center">
+        <div v-for="(levelGroup, level) in groupedOfficials" :key="level" class="flex flex-wrap justify-center">
           <q-card
-            v-for="official in otherOfficials"
+            v-for="official in levelGroup"
             :key="official.id"
-            class="q-pa-md q-mb-md q-ma-sm"
+            class="q-mb-md"
             flat
             bordered
             style="width: 200px; margin: 10px; text-align: center;"
@@ -56,7 +33,7 @@
                 <q-icon v-else name="person" size="100px" class="text-primary" />
               </div>
               <h3 class="text-primary">{{ official.name }}</h3>
-              <div class="text-subtitle1">{{ official.position }}</div>
+              <p class="position">{{ official.position.name }}</p>
             </q-card-section>
           </q-card>
         </div>
@@ -66,34 +43,54 @@
 </template>
 
 <script>
+import dateMixin from 'src/utils/mixins/dateMixin';
+import officialService from 'src/services/officialService';
+
 export default {
+  mixins: [dateMixin],
   data() {
     return {
-      barangayName: 'Barangay Example',
-      officials: [
-        { id: 1, name: 'Juan Dela Cruz', position: 'SK Chairman', image: null },
-        { id: 2, name: 'Maria Santos', position: 'Kagawad', image: null },
-        { id: 3, name: 'Pedro Reyes', position: 'Kagawad', image: null },
-        { id: 4, name: 'Josefa Garcia', position: 'Kagawad', image: null }
-      ],
-      startDate: 'January 1, 2024',
-      endDate: 'December 31, 2024'
+      officials: [],
+      startDate: '',
+      endDate: ''
     }
   },
   computed: {
     formattedDateRange() {
-      return `${this.startDate} - ${this.endDate}`;
+      return `${this.formatDate(this.startDate, 'D MMMM YYYY')} - ${this.formatDate(this.endDate, 'D MMMM YYYY')}`;
     },
-    skChairman() {
-      return this.officials.filter(official => official.position === 'SK Chairman');
-    },
-    otherOfficials() {
-      return this.officials.filter(official => official.position !== 'SK Chairman');
+    groupedOfficials() {
+      const groups = {};
+
+      this.officials.forEach(official => {
+        const level = official.position.level;
+
+        if (!groups[level]) {
+          groups[level] = [];
+        }
+
+        groups[level].push(official);
+      });
+
+      return Object.keys(groups).sort((a, b) => b - a).reduce((acc, level) => {
+        acc[level] = groups[level];
+        return acc;
+      }, {});
     }
   },
+  mounted() {
+    this.fetchOfficials();
+  },
   methods: {
-    addOfficial() {
-      console.log('Add Official button clicked');
+    async fetchOfficials() {
+      try {
+        const response = await officialService.getOfficials({ is_active: 1 });
+        this.officials = response.data.body.officials || [];
+        this.startDate = response.data.body.term.start_date;
+        this.endDate = response.data.body.term.end_date;
+      } catch (error) {
+        console.error('Error fetching officials:', error);
+      }
     }
   }
 }
@@ -101,7 +98,6 @@ export default {
 
 <style lang="scss" scoped>
 .q-card {
-  background-color: #f9f9f9;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
@@ -131,6 +127,10 @@ export default {
   flex-direction: column;
   align-items: center;
   justify-content: center;
+}
+
+.position {
+  color: #7d7d7d;
 }
 </style>
 

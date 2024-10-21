@@ -4,7 +4,6 @@
       <q-page class="flex justify-center items-center w-full">
         <q-form
           @submit="onSubmit"
-          @reset="onReset"
           class="row shadow-xl md:w-2/4 w-full"
         >
           <div class="col-12 col-md-5 q-pa-lg bg-primary text-white">

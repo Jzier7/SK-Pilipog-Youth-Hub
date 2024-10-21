@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\Announcement\RetrieveAll;
+use App\Http\Requests\Purok\RetrieveAll;
 use App\Repositories\PurokRepository;
 use Illuminate\Http\JsonResponse;
 

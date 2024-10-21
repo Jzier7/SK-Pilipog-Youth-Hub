@@ -24,7 +24,6 @@
           color="primary"
           v-model="search"
           placeholder="Search by name or email"
-          @input="filterUsers"
           class="q-mr-sm"
         >
           <template v-slot:prepend>

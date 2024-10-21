@@ -11,6 +11,18 @@ export const useModalStore = defineStore('modal', {
     showEditUserModal: false,
     showDeleteUserModal: false,
     showProofOfVoterModal: false,
+
+    showAddOfficialModal: false,
+    showEditOfficialModal: false,
+    showDeleteOfficialModal: false,
+
+    showAddTermModal: false,
+    showEditTermModal: false,
+    showDeleteTermModal: false,
+
+    showAddPositionModal: false,
+    showEditPositionModal: false,
+    showDeletePositionModal: false,
   }),
   actions: {
 
@@ -40,6 +52,39 @@ export const useModalStore = defineStore('modal', {
     },
     setShowProofOfVoterModal(params) {
       this.showProofOfVoterModal = params;
+    },
+
+    //Official
+    setShowAddOfficialModal(params) {
+      this.showAddOfficialModal = params;
+    },
+    setShowEditOfficialModal(params) {
+      this.showEditOfficialModal = params;
+    },
+    setShowDeleteOfficialModal(params) {
+      this.showDeleteOfficialModal = params;
+    },
+
+    //Term
+    setShowAddTermModal(params) {
+      this.showAddTermModal = params;
+    },
+    setShowEditTermModal(params) {
+      this.showEditTermModal = params;
+    },
+    setShowDeleteTermModal(params) {
+      this.showDeleteTermModal = params;
+    },
+
+    //Position
+    setShowAddPositionModal(params) {
+      this.showAddPositionModal = params;
+    },
+    setShowEditPositionModal(params) {
+      this.showEditPositionModal = params;
+    },
+    setShowDeletePositionModal(params) {
+      this.showDeletePositionModal = params;
     },
 
   },

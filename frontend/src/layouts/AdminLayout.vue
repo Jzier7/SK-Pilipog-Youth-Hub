@@ -1,7 +1,7 @@
 <template>
-  <q-layout view="hHh lpr lfr">
+  <q-layout view="hHh lpr lfr" class="bg-grey-1">
     <AppHeader :version="$q.version" @toggle-drawer="toggleLeftDrawer" />
-    <SideNav :links="linksList" :drawerOpen="leftDrawerOpen" :menuList="menuList" @update:drawerOpen="leftDrawerOpen = $event" />
+    <SideNav :drawerOpen="leftDrawerOpen" :menuList="menuList" @update:drawerOpen="leftDrawerOpen = $event" />
 
     <q-page-container>
       <router-view />
