@@ -47,8 +47,8 @@
       >
         <q-card-section class="overflow-hidden">
           <h2 class="text-h6 font-bold text-primary">{{ announcement.title }}</h2>
-          <p class="text-body2 text-gray-700">{{ announcement.category.name }}</p>
-          <p class="text-body2 text-gray-500 text-sm">{{ timeAgo(announcement.created_at) }}</p>
+          <p class="text-body2 text-gray-500">{{ announcement.category.name }}</p>
+          <p class="text-caption text-secondary">{{ timeAgo(announcement.created_at) }}</p>
           <q-separator class="my-2" />
           <div class="overflow-hidden max-h-10">
             <p class="text-body2 text-ellipsis" v-html="announcement.content"></p>

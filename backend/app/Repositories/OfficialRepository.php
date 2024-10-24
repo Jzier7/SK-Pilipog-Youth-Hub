@@ -21,21 +21,35 @@ class OfficialRepository extends JsonResponseFormat
         $query = Official::query();
         $isActiveTerm = null;
 
-        if (!empty($params['search'])) {
-            $searchTerm = '%' . $params['search'] . '%';
-            $query->where('name', 'like', $searchTerm);
-        }
-
         if (!empty($params['is_active'])) {
             $isActiveTerm = Term::where('is_active', 1)->first();
-            if ($isActiveTerm) {
-                $query->where('term_id', $isActiveTerm->id);
+            if (!$isActiveTerm) {
+                return [
+                    'message' => 'No active term found',
+                    'body' => [
+                        'officials' => [],
+                        'term' => null,
+                    ],
+                    'current_page' => 1,
+                    'from' => 0,
+                    'to' => 0,
+                    'last_page' => 1,
+                    'skip' => 0,
+                    'take' => 0,
+                    'total' => 0,
+                ];
             }
+            $query->where('term_id', $isActiveTerm->id);
         } elseif (!empty($params['term'])) {
             $term = Term::find($params['term']);
             if ($term) {
                 $query->where('term_id', $term->id);
             }
+        }
+
+        if (!empty($params['search'])) {
+            $searchTerm = '%' . $params['search'] . '%';
+            $query->where('name', 'like', $searchTerm);
         }
 
         if (!empty($params['position'])) {

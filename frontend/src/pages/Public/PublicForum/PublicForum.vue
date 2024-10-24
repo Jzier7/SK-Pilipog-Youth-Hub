@@ -29,89 +29,144 @@
       </q-card-section>
     </q-card>
 
-    <q-card flat bordered>
-      <q-card-section>
-        <div class="q-mb-sm">
-          <div class="text-subtitle1">John Wilche</div>
-          <div class="text-caption">2 hours ago</div>
-        </div>
-        <div>
-          <p>
-            Tinood, gibati gayud sa mga Pilipino ang imong gugma ug dedikadong serbisyo publiko. Kami nagapasalamat sa imong pagpahinungod ug kontribusyon alang sa atong barangay.
-          </p>
-        </div>
-      </q-card-section>
+    <div class="row justify-between q-mb-md q-mt-lg">
+      <q-space />
+      <form @submit.prevent="fetchPosts">
+        <q-input
+          rounded
+          outlined
+          dense
+          v-model="search"
+          placeholder="Search Posts"
+          @input="filterPosts"
+          color="primary"
+        >
+          <template v-slot:prepend>
+            <q-icon name="search" />
+          </template>
+        </q-input>
+      </form>
+    </div>
 
-      <q-card-actions align="right">
-        <q-btn flat icon="chat_bubble_outline" class="q-ml-sm" @click="toggleComments">
-          <q-badge color="primary" floating>{{ comments.length }}</q-badge>
-        </q-btn>
-      </q-card-actions>
+    <Post
+      v-for="(post) in posts"
+      :key="post.id"
+      :post="post"
+      :fetchPosts="fetchPosts"
+      class="q-my-sm"
+    />
 
-      <q-slide-transition>
-        <div v-if="showComments">
-          <q-card-section class="bg-grey-2 q-pa-md">
-            <div v-for="(comment, index) in comments" :key="index" class="q-mb-sm">
-              <div class="text-body2"><strong>{{ comment.author }}</strong></div>
-              <div class="text-caption text-grey">{{ comment.time }}</div>
-              <div>{{ comment.text }}</div>
-            </div>
-            <q-input
-              filled
-              type="textarea"
-              placeholder="Add a comment..."
-              v-model="newComment"
-              class="bg-white text-black q-mt-md"
-            />
-            <div class="text-right q-mt-sm">
-              <q-btn
-                label="COMMENT"
-                color="primary"
-                text-color="white"
-                @click="submitComment"
-              />
-            </div>
-          </q-card-section>
-        </div>
-      </q-slide-transition>
-    </q-card>
+    <div class="q-pa-md text-center">
+      <q-btn
+        flat
+        size="md"
+        label="Show More Posts . . . ."
+        color="primary"
+        @click="loadMorePosts"
+        v-if="currentPage < lastPage"
+      />
+    </div>
   </q-page>
 </template>
 
 <script>
+import { Notify } from 'quasar';
+import { defineAsyncComponent } from 'vue';
+import forumPostService from 'src/services/forumPostService';
+
 export default {
+  components: {
+    Post: defineAsyncComponent(() => import('./Components/ForumPost.vue')),
+  },
   data() {
     return {
       newPost: '',
-      newComment: '',
-      showComments: false,
-      comments: [
-        {
-          author: 'Jane Doe',
-          time: '1 hour ago',
-          text: 'Great post! Thanks for sharing.',
-        },
-      ],
-    }
+      posts: [],
+      search: '',
+      currentPage: 1,
+      pageSize: 12,
+      lastPage: 1,
+      total: 0,
+    };
+  },
+  watch: {
+    search(newVal) {
+      this.currentPage = 1;
+
+      clearTimeout(this.debounceTimeout);
+
+      this.debounceTimeout = setTimeout(() => {
+        this.fetchPosts();
+      }, 1000);
+    },
+  },
+  mounted() {
+    this.fetchPosts();
   },
   methods: {
-    submitPost() {
-      // Logic to submit a new post
+    filterPosts() {
+      this.currentPage = 1;
+      this.fetchPosts();
     },
-    toggleComments() {
-      this.showComments = !this.showComments;
-    },
-    submitComment() {
-      if (this.newComment.trim() !== '') {
-        this.comments.push({
-          author: 'You',
-          time: 'Just now',
-          text: this.newComment,
+    async submitPost() {
+      try {
+        const response = await forumPostService.storePost({
+          post: this.newPost,
         });
-        this.newComment = '';
+
+        Notify.create({
+          type: 'positive',
+          position: 'top',
+          message: response.data.message
+        });
+
+        this.fetchPosts();
+        this.newPost = '';
+      } catch (error) {
+        Notify.create({
+          type: 'negative',
+          position: 'top',
+          message: error.response?.data?.message || 'Error adding post.'
+        });
+        if (error.response?.data?.errors) {
+          this.errors = error.response.data.errors;
+        }
+      }
+    },
+    async fetchPosts() {
+      try {
+        if (this.currentPage === 1) {
+          this.posts = [];
+        }
+
+        const response = await forumPostService.getPosts({
+          search: this.search,
+          currentPage: this.currentPage,
+          pageSize: this.pageSize,
+        });
+        this.posts = [...this.posts, ...response.data.body || []];
+        this.lastPage = response.data.details.last_page || 1;
+        this.total = response.data.details.total || 0;
+      } catch (error) {
+        console.error('Error fetching posts:', error);
+      }
+    },
+    async loadMorePosts() {
+      if (this.currentPage < this.lastPage) {
+        this.currentPage++;
+        try {
+          const response = await forumPostService.getPosts({
+            search: this.search,
+            currentPage: this.currentPage,
+            pageSize: this.pageSize,
+          });
+          this.posts = this.posts.concat(response.data.body || []);
+        } catch (error) {
+          console.error('Error loading more posts:', error);
+        }
       }
     },
   },
-}
+};
 </script>
 

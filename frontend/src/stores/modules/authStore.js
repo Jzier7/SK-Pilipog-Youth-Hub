@@ -34,7 +34,7 @@ export const useAuthStore = defineStore('auth', {
 
       try {
         const response = await authService.logout();
-        userStore.clearUserData();
+        userStore.removeUser();
 
         return {
           data: response.body,

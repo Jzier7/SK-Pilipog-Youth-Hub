@@ -77,6 +77,16 @@ class User extends Authenticatable
         return $this->hasMany(Announcement::class, 'author_id', 'id');
     }
 
+    public function posts(): HasMany
+    {
+        return $this->hasMany(ForumPost::class, 'author_id', 'id');
+    }
+
+    public function comments(): HasMany
+    {
+        return $this->hasMany(ForumComment::class, 'author_id', 'id');
+    }
+
     public function isSuperAdmin(): bool
     {
         return $this->role_id === 1;

@@ -6,7 +6,7 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 
-class SyncRoutesTable extends Command
+class MigrateRoutes extends Command
 {
     /**
      * The name and signature of the console command.
@@ -20,29 +20,24 @@ class SyncRoutesTable extends Command
      *
      * @var string
      */
-    protected $description = 'Sync routes table';
+    protected $description = 'Migrate application routes to the database';
 
     /**
      * Execute the console command.
      */
     public function handle()
     {
-
-        $this->info('Syncing routes...');
+        $this->info('Migrating routes...');
 
         DB::statement('SET FOREIGN_KEY_CHECKS=0;');
 
-        DB::table('abilities')->truncate();
         DB::table('routes')->truncate();
 
-        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
-
         $routes = Route::getRoutes();
-        $newRoutes = [];
 
         foreach ($routes as $route) {
             if (strpos($route->uri(), 'api') === 0) {
-                $routeId = DB::table('routes')->insertGetId([
+                DB::table('routes')->insert([
                     'uri' => $route->uri(),
                     'name' => $route->getName(),
                     'action' => $route->getActionName(),
@@ -51,20 +46,10 @@ class SyncRoutesTable extends Command
                     'created_at' => now(),
                     'updated_at' => now()
                 ]);
-
-                $newRoutes[] = $routeId;
             }
         }
 
-        foreach ($newRoutes as $routeId) {
-            DB::table('abilities')->insert([
-                'role_id' => 1,
-                'route_id' => $routeId,
-                'created_at' => now(),
-                'updated_at' => now()
-            ]);
-        }
-
-        $this->info('Routes synced successfully!');
+        $this->info('Routes migrated successfully!');
     }
 }
+

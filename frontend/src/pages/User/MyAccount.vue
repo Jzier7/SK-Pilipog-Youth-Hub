@@ -10,74 +10,84 @@
 
     <div class="q-pa-none">
       <div class="q-mb-md q-gutter-sm flex items-center">
-        <q-btn color="primary" label="Update Info" @click="updateUserInfo" />
+        <q-btn
+          color="primary"
+          label="Update Info"
+          @click="enableEditing"
+          v-if="!isEditing"
+        />
+        <q-btn
+          color="secondary"
+          label="Save"
+          @click="updateUserInfo"
+          v-if="isEditing"
+        />
+        <q-btn
+          color="grey"
+          label="Cancel"
+          @click="cancelEditing"
+          v-if="isEditing"
+        />
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
         <CustomInput
-          v-model="user.first_name"
+          v-model="userData.first_name"
           label="First Name"
           inputClass="col-span-2 md:col-span-1"
+          :disable="!isEditing"
+          :errorMessage="errors.first_name ? errors.first_name[0] : ''"
         />
         <CustomInput
-          v-model="user.last_name"
+          v-model="userData.last_name"
           label="Last Name"
           inputClass="col-span-2 md:col-span-1"
+          :disable="!isEditing"
+          :errorMessage="errors.last_name ? errors.last_name[0] : ''"
         />
         <CustomInput
-          v-model="user.middle_name"
+          v-model="userData.middle_name"
           label="Middle Name"
           inputClass="col-span-2 md:col-span-1"
+          :disable="!isEditing"
+          :errorMessage="errors.middle_name ? errors.middle_name[0] : ''"
         />
         <CustomInput
-          v-model="user.birthdate"
+          v-model="userData.birthdate"
           label="Birthdate"
           type="date"
           inputClass="col-span-2 md:col-span-1"
+          :disable="!isEditing"
+          :errorMessage="errors.birthdate ? errors.birthdate[0] : ''"
         />
         <CustomInput
-          v-model="user.gender"
+          v-model="userData.gender"
           label="Gender"
           inputClass="col-span-2 md:col-span-1"
-        />
-        <CustomInput
-          v-model="user.purok"
-          label="Purok"
-          inputClass="col-span-2 md:col-span-1"
+          :disable="!isEditing"
+          :errorMessage="errors.gender ? errors.gender[0] : ''"
         />
         <CustomSelect
-          v-model="user.active_voter"
-          label="Active Voter?"
-          :options="['Yes', 'No']"
-          selectClass="col-span-2 md:col-span-1"
-        />
-        <CustomUploader
-          v-model="user.uploadedFiles"
-          label="Upload Image"
-          uploaderClass="col-span-2"
+          v-model="userData.purok"
+          :options="purokData.map(purok => ({ label: purok.name, value: purok.id }))"
+          label="Purok"
+          :disable="!isEditing"
+          :errorMessage="errors.purok ? errors.purok[0] : ''"
         />
         <CustomInput
-          v-model="user.email"
+          v-model="userData.email"
           label="Email"
           type="email"
           inputClass="col-span-2 md:col-span-1"
+          :disable="!isEditing"
+          :errorMessage="errors.email ? errors.email[0] : ''"
         />
         <CustomInput
-          v-model="user.username"
+          v-model="userData.username"
           label="Username"
           inputClass="col-span-2 md:col-span-1"
-        />
-        <CustomInput
-          v-model="user.password"
-          label="Password"
-          type="password"
-          inputClass="col-span-2 md:col-span-1"
-        />
-        <CustomInput
-          v-model="user.confirm_password"
-          label="Confirm Password"
-          type="password"
-          inputClass="col-span-2 md:col-span-1"
+          :disable="!isEditing"
+          :errorMessage="errors.username ? errors.username[0] : ''"
         />
       </div>
     </div>
@@ -85,56 +95,73 @@
 </template>
 
 <script>
+import { Notify } from 'quasar';
 import { defineAsyncComponent } from 'vue';
-import userService from '../../services/userService';
+import { useUserStore } from 'src/stores/modules/userStore';
+import purokService from 'src/services/purokService';
 
 export default {
   name: 'UserInfo',
   components: {
     CustomInput: defineAsyncComponent(() => import('components/Widgets/CustomInput.vue')),
     CustomSelect: defineAsyncComponent(() => import('components/Widgets/CustomSelect.vue')),
-    CustomUploader: defineAsyncComponent(() => import('components/Widgets/CustomUploader.vue')),
   },
   data() {
     return {
-      user: {
-        first_name: '',
-        last_name: '',
-        middle_name: '',
-        birthdate: '',
-        gender: '',
-        purok: '',
-        active_voter: '',
-        uploadedFiles: [],
-        email: '',
-        username: '',
-        password: '',
-        confirm_password: ''
-      }
+      userData: {
+        purok: null,
+        purok_id: null,
+      },
+      purokData: [],
+      isEditing: false,
+      errors: {},
     };
   },
   methods: {
-    async fetchUserInfo() {
+    enableEditing() {
+      this.isEditing = true;
+      this.errors = {};
+    },
+    cancelEditing() {
+      this.isEditing = false;
+      this.errors = {};
+      this.fetchUserData();
+    },
+    async fetchUserData() {
+      const userStore = useUserStore();
+      this.userData = { ...userStore.userData, purok: userStore.userData.purok_id };
+    },
+    async fetchPurok() {
       try {
-        const userInfo = await userService.getUserInfo();
-        this.user = userInfo;
-      } catch (err) {
-        console.error('Error fetching user information:', err);
+        const response = await purokService.getAllPurok();
+        this.purokData = response.data.body || [];
+      } catch (error) {
+        console.error('Error fetching purok:', error);
       }
     },
     async updateUserInfo() {
-      try {
-        const response = await userService.updateUser(this.user);
-        console.log('User information updated successfully:', response);
-      } catch (err) {
-        console.error('Error updating user information:', err);
+      const userStore = useUserStore();
+      this.userData.purok_id = this.userData.purok;
+      const { success, response, error } = await userStore.updateUser(this.userData);
+      if (success) {
+        this.isEditing = false;
+
+        Notify.create({
+          type: 'positive',
+          position: 'top',
+          message: response.data.message,
+        });
+
+      } else {
+        this.errors = error;
       }
-    }
+    },
   },
-  created() {
-    this.fetchUserInfo();
-  }
-}
+  mounted() {
+    this.fetchPurok();
+    this.fetchUserData();
+  },
+};
 </script>
 
 <style lang="scss" scoped>

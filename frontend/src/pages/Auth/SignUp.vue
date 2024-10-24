@@ -25,7 +25,12 @@
                 <CustomInput :errorMessage="errors.last_name ? errors.last_name[0] : ''" v-model="form.last_name" label="Last Name" inputClass="col-span-2 md:col-span-1" />
                 <CustomInput :errorMessage="errors.middle_name ? errors.middle_name[0] : ''" v-model="form.middle_name" label="Middle Name" inputClass="col-span-2 md:col-span-1" />
                 <CustomInput :errorMessage="errors.birthdate ? errors.birthdate[0] : ''" v-model="form.birthdate" label="Birthdate" type="date" inputClass="col-span-2 md:col-span-1" />
-                <CustomInput :errorMessage="errors.gender ? errors.gender[0] : ''" v-model="form.gender" label="Gender" inputClass="col-span-2 md:col-span-1" />
+                <CustomSelect
+                  v-model="form.gender"
+                  :options="genderOptions"
+                  label="Gender"
+                  :errorMessage="errors.gender ? errors.gender[0] : ''"
+                />
                 <CustomSelect
                   v-model="form.purok"
                   :options="purokData.map(purok => ({ label: purok.name, value: purok.id }))"
@@ -83,6 +88,11 @@ export default {
         confirm_password: '',
       },
       purokData: [],
+      genderOptions: [
+        { label: 'Select Gender', value: '' },
+        { label: 'Male', value: 'male' },
+        { label: 'Female', value: 'female' },
+      ],
       errors: {},
     };
   },

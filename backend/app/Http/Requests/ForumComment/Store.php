@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\Announcement;
+namespace App\Http\Requests\ForumComment;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class RetrieveAll extends FormRequest
+class Store extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,11 +22,8 @@ class RetrieveAll extends FormRequest
     public function rules(): array
     {
         return [
-            'search' => ['nullable', 'string', 'max:255'],
-            'currentPage' => ['nullable', 'integer', 'min:1'],
-            'pageSize' => ['nullable', 'integer', 'min:1', 'max:100'],
-            'orderBy' => ['nullable', 'string', 'max:255'],
-            'latest' => ['nullable', 'string', 'max:255']
+            'post' => ['required', 'integer', 'exists:forum_posts,id'],
+            'comment' => ['required', 'string'],
         ];
     }
 }

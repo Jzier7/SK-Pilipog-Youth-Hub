@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\Announcement;
+namespace App\Http\Requests\ForumPost;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class RetrieveAll extends FormRequest
+class Retrieve extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -26,7 +26,7 @@ class RetrieveAll extends FormRequest
             'currentPage' => ['nullable', 'integer', 'min:1'],
             'pageSize' => ['nullable', 'integer', 'min:1', 'max:100'],
             'orderBy' => ['nullable', 'string', 'max:255'],
-            'latest' => ['nullable', 'string', 'max:255']
+            'post' => ['nullable', 'string', 'exists:posts,id']
         ];
     }
 }

@@ -27,6 +27,7 @@ class DatabaseSeeder extends Seeder
             CategorySeeder::class,
             AnnouncementSeeder::class,
             ForumPostSeeder::class,
+            ForumCommentSeeder::class,
             EventSeeder::class,
             TermSeeder::class,
             PositionSeeder::class,

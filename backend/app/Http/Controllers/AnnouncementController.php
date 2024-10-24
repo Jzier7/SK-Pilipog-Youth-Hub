@@ -34,6 +34,7 @@ class AnnouncementController extends Controller
             'currentPage' => $request->input('currentPage', 1),
             'pageSize' => $request->input('pageSize', 10),
             'orderBy' => $request->input('orderBy', 'desc'),
+            'latest' => $request->input('latest')
         ];
 
         $response = $this->announcementRepository->retrieveAll($params);

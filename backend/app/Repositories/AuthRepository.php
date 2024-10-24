@@ -80,7 +80,7 @@ class AuthRepository extends JsonResponseFormat
                 }
             }
 
-            Auth::login($user->load(['files', 'role.abilities.routes']));
+            Auth::login($user->load(['files', 'role.abilities.route']));
 
             DB::commit();
             return [

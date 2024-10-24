@@ -4,7 +4,8 @@
       <q-toolbar class="q-pa-none">
         <q-toolbar-title class="toolbar-title">
           <h3 class="text-primary">SK OFFICIALS</h3>
-          <span class="text-[13px]">{{ formattedDateRange }}</span>
+          <span v-if="officials.length > 0" class="text-[13px]">{{ formattedDateRange }}</span>
+          <span v-else class="text-[13px] text-secondary">No Active Officials</span>
         </q-toolbar-title>
       </q-toolbar>
     </div>

@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Ability extends Model
 {
@@ -15,8 +15,13 @@ class Ability extends Model
         'route_id'
     ];
 
-    public function route(): HasOne
+    public function route(): BelongsTo
     {
-        return $this->hasOne(Route::class, 'id', 'route_id');
+        return $this->belongsTo(Route::class, 'route_id', 'id');
+    }
+
+    public function role(): BelongsTo
+    {
+        return $this->belongsTo(Route::class, 'role_id', 'id');
     }
 }

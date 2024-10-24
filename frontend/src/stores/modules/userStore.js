@@ -1,15 +1,13 @@
-import { defineStore } from 'pinia'
-import userService from "src/services/userService";
+import { defineStore } from 'pinia';
+import userService from 'src/services/userService';
 
 export const useUserStore = defineStore('user', {
   state: () => ({
-    userData: null,
+    userData: {},
     votersCount: 0,
     usersCountPerPurok: [],
   }),
   actions: {
-
-    //Current User Data operations
     async fetchUser() {
       try {
         const response = await userService.getUser();
@@ -18,14 +16,19 @@ export const useUserStore = defineStore('user', {
         console.error("Error fetching user: ", error);
       }
     },
+    async updateUser(data) {
+      try {
+        const response = await userService.updateUser(data);
+        this.userData = response.data.body;
+        return { success: true, response };
+      } catch (error) {
+        console.error("Error editing user: ", error);
+        return { success: false, error: error.response.data };
+      }
+    },
     setUserData(data) {
       this.userData = data;
     },
-    clearUserData() {
-      this.userData = null;
-    },
-
-    //Users Data operations
     async fetchVotersCount() {
       try {
         const response = await userService.getVotersCount();
@@ -41,7 +44,13 @@ export const useUserStore = defineStore('user', {
       } catch (error) {
         console.error("Error fetching users count per purok: ", error);
       }
+    },
+    removeUser() {
+      localStorage.removeItem('user');
     }
   },
-})
+  persist: {
+    pick: ['userData'],
+  },
+});
 

@@ -6,6 +6,7 @@ use App\Classes\JsonResponseFormat;
 use App\Models\Announcement;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
 
 class AnnouncementRepository extends JsonResponseFormat
 {
@@ -25,6 +26,12 @@ class AnnouncementRepository extends JsonResponseFormat
                 $query->select('id', 'first_name', 'last_name');
             }
         ]);
+
+        if (!empty($params['latest'])) {
+            $todayStart = Carbon::today();
+            $todayEnd = Carbon::tomorrow();
+            $query->whereBetween('created_at', [$todayStart, $todayEnd]);
+        }
 
         if (!empty($params['search'])) {
             $query->where(function ($subQuery) use ($params) {

@@ -100,7 +100,7 @@ export default {
       if (editData) {
         this.localForm.name = editData.name || '';
         this.localForm.position = editData.position?.id || '';
-        this.localForm.term = editData.term?.id || this.latestTermId; // Use latestTermId if no specific term is provided
+        this.localForm.term = editData.term?.id || this.latestTermId;
       }
     },
     async editOfficial() {
