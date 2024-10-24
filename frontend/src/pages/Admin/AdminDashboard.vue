@@ -34,7 +34,7 @@
               <q-icon name="event" size="5rem" class="q-mr-lg" color="primary" />
               <div class="place-content-center">
                 <div class="text-h6 text-primary">
-                  <strong>Upcoming Event</strong>
+                  <strong>Announcement</strong>
                   <span v-show="announcementsToday.length > 0" class="text-gray-500"> ( {{ announcementsToday.length }} today )</span>
                 </div>
                 <div class="text-subtitle1 text-gray-500 title-truncate">
