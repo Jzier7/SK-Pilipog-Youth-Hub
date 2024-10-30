@@ -9,68 +9,110 @@
     </div>
 
     <div class="q-pa-none">
+      <div class="q-mb-md q-gutter-sm flex items-center">
+        <q-space />
+        <q-input
+          rounded
+          outlined
+          dense
+          color="primary"
+          v-model="search"
+          placeholder="Search by name or activity"
+          class="q-mr-sm"
+        >
+          <template v-slot:prepend>
+            <q-icon name="search" />
+          </template>
+        </q-input>
+      </div>
 
       <q-table
         flat
         bordered
-        :title="tableTitle"
-        :rows="filteredRows"
+        :rows="meritData"
         :columns="columns"
         row-key="id"
+        :pagination="{ rowsPerPage: pageSize }"
+        hide-bottom
       >
-        <template v-slot:top>
-          <div>
-            <h3>Activity Leaderboard</h3>
-            <span class="text-[13px]">{{ formattedDateRange }}</span>
-          </div>
-          <q-space />
+        <template v-slot:header="props">
+          <q-tr :props="props">
+            <q-th v-for="col in props.cols" :key="col.name" :props="props" class="text-primary text-bold">
+              {{ col.label }}
+            </q-th>
+          </q-tr>
         </template>
       </q-table>
+
+      <div class="row justify-end q-mt-md">
+        <q-pagination
+          v-model="currentPage"
+          :max="lastPage"
+          @update:model-value="updatePage"
+          direction-links
+        />
+      </div>
     </div>
   </q-page>
 </template>
 
 <script>
+import userService from 'src/services/userService';
+
 export default {
   data() {
     return {
+      meritData: [],
+      search: '',
+      currentPage: 1,
+      pageSize: 12,
+      lastPage: 1,
+      debounceTimeout: null,
       columns: [
-        { name: 'id', label: 'ID', align: 'center', field: 'id' },
-        { name: 'name', label: 'Name', align: 'left', field: 'name' },
-        { name: 'activityCount', label: 'Activities Participated', align: 'center', field: 'activityCount' }
-      ],
-      users: [
-        { id: 1, name: 'Juan Dela Cruz', activityCount: 5 },
-        { id: 2, name: 'Maria Santos', activityCount: 8 },
-        { id: 3, name: 'Pedro Reyes', activityCount: 3 },
-        { id: 4, name: 'Josefa Garcia', activityCount: 10 }
-      ],
-      leagueName: 'Activity League',
-      startDate: 'January 1, 2024',
-      endDate: 'December 31, 2024'
+        { name: 'name', label: 'Name', align: 'center', field: row => `${row.first_name} ${row.last_name}` },
+        { name: 'activity', label: 'Activity Participated', align: 'center', field: 'activity_count' }
+      ]
+    };
+  },
+  watch: {
+    search(newVal) {
+      clearTimeout(this.debounceTimeout);
+      this.debounceTimeout = setTimeout(() => {
+        this.fetchMeritData();
+      }, 1000);
     }
   },
-  computed: {
-    tableTitle() {
-      return `${this.leagueName} Leaderboard`;
-    },
-    formattedDateRange() {
-      return `${this.startDate} - ${this.endDate}`;
-    },
-    filteredRows() {
-      return [...this.users].sort((a, b) => b.activityCount - a.activityCount);
-    }
+  mounted() {
+    this.fetchMeritData();
   },
   methods: {
-    addUser() {
-      console.log('Add User button clicked');
+    updatePage(page) {
+      this.currentPage = page;
+      this.fetchMeritData();
+    },
+    async fetchMeritData() {
+      try {
+        const response = await userService.getUserMerits({
+          search: this.search,
+          currentPage: this.currentPage,
+          pageSize: this.pageSize,
+        });
+        this.meritData = response.data.body || [];
+        this.lastPage = response.data.details.last_page || 1;
+      } catch (error) {
+        console.error('Error fetching merit data:', error);
+      }
     }
   }
-}
+};
 </script>
 
 <style lang="scss" scoped>
-::v-deep .q-table__top {
+.text-bold {
+  font-weight: bold;
+}
+
+.q-pagination .q-btn {
   background-color: $primary;
   color: white;
 }

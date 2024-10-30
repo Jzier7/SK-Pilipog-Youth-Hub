@@ -10,6 +10,13 @@
           label="Categories"
         />
         <q-editor v-model="form.content" min-height="10rem" class="editor q-mb-md" />
+
+        <CustomUploader
+          label="Image"
+          v-model="form.files"
+          uploaderClass="q-mb-md"
+        />
+
         <div class="row justify-end">
           <q-btn label="Publish" color="primary" @click="publish"></q-btn>
           <q-btn label="Cancel" color="negative" @click="closeModal" class="q-ml-sm"></q-btn>
@@ -30,6 +37,7 @@ export default {
   components: {
     CustomInput: defineAsyncComponent(() => import('components/Widgets/CustomInput.vue')),
     CustomSelect: defineAsyncComponent(() => import('components/Widgets/CustomSelect.vue')),
+    CustomUploader: defineAsyncComponent(() => import('components/Widgets/CustomUploader.vue')),
   },
   props: {
     fetchAnnouncements: {
@@ -42,7 +50,8 @@ export default {
       form: {
         title: '',
         category: '',
-        content: ''
+        content: '',
+        files: []
       },
       modalStore: useModalStore(),
       categories: [],
@@ -59,15 +68,25 @@ export default {
       this.form = {
         title: '',
         category: '',
-        content: ''
+        content: '',
+        files: []
       };
     },
     async publish() {
+      const formData = new FormData();
+      formData.append('title', this.form.title);
+      formData.append('category', this.form.category);
+      formData.append('content', this.form.content);
+
+      this.form.files.forEach(file => {
+        formData.append('files[]', file);
+      });
+
       try {
-        const response = await announcementService.storeAnnouncement({
-          title: this.form.title,
-          category: this.form.category,
-          content: this.form.content
+        const response = await announcementService.storeAnnouncement(formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
         });
 
         Notify.create({
@@ -105,5 +124,4 @@ export default {
 .editor {
   color: $primary;
 }
-
 </style>

@@ -12,7 +12,7 @@ const announcementService = {
   },
 
   async updateAnnouncement(data) {
-    const response = await api.patch('/api/announcement/update', data);
+    const response = await api.post('/api/announcement/update', data);
     return response;
   },
 

@@ -34,6 +34,31 @@ class AuthRepository extends JsonResponseFormat
     }
 
     /**
+     * @return array
+     */
+    public function loginAsGuest(): array
+    {
+        $guestCredentials = [
+            'email' => 'guest@guest.com',
+            'password' => '2M[4oD5BAaP4'
+        ];
+
+        if (!Auth::attempt($guestCredentials)) {
+            return [
+                'message' => 'Guest login failed',
+                'status' => 401
+            ];
+        }
+
+        $user = User::with(['files', 'role.abilities.route'])->find(Auth::id());
+
+        return [
+            'message' => 'Login as Guest',
+            'body' => $user,
+        ];
+    }
+
+    /**
      * @param array $data
      * @return array
      */

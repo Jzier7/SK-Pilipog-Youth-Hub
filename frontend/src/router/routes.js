@@ -14,6 +14,19 @@ const routes = [
     component: () => import('pages/Auth/ForgotPassword.vue'),
   },
 
+  // Guest Routes
+  {
+    path: '/guest',
+    component: () => import('layouts/GuestLayout.vue'),
+    children: [
+      { path: 'home', component: () => import('pages/User/UserHome.vue') },
+      { path: 'forum', component: () => import('pages/Public/PublicForum/PublicForum.vue') },
+      { path: 'event', component: () => import('pages/Public/PublicEvent.vue') },
+      { path: 'sk-official', component: () => import('pages/Public/SKOfficial.vue') },
+      { path: 'merit-board', component: () => import('pages/Public/MeritBoard.vue') },
+    ]
+  },
+
   // User Routes
   {
     path: '/user',
@@ -36,7 +49,7 @@ const routes = [
       { path: 'dashboard', component: () => import('pages/Admin/AdminDashboard.vue') },
       { path: 'announcement', component: () => import('pages/Admin/AdminAnnouncement.vue') },
       { path: 'forum', component: () => import('pages/Public/PublicForum/PublicForum.vue') },
-      { path: 'event', component: () => import('pages/Public/PublicEvent.vue') },
+      { path: 'event', component: () => import('pages/Admin/Event/MainPage.vue') },
       { path: 'sk-official', component: () => import('pages/Admin/SKOfficial/MainPage.vue') },
       { path: 'merit-board', component: () => import('pages/Public/MeritBoard.vue') },
       { path: 'user-registry', component: () => import('pages/Admin/UserRegistry.vue') },
@@ -52,7 +65,7 @@ const routes = [
       { path: 'dashboard', component: () => import('pages/Admin/AdminDashboard.vue') },
       { path: 'announcement', component: () => import('pages/Admin/AdminAnnouncement.vue') },
       { path: 'forum', component: () => import('pages/Public/PublicForum/PublicForum.vue') },
-      { path: 'event', component: () => import('pages/Public/PublicEvent.vue') },
+      { path: 'event', component: () => import('pages/Admin/Event/MainPage.vue') },
       { path: 'sk-official', component: () => import('pages/Admin/SKOfficial/MainPage.vue') },
       { path: 'merit-board', component: () => import('pages/Public/MeritBoard.vue') },
       { path: 'user-registry', component: () => import('pages/Admin/UserRegistry.vue') },

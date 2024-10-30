@@ -3,75 +3,221 @@
     <div class="q-mb-md">
       <q-toolbar class="q-pa-none">
         <q-toolbar-title>
-          <h3 class="text-primary">EVENT</h3>
-          <span class="text-[13px]">{{ formattedDateRange }}</span>
+          <h3 class="text-primary">Events</h3>
         </q-toolbar-title>
       </q-toolbar>
     </div>
 
-    <div>
-      <BracketTree />
+    <div class="q-pa-none">
+      <div class="q-mb-md q-gutter-sm flex items-center">
+        <q-space />
+        <q-select
+          v-model="selectedEvent"
+          :options="eventOptions"
+          outlined
+          dense
+          color="primary"
+          class="q-mr-sm"
+          :clearable="selectedEvent !== null"
+          emit-value
+          map-options
+        />
+        <q-select
+          v-model="selectedStatus"
+          :options="statusOptions"
+          outlined
+          dense
+          color="primary"
+          class="q-mr-sm"
+          :clearable="selectedStatus !== null"
+          emit-value
+          map-options
+        />
+        <q-input
+          rounded
+          outlined
+          dense
+          color="primary"
+          v-model="search"
+          placeholder="Search by team or game name"
+          class="q-mr-sm"
+        >
+          <template v-slot:prepend>
+            <q-icon name="search" />
+          </template>
+        </q-input>
+      </div>
+    </div>
+
+    <div class="card-container">
+      <q-card v-for="game in games" :key="game.id" class="my-card m-1" flat bordered>
+        <q-card-section>
+          <h4 class="text-primary text-bold">{{ game.name }}</h4>
+          <p class="text-body2 text-gray-500">{{ game.event ? game.event.name : 'N/A' }}</p>
+          <div class="team-info">
+            <div class="team-column">
+              <img :src="getMediaURL(game.team1.image)" alt="Team 1" class="team-image" />
+              <p class="text-body2"><span class="text-primary">{{ game.team1 ? game.team1.name : 'N/A' }}</span></p>
+            </div>
+            <div class="vs-text text-primary">vs</div>
+            <div class="team-column">
+              <img :src="getMediaURL(game.team2.image)" alt="Team 2" class="team-image" />
+              <p class="text-body2"><span class="text-primary">{{ game.team2 ? game.team2.name : 'N/A' }}</span></p>
+            </div>
+          </div>
+          <div class="game-status">
+            <template v-if="game.status === 'pending'">
+              <q-badge color="secondary" :label="formatDate(game.date, 'D MMMM YYYY')" />
+            </template>
+            <template v-else-if="game.status === 'completed'">
+              <q-badge color="primary" label="Final Score" class="text-white" />
+              <div class="score-container">
+                <span :class="{'text-primary text-bold': game.team1_score > game.team2_score, 'text-gray-500': game.team1_score <= game.team2_score}">{{ game.team1_score }}</span> |
+                <span :class="{'text-primary text-bold': game.team2_score > game.team1_score, 'text-gray-500': game.team2_score <= game.team1_score}">{{ game.team2_score }}</span>
+              </div>
+            </template>
+            <template v-else-if="game.status === 'canceled'">
+              <q-badge color="negative" class="text-white" label="Canceled" />
+            </template>
+          </div>
+        </q-card-section>
+      </q-card>
     </div>
   </q-page>
 </template>
 
 <script>
-import { defineAsyncComponent } from 'vue';
+import { defineComponent } from 'vue';
+import gameService from 'src/services/gameService';
+import eventService from 'src/services/eventService';
+import dateMixin from 'src/utils/mixins/dateMixin';
+import handleMedia from 'src/utils/mixins/handleMedia';
 
-export default {
-  components: {
-    BracketTree: defineAsyncComponent(() => import('components/Bracket/BracketTree.vue')),
-  },
+export default defineComponent({
+  mixins: [dateMixin, handleMedia],
   data() {
     return {
-      visibleColumns: ['id', 'name'],
-      selectedCategory: 'All',
-      categories: ['All', 'Basketball', 'Volleyball', 'Mobile Legends'],
-      columns: [
-        { name: 'id', label: 'ID', align: 'center', field: 'id' },
-        { name: 'name', label: 'Team Name', align: 'center', field: 'name' }
-      ],
-      rows: [
-        { id: 1, name: 'Team A', category: 'Basketball' },
-        { id: 2, name: 'Team B', category: 'Basketball' },
-        { id: 3, name: 'Team C', category: 'Volleyball' },
-        { id: 4, name: 'Team D', category: 'Volleyball' },
-        { id: 5, name: 'Team E', category: 'Mobile Legends' },
-        { id: 6, name: 'Team F', category: 'Mobile Legends' }
-      ],
-      leagueName: 'Summer League',
-      startDate: 'March 24, 2024',
-      endDate: 'April 24, 2024'
-    }
+      games: [],
+      gameData: [],
+      search: '',
+      selectedEvent: null,
+      selectedStatus: null,
+      events: [],
+    };
   },
   computed: {
-    tableTitle() {
-      return `${this.leagueName} Teams`;
+    statusOptions() {
+      return [
+        { label: 'All Statuses', value: null },
+        { label: 'Completed', value: 'completed' },
+        { label: 'Pending', value: 'pending' },
+        { label: 'Canceled', value: 'canceled' },
+      ];
     },
-    formattedDateRange() {
-      return `${this.startDate} - ${this.endDate}`;
+    eventOptions() {
+      return [
+        { label: 'Select Event', value: null, disabled: true },
+        ...this.events.map(event => ({ label: event.name, value: event.id })),
+      ];
     },
-    filteredRows() {
-      if (this.selectedCategory === 'All') {
-        return this.rows;
-      }
-      return this.rows.filter(row => row.category === this.selectedCategory);
-    }
+  },
+  watch: {
+    search() {
+      this.debounceFetchGames();
+    },
+    selectedEvent() {
+      this.fetchGames();
+    },
+    selectedStatus() {
+      this.fetchGames();
+    },
+  },
+  mounted() {
+    this.fetchGames();
+    this.fetchEvents();
   },
   methods: {
-    filterRows() {
-      console.log('Filter method called. Selected Category:', this.selectedCategory);
+    async fetchGames() {
+      try {
+        const response = await gameService.getGames({
+          search: this.search,
+          event: this.selectedEvent,
+          status: this.selectedStatus,
+        });
+        this.games = response.data.body || [];
+      } catch (error) {
+        console.error('Error fetching games:', error);
+      }
     },
-    addTeam() {
-      console.log('Add button clicked');
-    }
-  }
-}
+    async fetchEvents() {
+      try {
+        const response = await eventService.getEvents();
+        this.events = response.data.body || [];
+      } catch (error) {
+        console.error('Error fetching events:', error);
+      }
+    },
+    debounceFetchGames() {
+      clearTimeout(this.debounceTimeout);
+      this.debounceTimeout = setTimeout(() => {
+        this.fetchGames();
+      }, 1000);
+    },
+  },
+});
 </script>
 
-<style lang="scss" scoped>
-::v-deep .q-table__top {
-  background-color: $primary;
-  color: white;
+<style scoped>
+.card-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.my-card {
+  width: 350px;
+  transition: transform 0.2s;
+}
+
+.my-card:hover {
+  transform: scale(1.02);
+}
+
+.team-info {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 10px;
+  height: 80px;
+}
+
+.team-column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.team-image {
+  width: 60px;
+  height: auto;
+  margin-bottom: 5px;
+}
+
+.vs-text {
+  margin: 0 10px;
+  font-size: 1.5rem;
+  color: #000;
+}
+
+.game-status {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.score-container {
+  margin-top: 5px;
 }
 </style>
+

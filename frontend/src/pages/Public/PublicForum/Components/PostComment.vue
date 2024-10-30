@@ -41,29 +41,30 @@
       <div>{{ comment.comment }}</div>
     </div>
 
-
-    <q-input
-      outlined
-      type="textarea"
-      placeholder="Add a comment..."
-      v-model="newComment"
-      class="bg-white text-black q-mt-lg"
-    />
-    <div class="text-right q-mt-sm">
-      <q-btn
-        v-if="!isEditing"
-        label="COMMENT"
-        color="primary"
-        text-color="white"
-        @click="submitComment"
+    <div v-show="!isGuest">
+      <q-input
+        outlined
+        type="textarea"
+        placeholder="Add a comment..."
+        v-model="newComment"
+        class="bg-white text-black q-mt-lg"
       />
-      <q-btn
-        v-else
-        label="EDIT"
-        color="primary"
-        text-color="white"
-        @click="updateComment"
-      />
+      <div class="text-right q-mt-sm">
+        <q-btn
+          v-if="!isEditing"
+          label="COMMENT"
+          color="primary"
+          text-color="white"
+          @click="submitComment"
+        />
+        <q-btn
+          v-else
+          label="EDIT"
+          color="primary"
+          text-color="white"
+          @click="updateComment"
+        />
+      </div>
     </div>
 
   </q-card-section>
@@ -74,6 +75,7 @@ import { Notify } from 'quasar';
 import forumCommentService from 'src/services/forumCommentService';
 import dateMixin from 'src/utils/mixins/dateMixin';
 import { useUserStore } from 'src/stores/modules/userStore';
+import { USER_ROLES } from 'src/utils/constants';
 
 export default {
   mixins: [dateMixin],
@@ -103,6 +105,10 @@ export default {
     userId() {
       const userStore = useUserStore();
       return userStore.userData?.id;
+    },
+    isGuest() {
+      const userStore = useUserStore();
+      return userStore.userData?.role.slug === USER_ROLES.GUEST;
     }
   },
   mounted() {

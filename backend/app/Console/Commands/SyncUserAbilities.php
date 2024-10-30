@@ -33,6 +33,7 @@ class SyncUserAbilities extends Command
         $superAdminRoleId = 1;
         $adminRoleId = 2;
         $userRoleId = 3;
+        $guestRoleId = 4;
 
         $allRouteIds = DB::table('routes')->pluck('id')->toArray();
 
@@ -51,6 +52,16 @@ class SyncUserAbilities extends Command
             41,
             42,
             43,
+            44,
+        ];
+
+        $guestRouteIds = [
+            1,
+            2,
+            18,
+            23,
+            27,
+            40,
             44,
         ];
 
@@ -78,6 +89,16 @@ class SyncUserAbilities extends Command
         foreach ($userRouteIds as $routeId) {
             DB::table('abilities')->insert([
                 'role_id' => $userRoleId,
+                'route_id' => $routeId,
+                'created_at' => now(),
+                'updated_at' => now()
+            ]);
+        }
+
+        // Syncing abilities for Guest
+        foreach ($guestRouteIds as $routeId) {
+            DB::table('abilities')->insert([
+                'role_id' => $guestRoleId,
                 'route_id' => $routeId,
                 'created_at' => now(),
                 'updated_at' => now()

@@ -3,7 +3,6 @@
 namespace Database\Factories;
 
 use App\Models\Event;
-use App\Models\User;
 use App\Models\Category;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -14,9 +13,8 @@ class EventFactory extends Factory
     public function definition(): array
     {
         return [
-            'initiator_id' => User::inRandomOrder()->first()->id,
+            'name' => $this->faker->word,
             'category_id' => Category::inRandomOrder()->first()->id,
-            'event_date' => $this->faker->date,
             'created_at' => now(),
             'updated_at' => now(),
         ];

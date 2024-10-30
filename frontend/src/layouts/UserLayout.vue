@@ -53,7 +53,7 @@ const menuList = [
 ]
 
 export default defineComponent({
-  name: 'AdminLayout',
+  name: 'UserLayout',
   components: {
     AppHeader: defineAsyncComponent(() => import('components/AppHeader/AppHeader.vue')),
     SideNav: defineAsyncComponent(() => import('components/SideNav/SideNav.vue')),

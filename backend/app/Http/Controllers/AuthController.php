@@ -35,6 +35,18 @@ class AuthController extends Controller
     }
 
     /**
+     * Handles login as guest requests
+     *
+     * @param array $request
+     * @return Illuminate\Http\Response
+     */
+    public function loginAsGuest(): JsonResponse
+    {
+        $response = $this->authRepository->loginAsGuest();
+        return $this->authRepository->getJsonResponse($response);
+    }
+
+    /**
      * Handles logout requests
      *
      * @param array $request

@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Classes\JsonResponseFormat;
 use App\Models\Category;
+use Illuminate\Support\Facades\DB;
 
 class CategoryRepository extends JsonResponseFormat
 {
@@ -41,6 +42,96 @@ class CategoryRepository extends JsonResponseFormat
             'take' => $pageSize,
             'total' => $category->total(),
         ];
+    }
+
+    /**
+     * Add a category.
+     *
+     * @param array $data
+     * @return array
+     */
+    public function store(array $data): array
+    {
+        DB::beginTransaction();
+        try {
+
+            $category = Category::create([
+                'name' => $data['name'],
+            ]);
+
+            DB::commit();
+            return [
+                'message' => 'Category added successfully',
+                'body' => $category
+            ];
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return [
+                'error' => $e->getMessage(),
+                'status' => 500,
+            ];
+        }
+    }
+
+    /**
+     * Update a category.
+     *
+     * @param array $data
+     * @return array
+     */
+    public function update(array $data): array
+    {
+        DB::beginTransaction();
+        try {
+            $category = Category::findOrFail($data['id']);
+
+            $category->update([
+                'name' => $data['name'],
+            ]);
+
+            DB::commit();
+            return [
+                'message' => 'Category updated successfully',
+                'body' => $category,
+            ];
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return [
+                'error' => $e->getMessage(),
+                'status' => 500,
+            ];
+        }
+    }
+
+    /**
+     * Delete a category.
+     *
+     * @param array $data
+     * @return array
+     */
+    public function delete(array $data): array
+    {
+        DB::beginTransaction();
+        try {
+            $category = Category::findOrFail($data['id']);
+
+            $category->delete();
+
+            DB::commit();
+            return [
+                'message' => 'Category deleted successfully',
+                'body' => $category,
+            ];
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return [
+                'error' => $e->getMessage(),
+                'status' => 500,
+            ];
+        }
     }
 }
 

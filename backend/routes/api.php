@@ -13,6 +13,9 @@ use App\Http\Controllers\TermController;
 use App\Http\Controllers\PositionController;
 use App\Http\Controllers\ForumPostController;
 use App\Http\Controllers\ForumCommentController;
+use App\Http\Controllers\EventController;
+use App\Http\Controllers\TeamController;
+use App\Http\Controllers\GameController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth:sanctum', 'role.guard'])->group(function () {
@@ -47,6 +50,7 @@ Route::middleware(['auth:sanctum', 'role.guard'])->group(function () {
         Route::prefix('retrieve')->group(function () {
             Route::get('all/users', [UserController::class, 'retrieveAllUsers']);
             Route::get('all/admins', [UserController::class, 'retrieveAllAdmins']);
+            Route::get('all/merits', [UserController::class, 'retrieveUserMerits']);
             Route::get('one', [UserController::class, 'retrieveOne']);
         });
 
@@ -63,7 +67,7 @@ Route::middleware(['auth:sanctum', 'role.guard'])->group(function () {
     Route::prefix('category')->group(function () {
         Route::post('store', [CategoryController::class, 'store']);
         Route::patch('update', [CategoryController::class, 'update']);
-        Route::delete('delete', [AnnouncementController::class, 'delete']);
+        Route::delete('delete', [CategoryController::class, 'delete']);
 
         Route::prefix('retrieve')->group(function () {
             Route::get('all', [CategoryController::class, 'retrieveAll']);
@@ -74,12 +78,36 @@ Route::middleware(['auth:sanctum', 'role.guard'])->group(function () {
     //FOR ANNOUCEMENT PAGE
     Route::prefix('announcement')->group(function () {
         Route::post('store', [AnnouncementController::class, 'store']);
-        Route::patch('update', [AnnouncementController::class, 'update']);
+        Route::post('update', [AnnouncementController::class, 'update']);
         Route::delete('delete', [AnnouncementController::class, 'delete']);
 
         Route::prefix('retrieve')->group(function () {
             Route::get('all', [AnnouncementController::class, 'retrieveAll']);
         });
+    });
+
+    //FOR EVENT PAGE
+    Route::prefix('event')->group(function () {
+        Route::post('store', [EventController::class, 'store']);
+        Route::patch('update', [EventController::class, 'update']);
+        Route::delete('delete', [EventController::class, 'delete']);
+        Route::get('retrieve', [EventController::class, 'retrieve']);
+    });
+
+    Route::prefix('team')->group(function () {
+        Route::post('store', [TeamController::class, 'store']);
+        Route::patch('update', [TeamController::class, 'update']);
+        Route::delete('delete', [TeamController::class, 'delete']);
+        Route::get('retrieve', [TeamController::class, 'retrieve']);
+    });
+
+    Route::prefix('game')->group(function () {
+        Route::post('store', [GameController::class, 'store']);
+        Route::patch('update', [GameController::class, 'update']);
+        Route::delete('delete', [GameController::class, 'delete']);
+        Route::get('retrieve', [GameController::class, 'retrieve']);
+
+        Route::patch('update/result', [GameController::class, 'updateResult']);
     });
 
     //FOR SK OFFICIAL PAGE
@@ -120,11 +148,13 @@ Route::middleware(['auth:sanctum', 'role.guard'])->group(function () {
         Route::delete('delete', [ForumCommentController::class, 'delete']);
         Route::get('retrieve', [ForumCommentController::class, 'retrieve']);
     });
+
 });
 
 Route::prefix('auth')->group(function () {
     Route::post('register', [AuthController::class, 'register']);
     Route::post('login', [AuthController::class, 'login']);
+    Route::post('login/guest', [AuthController::class, 'loginAsGuest']);
     Route::post('logout', [AuthController::class, 'logout']);
 });
 

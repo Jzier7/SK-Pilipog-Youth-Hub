@@ -4,6 +4,8 @@ namespace App\Repositories;
 
 use App\Classes\JsonResponseFormat;
 use App\Models\Announcement;
+use App\Models\File;
+use App\Services\FileUploadService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
@@ -24,7 +26,8 @@ class AnnouncementRepository extends JsonResponseFormat
             },
             'author' => function ($query) {
                 $query->select('id', 'first_name', 'last_name');
-            }
+            },
+            'files'
         ]);
 
         if (!empty($params['latest'])) {
@@ -74,9 +77,28 @@ class AnnouncementRepository extends JsonResponseFormat
     {
         DB::beginTransaction();
         try {
-
+            $files = $data['files'];
+            unset($data['files']);
             $data['author_id'] = Auth::id();
             $announcement = Announcement::create($data);
+
+            if ($files) {
+
+                $fileUploadService = new FileUploadService();
+
+                foreach ($files as $file) {
+                    $file_size = $fileUploadService->getFileSize($file);
+                    $file_path = $fileUploadService->upload($file, 'users');
+                    $file_name = $file->getClientOriginalName();
+
+                    $new_file = new File();
+                    $new_file->path = $file_path;
+                    $new_file->size = $file_size;
+                    $new_file->name = $file_name;
+
+                    $announcement->files()->save($new_file);
+                }
+            }
 
             DB::commit();
             return [
@@ -93,9 +115,12 @@ class AnnouncementRepository extends JsonResponseFormat
         }
     }
 
+
+
     /**
-     * Update an announcement.
+     * Update an existing announcement.
      *
+     * @param int $id
      * @param array $data
      * @return array
      */
@@ -105,11 +130,46 @@ class AnnouncementRepository extends JsonResponseFormat
         try {
             $announcement = Announcement::findOrFail($data['id']);
 
-            $announcement->update([
-                'title' => $data['title'],
-                'category_id' => $data['category_id'],
-                'content' => $data['content'],
-            ]);
+            $files = $data['files'] ?? null;
+            unset($data['files']);
+
+            $announcement->update($data);
+
+            if ($files && !is_array($files)) {
+                $fileUploadService = new FileUploadService();
+
+                $file_size = $fileUploadService->getFileSize($files);
+                $file_path = $fileUploadService->upload($files, 'users');
+                $file_name = $files->getClientOriginalName();
+
+                $new_file = new File();
+                $new_file->path = $file_path;
+                $new_file->size = $file_size;
+                $new_file->name = $file_name;
+
+                $announcement->files()->save($new_file);
+            }
+            elseif (is_array($files) && count($files) > 0) {
+                foreach ($announcement->files as $old_file) {
+                    \Storage::delete($old_file->path);
+                    $old_file->delete();
+                }
+
+                foreach ($files as $file) {
+                    $fileUploadService = new FileUploadService();
+
+                    $file_size = $fileUploadService->getFileSize($file);
+                    $file_path = $fileUploadService->upload($file, 'users');
+                    $file_name = $file->getClientOriginalName();
+
+                    $new_file = new File();
+                    $new_file->path = $file_path;
+                    $new_file->size = $file_size;
+                    $new_file->name = $file_name;
+
+                    $announcement->files()->save($new_file);
+                }
+            }
 
             DB::commit();
             return [
@@ -120,8 +180,8 @@ class AnnouncementRepository extends JsonResponseFormat
         } catch (\Exception $e) {
             DB::rollBack();
             return [
-                'error' => $e->getMessage(),
-                'status' => 500,
+                'error' => 'An error occurred while updating the announcement: ' . $e->getMessage(),
+                'status' => 500
             ];
         }
     }

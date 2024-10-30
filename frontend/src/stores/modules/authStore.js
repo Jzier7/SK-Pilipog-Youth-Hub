@@ -29,6 +29,30 @@ export const useAuthStore = defineStore('auth', {
       }
     },
 
+    async loginAsGuest() {
+      const userStore = useUserStore();
+
+      try {
+        const response = await authService.loginAsGuest();
+        userStore.setUserData(response.body);
+
+        return {
+          message: response.message,
+          status: response.status
+        };
+
+      } catch (error) {
+        console.error("Login failed:", error);
+
+        return {
+          data: null,
+          message: 'Login failed, please check your credentials',
+          status: error.status
+        };
+
+      }
+    },
+
     async logout() {
       const userStore = useUserStore();
 

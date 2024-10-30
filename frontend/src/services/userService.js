@@ -6,6 +6,11 @@ const userService = {
     return response;
   },
 
+  async getUserMerits(params) {
+    const response = await api.get('/api/users/retrieve/all/merits', { params });
+    return response;
+  },
+
   async getAllUser(params) {
     const response = await api.get('/api/users/retrieve/all/users', { params });
     return response;

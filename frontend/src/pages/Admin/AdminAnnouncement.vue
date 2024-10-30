@@ -101,6 +101,7 @@ import { defineAsyncComponent } from 'vue';
 import { useModalStore } from 'src/stores/modules/modalStore';
 import announcementService from 'src/services/announcementService';
 import dateMixin from 'src/utils/mixins/dateMixin'
+import handleMedia from 'src/utils/mixins/handleMedia';
 
 export default {
   components: {
@@ -109,7 +110,7 @@ export default {
     DeleteAnnouncementModal: defineAsyncComponent(() => import('components/Modals/Announcement/DeleteAnnouncement.vue')),
     ViewAnnouncementModal: defineAsyncComponent(() => import('components/Modals/Announcement/ViewAnnouncement.vue')),
   },
-  mixins: [dateMixin],
+  mixins: [dateMixin, handleMedia],
   data() {
     return {
       announcements: [],

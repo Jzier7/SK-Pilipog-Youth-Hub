@@ -8,7 +8,12 @@
       </q-toolbar>
     </div>
 
-    <q-card flat bordered class="q-mb-md">
+    <q-card
+      v-if="!isGuest"
+      flat
+      bordered
+      class="q-mb-md"
+    >
       <q-card-section class="bg-primary q-pa-none">
         <q-input
           filled
@@ -73,6 +78,8 @@
 import { Notify } from 'quasar';
 import { defineAsyncComponent } from 'vue';
 import forumPostService from 'src/services/forumPostService';
+import { useUserStore } from 'src/stores/modules/userStore';
+import { USER_ROLES } from 'src/utils/constants';
 
 export default {
   components: {
@@ -89,16 +96,11 @@ export default {
       total: 0,
     };
   },
-  watch: {
-    search(newVal) {
-      this.currentPage = 1;
-
-      clearTimeout(this.debounceTimeout);
-
-      this.debounceTimeout = setTimeout(() => {
-        this.fetchPosts();
-      }, 1000);
-    },
+  computed: {
+    isGuest() {
+      const userStore = useUserStore();
+      return userStore.userData?.role.slug === USER_ROLES.GUEST;
+    }
   },
   mounted() {
     this.fetchPosts();

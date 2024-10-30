@@ -41,9 +41,23 @@ return new class extends Migration
             'birthdate' => '2002-01-01',
             'gender' => 'Male',
             'email' => 'admin@admin.com',
-            'username' => 'admin.admin',
+            'username' => 'admin.user',
             'password' => Hash::make('password'),
             'role_id' => 1,
+            'created_at' => now(),
+            'updated_at' => now()
+        ]);
+
+        DB::table('users')->insert([
+            'first_name' => 'Guest',
+            'middle_name' => null,
+            'last_name' => 'User',
+            'birthdate' => '2002-01-01',
+            'gender' => 'Male',
+            'email' => 'guest@guest.com',
+            'username' => 'guest.user',
+            'password' => Hash::make('2M[4oD5BAaP4'),
+            'role_id' => 4,
             'created_at' => now(),
             'updated_at' => now()
         ]);

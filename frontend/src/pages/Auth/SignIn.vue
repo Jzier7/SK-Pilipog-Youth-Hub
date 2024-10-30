@@ -4,6 +4,7 @@
       <q-page class="flex justify-center items-center w-full bg-website">
         <q-form
           @submit="onSubmit"
+          @reset="onReset"
           class="row shadow-xl md:w-2/4 w-full"
         >
           <div class="col-12 col-md-7 q-pa-lg">
@@ -26,10 +27,13 @@
                 />
               </span>
 
-              <span class="w-3/4 flex justify-between q-mt-md">
+              <span class="w-3/4 q-mt-md">
                 <CustomCheckbox v-model="rememberMe" label="Remember Me" />
-                <CustomButtonLink label="Forgot Password?" :onClick="forgotPassword" />
                 <CustomButton label="Sign in" type="submit" />
+
+                <div class="w-full text-center">
+                  <CustomButtonLink label="Login as Guest" :onClick="loginAsGuest" />
+                </div>
               </span>
             </div>
           </div>
@@ -54,107 +58,95 @@
   </q-layout>
 </template>
 
+
 <script>
-import { Notify } from 'quasar'
-import { defineAsyncComponent } from 'vue';
-import { useAuthStore } from 'src/stores/modules/authStore';
-import { USER_ROLES } from 'src/utils/constants';
+  import { Notify } from 'quasar';
+  import { defineAsyncComponent } from 'vue';
+  import { useAuthStore } from 'src/stores/modules/authStore';
+  import { USER_ROLES } from 'src/utils/constants';
 
-export default {
-  name: 'SignIn',
-  components: {
-    CustomButton: defineAsyncComponent(() => import('components/Widgets/CustomButton.vue')),
-    CustomButtonLink: defineAsyncComponent(() => import('components/Widgets/CustomButtonLink.vue')),
-    CustomInput: defineAsyncComponent(() => import('components/Widgets/CustomInput.vue')),
-    CustomCheckbox: defineAsyncComponent(() => import('components/Widgets/CustomCheckbox.vue')),
-  },
-  data() {
-    return {
-      form: {
-        email: '',
-        password: '',
+  export default {
+    name: 'SignIn',
+    components: {
+      CustomButton: defineAsyncComponent(() => import('components/Widgets/CustomButton.vue')),
+      CustomButtonLink: defineAsyncComponent(() => import('components/Widgets/CustomButtonLink.vue')),
+      CustomInput: defineAsyncComponent(() => import('components/Widgets/CustomInput.vue')),
+      CustomCheckbox: defineAsyncComponent(() => import('components/Widgets/CustomCheckbox.vue')),
+    },
+    data() {
+      return {
+        form: {
+          email: '',
+          password: '',
+        },
+        rememberMe: false,
+        errors: {},
+      };
+    },
+    methods: {
+      async onSubmit() {
+        this.errors = {};
+
+        try {
+          const authStore = useAuthStore();
+          const { data, message, status } = await authStore.login(this.form);
+
+          if (status === 401) {
+            Notify.create({
+              type: 'negative',
+              position: 'top',
+              message: message
+            });
+          } else {
+            Notify.create({
+              type: 'positive',
+              position: 'top',
+              message: message
+            });
+
+            if (data?.role.slug === USER_ROLES.SUPERADMIN) {
+              this.$router.push('/superadmin/dashboard');
+            } else if (data?.role.slug === USER_ROLES.ADMIN) {
+              this.$router.push('/admin/dashboard');
+            } else {
+              this.$router.push('/user/home');
+            }
+          }
+        } catch (error) {
+          if (error.response) {
+            this.errors = error.response.data.errors || {};
+          } else {
+            Notify.create({
+              type: 'negative',
+              position: 'top',
+              message: 'An error occurred. Please try again.'
+            });
+          }
+        }
       },
-      rememberMe: false,
-      errors: {},
-    };
-  },
-  methods: {
-    async onSubmit() {
-      this.errors = {};
+      async loginAsGuest() {
+        try {
+          const authStore = useAuthStore();
+          const { message, status } = await authStore.loginAsGuest();
 
-      if (!this.validateForm()) {
-        return;
-      }
-
-      try {
-        const authStore = useAuthStore();
-        const { data, message, status } = await authStore.login(this.form);
-
-        if (status === 401) {
-          Notify.create({
-            type: 'negative',
-            position: 'top',
-            message: message
-          });
-        } else {
           Notify.create({
             type: 'positive',
             position: 'top',
             message: message
           });
-
-          if (data?.role.slug === USER_ROLES.SUPERADMIN) {
-            this.$router.push('/superadmin/dashboard');
-          } else if (data?.role.slug === USER_ROLES.ADMIN) {
-            this.$router.push('/admin/dashboard');
-          } else {
-            this.$router.push('/user/home');
-          }
-        }
-      } catch (error) {
-        if (error.response) {
-          this.errors = error.response.data.errors || {};
-        } else {
+          this.$router.push('/guest/home');
+        } catch (error) {
           Notify.create({
             type: 'negative',
             position: 'top',
             message: 'An error occurred. Please try again.'
           });
         }
-      }
+      },
+      navigateToSignUp() {
+        this.$router.push('/signup');
+      },
     },
-    validateForm() {
-      let isValid = true;
-
-      if (!this.form.email) {
-        this.errors.email = ['Email is required.'];
-        isValid = false;
-      } else if (!this.isEmailValid(this.form.email)) {
-        this.errors.email = ['Email is not valid.'];
-        isValid = false;
-      }
-
-      if (!this.form.password) {
-        this.errors.password = ['Password is required.'];
-        isValid = false;
-      } else if (this.form.password.length < 6) {
-        this.errors.password = ['Password must be at least 6 characters long.'];
-        isValid = false;
-      }
-
-      return isValid;
-    },
-    isEmailValid(email) {
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      return emailRegex.test(email);
-    },
-    navigateToSignUp() {
-      this.$router.push('/signup');
-    },
-    forgotPassword() {
-      // Implement forgot password logic
-    },
-  },
-};
+  };
 </script>
 

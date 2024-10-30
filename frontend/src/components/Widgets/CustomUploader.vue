@@ -7,6 +7,9 @@
       class="w-full"
       v-model="files"
       @added="onFilesAdded"
+      :file-sizes="fileSizes"
+      :max-files="maxFiles"
+      @removed="onFileRemoved"
     />
     <span v-if="errorMessage" class="text-negative text-xs px-4">{{ errorMessage }}</span>
   </div>
@@ -40,6 +43,14 @@ export default {
       type: String,
       default: '',
     },
+    maxFiles: {
+      type: Number,
+      default: 10,
+    },
+    fileSizes: {
+      type: Object,
+      default: () => ({})
+    }
   },
   data() {
     return {
@@ -58,10 +69,21 @@ export default {
     },
   },
   methods: {
-    onFilesAdded(files) {
-      this.files = files;
-      this.$emit('update:modelValue', files);
+    onFilesAdded(newFiles) {
+      this.files = [...this.files, ...newFiles];
+      this.$emit('update:modelValue', this.files);
     },
+    onFileRemoved(file) {
+      const index = this.files.indexOf(file);
+      if (index !== -1) {
+        this.files.splice(index, 1);
+        this.$emit('update:modelValue', this.files);
+      }
+    }
   },
 }
 </script>
+
+<style scoped>
+</style>
+

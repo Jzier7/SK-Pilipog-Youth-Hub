@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\Category\RetrieveAll;
+use App\Http\Requests\Category\Store;
+use App\Http\Requests\Category\Update;
+use App\Http\Requests\Category\Delete;
 use App\Repositories\CategoryRepository;
 use Illuminate\Http\JsonResponse;
 
@@ -33,4 +36,54 @@ class CategoryController extends Controller
         $response = $this->categoryRepository->retrieveAll($params);
         return $this->categoryRepository->getJsonResponse($response);
     }
+
+    /**
+     * Add a category.
+     *
+     * @return Illuminate\Http\JsonResponse The user's data in JSON format.
+     */
+    public function store(Store $request): JsonResponse
+    {
+
+        $data = [
+            'name' => $request->input('name'),
+        ];
+
+        $response = $this->categoryRepository->store($data);
+        return $this->categoryRepository->getJsonResponse($response);
+    }
+
+    /**
+     * Update a category.
+     *
+     * @return Illuminate\Http\JsonResponse The user's data in JSON format.
+     */
+    public function update(Update $request): JsonResponse
+    {
+
+        $data = [
+            'id' => $request->input('id'),
+            'name' => $request->input('name'),
+        ];
+
+        $response = $this->categoryRepository->update($data);
+        return $this->categoryRepository->getJsonResponse($response);
+    }
+
+    /**
+     * Delete a category.
+     *
+     * @return Illuminate\Http\JsonResponse The user's data in JSON format.
+     */
+    public function delete(Delete $request): JsonResponse
+    {
+
+        $data = [
+            'id' => $request->input('id'),
+        ];
+
+        $response = $this->categoryRepository->delete($data);
+        return $this->categoryRepository->getJsonResponse($response);
+    }
+
 }

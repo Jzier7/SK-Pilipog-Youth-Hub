@@ -32,6 +32,8 @@ class DatabaseSeeder extends Seeder
             TermSeeder::class,
             PositionSeeder::class,
             OfficialSeeder::class,
+            TeamSeeder::class,
+            GameSeeder::class,
         ]);
 
     }

@@ -74,6 +74,24 @@ class UserController extends Controller
     }
 
     /**
+     * Retrieves all user merits.
+     *
+     * @return Illuminate\Http\JsonResponse The user's data in JSON format.
+     */
+    public function retrieveUserMerits(RetrieveAllUsers $request): JsonResponse
+    {
+        $params = [
+            'search' => $request->input('search'),
+            'currentPage' => $request->input('currentPage', 1),
+            'pageSize' => $request->input('pageSize', 10),
+            'orderBy' => $request->input('orderBy', 'desc'),
+        ];
+
+        $response = $this->userRepository->retrieveUserMerits($params);
+        return $this->userRepository->getJsonResponse($response);
+    }
+
+    /**
      * Add a user.
      *
      * @return Illuminate\Http\JsonResponse The user's data in JSON format.

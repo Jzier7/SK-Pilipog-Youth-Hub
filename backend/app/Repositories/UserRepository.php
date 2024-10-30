@@ -136,6 +136,61 @@ class UserRepository extends JsonResponseFormat
     }
 
     /**
+     * Get all users merits with optional filtering and pagination.
+     *
+     * @param array $params
+     * @return array
+     */
+    public function retrieveUserMerits(array $params): array
+    {
+        $query = User::query()
+            ->withCount(['teams as activity_count' => function ($query) {
+                $query->whereHas('teamAsTeam1', function ($q) {
+                    $q->where('status', 'completed');
+                })->orWhereHas('teamAsTeam2', function ($q) {
+                        $q->where('status', 'completed');
+                    });
+            }]);
+
+        if (!empty($params['isAdmin'])) {
+            $query->where('role_id', 2);
+        } else {
+            $query->whereNotIn('role_id', [1, 2, 4]);
+        }
+
+        if (!empty($params['search'])) {
+            $searchTerm = '%' . $params['search'] . '%';
+            $query->where(function ($subQuery) use ($searchTerm) {
+                $subQuery->where('first_name', 'like', $searchTerm)
+                    ->orWhere('last_name', 'like', $searchTerm)
+                    ->orWhere('email', 'like', $searchTerm)
+                    ->orWhere('username', 'like', $searchTerm);
+            });
+        }
+
+        if (!empty($params['orderBy'])) {
+            $query->orderBy('created_at', $params['orderBy']);
+        }
+
+        $currentPage = $params['currentPage'] ?? 1;
+        $pageSize = $params['pageSize'] ?? 10;
+
+        $users = $query->paginate($pageSize, ['*'], 'page', $currentPage);
+
+        return [
+            'message' => 'All users retrieved successfully',
+            'body' => $users->items(),
+            'current_page' => $users->currentPage(),
+            'from' => $users->firstItem(),
+            'to' => $users->lastItem(),
+            'last_page' => $users->lastPage(),
+            'skip' => ($currentPage - 1) * $pageSize,
+            'take' => $pageSize,
+            'total' => $users->total(),
+        ];
+    }
+
+    /**
      * Update a user.
      *
      * @param array $data

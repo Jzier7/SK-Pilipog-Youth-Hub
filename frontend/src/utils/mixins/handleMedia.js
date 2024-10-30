@@ -4,7 +4,7 @@ export default {
       if (media && media.path) {
         return `${process.env.BACKEND_URL}/storage/${media.path}`;
       } else {
-        return 'No proof of voter available.';
+        return 'src/assets/logo.png';
       }
     },
   },

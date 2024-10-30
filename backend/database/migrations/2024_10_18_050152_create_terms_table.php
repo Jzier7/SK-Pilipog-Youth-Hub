@@ -16,6 +16,7 @@ return new class extends Migration
             $table->boolean('is_active')->default(0);
             $table->date('start_date');
             $table->date('end_date');
+            $table->softDeletes();
             $table->timestamps();
         });
     }
