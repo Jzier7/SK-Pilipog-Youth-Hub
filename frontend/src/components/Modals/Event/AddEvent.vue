@@ -94,6 +94,17 @@ export default {
       try {
         const response = await categoryService.getAllCategories();
         this.categoryData = response.data.body || [];
+
+        if (this.categoryData.length === 0) {
+          Notify.create({
+            type: 'warning',
+            position: 'top',
+            textColor: 'white',
+            timeout: 10000,
+            message: 'No categories found. Please add categories before creating events.'
+          });
+        }
+
       } catch (error) {
         console.error('Error fetching categories:', error);
       }

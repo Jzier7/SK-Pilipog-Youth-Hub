@@ -95,9 +95,6 @@ export default {
   },
   mounted() {
     this.fetchEventOptions();
-    if (this.editData.event_id) {
-      this.fetchTeamOptions(this.editData.event_id);
-    }
   },
   methods: {
     closeModal() {
@@ -124,6 +121,10 @@ export default {
           }
         } else {
           this.localForm.date = '';
+        }
+
+        if (this.localForm.event) {
+          this.fetchTeamOptions(this.localForm.event);
         }
       }
     },

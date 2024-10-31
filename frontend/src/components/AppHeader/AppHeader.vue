@@ -44,7 +44,7 @@ export default {
   computed: {
     isGuest() {
       const userStore = useUserStore();
-      return userStore.userData?.role.slug === USER_ROLES.GUEST;
+      return userStore.userData?.role?.slug === USER_ROLES.GUEST;
     },
     logoutLabel() {
       return this.isGuest ? 'back to login page' : 'Logout';

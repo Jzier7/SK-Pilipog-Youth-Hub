@@ -120,6 +120,17 @@ export default {
       try {
         const response = await positionService.getPositions();
         this.positionData = response.data.body || [];
+
+        if (this.positionData.length === 0) {
+          Notify.create({
+            type: 'warning',
+            position: 'top',
+            textColor: 'white',
+            timeout: 10000,
+            message: 'No positions found. Please add positions before creating officials.'
+          });
+        }
+
       } catch (error) {
         console.error('Error fetching positions:', error);
       }
@@ -128,6 +139,16 @@ export default {
       try {
         const response = await termService.getTerms();
         this.termData = response.data.body || [];
+
+        if (this.termData.length === 0) {
+          Notify.create({
+            type: 'warning',
+            position: 'top',
+            textColor: 'white',
+            timeout: 10000,
+            message: 'No terms found. Please add terms before creating official.'
+          });
+        }
 
         const activeTerm = this.termData.find(term => term.is_active);
         if (activeTerm) {

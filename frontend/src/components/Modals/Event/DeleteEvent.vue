@@ -4,10 +4,11 @@
       <h3 class="text-negative pb-4">Delete Event</h3>
       <div class="text-primary q-mb-md">
         <p>Are you sure you want to delete the event "<strong>{{ localForm.name }}</strong>"?</p>
+        <p class="text-warning">Note: Deleting this event may also remove any associated items.</p>
       </div>
       <div class="row justify-end">
+        <q-btn label="Delete" color="negative" class="q-mr-sm" @click="confirmDelete"></q-btn>
         <q-btn label="Cancel" color="grey" @click="closeModal"></q-btn>
-        <q-btn label="Delete" color="negative" class="q-ml-sm" @click="confirmDelete"></q-btn>
       </div>
     </q-card>
   </q-dialog>

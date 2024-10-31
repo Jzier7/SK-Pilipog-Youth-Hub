@@ -133,6 +133,17 @@ export default {
           label: `${user.first_name} ${user.last_name}`,
           value: user.id,
         })) || [];
+
+        if (this.userOptions.length === 0) {
+          Notify.create({
+            type: 'warning',
+            position: 'top',
+            textColor: 'white',
+            timeout: 10000,
+            message: 'No users found'
+          });
+        }
+
       } catch (error) {
         console.error('Error fetching users:', error);
       }
@@ -144,6 +155,17 @@ export default {
           label: event.name,
           value: event.id,
         })) || [];
+
+        if (this.eventOptions.length === 0) {
+          Notify.create({
+            type: 'warning',
+            position: 'top',
+            textColor: 'white',
+            timeout: 10000,
+            message: 'No events found. Please add events before creating teams.'
+          });
+        }
+
       } catch (error) {
         console.error('Error fetching events:', error);
       }

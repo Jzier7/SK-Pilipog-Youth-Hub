@@ -146,6 +146,17 @@ export default {
       try {
         const response = await purokService.getAllPurok();
         this.purokData = response.data.body || [];
+
+        if (this.purokData.length === 0) {
+          Notify.create({
+            type: 'warning',
+            position: 'top',
+            textColor: 'white',
+            timeout: 10000,
+            message: 'No purok found. Please add purok before creating admin users.'
+          });
+        }
+
       } catch (error) {
         console.error('Error fetching purok:', error);
       }

@@ -4,7 +4,7 @@
       <h3 class="text-primary pb-4">Edit Position</h3>
       <q-form @submit.prevent>
         <CustomInput v-model="localForm.name" label="Position Name" />
-        <CustomInput v-model="localForm.level" label="Level" type="number" />
+        <CustomInput v-model="localForm.level" label="Position Rank (1 = Highest)" type="number" />
 
         <div class="row justify-end">
           <q-btn label="Save" color="primary" @click="editPosition"></q-btn>

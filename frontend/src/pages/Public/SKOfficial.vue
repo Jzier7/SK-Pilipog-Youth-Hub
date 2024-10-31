@@ -87,8 +87,11 @@ export default {
       try {
         const response = await officialService.getOfficials({ is_active: 1 });
         this.officials = response.data.body.officials || [];
-        this.startDate = response.data.body.term.start_date;
-        this.endDate = response.data.body.term.end_date;
+
+        if (response.data.body.term) {
+          this.startDate = response.data.body.term.start_date;
+          this.endDate = response.data.body.term.end_date;
+        }
       } catch (error) {
         console.error('Error fetching officials:', error);
       }

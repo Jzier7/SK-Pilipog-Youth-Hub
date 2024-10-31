@@ -2,12 +2,13 @@
   <q-dialog v-model="modalStore.showDeletePositionModal">
     <q-card flat bordered class="q-pa-md text-white" style="width: 400px; max-width: 80vw;">
       <h3 class="text-negative pb-4">Delete Position</h3>
-      <div class="text-primary">
+      <div class="text-primary q-mb-md">
         <p>Are you sure you want to delete the position "<strong>{{ localForm.name }}</strong>"?</p>
+        <p class="text-warning">Note: Deleting this position may also remove any associated officials.</p>
       </div>
       <div class="row justify-end">
+        <q-btn label="Delete" color="negative" class="q-mr-sm" @click="confirmDelete"></q-btn>
         <q-btn label="Cancel" color="grey" @click="closeModal"></q-btn>
-        <q-btn label="Delete" color="negative" class="q-ml-sm" @click="confirmDelete"></q-btn>
       </div>
     </q-card>
   </q-dialog>

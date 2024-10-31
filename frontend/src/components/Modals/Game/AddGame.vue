@@ -153,6 +153,17 @@ export default {
           label: event.name,
           value: event.id,
         })) || [];
+
+        if (this.eventOptions.length === 0) {
+          Notify.create({
+            type: 'warning',
+            position: 'top',
+            textColor: 'white',
+            timeout: 10000,
+            message: 'No events found. Please add events before creating games.'
+          });
+        }
+
       } catch (error) {
         console.error('Error fetching events:', error);
       }
@@ -167,6 +178,17 @@ export default {
           label: team.name,
           value: team.id,
         })) || [];
+
+        if (this.teamOptions.length === 0) {
+          Notify.create({
+            type: 'warning',
+            position: 'top',
+            textColor: 'white',
+            timeout: 10000,
+            message: 'No teams found. Please add teams before creating games.'
+          });
+        }
+
       } catch (error) {
         console.error('Error fetching teams:', error);
       }

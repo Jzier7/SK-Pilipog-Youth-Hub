@@ -112,6 +112,16 @@ export default {
         const response = await categoryService.getAllCategories();
         this.categories = response.data.body || [];
 
+      if (this.categories && this.categories.length === 0) {
+        Notify.create({
+          type: 'warning',
+          position: 'top',
+          textColor: 'white',
+          timeout: 10000,
+          message: 'No categories found. Please add categories on the Events page before creating announcements.'
+        });
+      }
+
       } catch (error) {
         console.error('Error fetching categories:', error);
       }

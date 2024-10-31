@@ -60,8 +60,9 @@
           :disable="!isEditing"
           :errorMessage="errors.birthdate ? errors.birthdate[0] : ''"
         />
-        <CustomInput
+        <CustomSelect
           v-model="userData.gender"
+          :options="genderOptions"
           label="Gender"
           inputClass="col-span-2 md:col-span-1"
           :disable="!isEditing"
@@ -113,6 +114,10 @@ export default {
         purok_id: null,
       },
       purokData: [],
+      genderOptions: [
+        { label: 'Male', value: 'male' },
+        { label: 'Female', value: 'female' }
+      ],
       isEditing: false,
       errors: {},
     };

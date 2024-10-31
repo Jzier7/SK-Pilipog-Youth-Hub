@@ -6,8 +6,8 @@
         <p>Are you sure you want to delete the game "<strong>{{ localForm.name }}</strong>"?</p>
       </div>
       <div class="row justify-end">
+        <q-btn label="Delete" color="negative" class="q-mr-sm" @click="confirmDelete"></q-btn>
         <q-btn label="Cancel" color="grey" @click="closeModal"></q-btn>
-        <q-btn label="Delete" color="negative" class="q-ml-sm" @click="confirmDelete"></q-btn>
       </div>
     </q-card>
   </q-dialog>

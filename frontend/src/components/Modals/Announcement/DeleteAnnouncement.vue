@@ -2,12 +2,12 @@
   <q-dialog v-model="modalStore.showDeleteAnnouncementModal">
     <q-card flat bordered class="q-pa-md text-white" style="width: 400px; max-width: 80vw;">
       <h3 class="text-negative pb-4">Delete Announcement</h3>
-      <div class="text-primary">
+      <div class="text-primary q-mb-md">
         <p>Are you sure you want to delete the announcement titled "<strong>{{ localForm.title }}</strong>"?</p>
       </div>
       <div class="row justify-end">
+        <q-btn label="Delete" color="negative" class="q-mr-sm" @click="confirmDelete"></q-btn>
         <q-btn label="Cancel" color="grey" @click="closeModal"></q-btn>
-        <q-btn label="Delete" color="negative" class="q-ml-sm" @click="confirmDelete"></q-btn>
       </div>
     </q-card>
   </q-dialog>
@@ -15,7 +15,6 @@
 
 <script>
 import { Notify } from 'quasar'
-import { defineAsyncComponent } from 'vue';
 import { useModalStore } from 'src/stores/modules/modalStore';
 import announcementService from 'src/services/announcementService';
 

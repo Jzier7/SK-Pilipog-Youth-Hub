@@ -2,11 +2,11 @@
   <q-page padding>
     <q-card class="q-my-lg bg-primary" flat bordered>
       <q-card-section>
-        <q-toolbar-section class="q-pa-none">
+        <q-toolbar>
           <q-toolbar-title>
             <h2 class="text-white">Hi! {{ userData.username }}</h2>
           </q-toolbar-title>
-        </q-toolbar-section>
+        </q-toolbar>
       </q-card-section>
     </q-card>
 

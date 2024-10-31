@@ -56,12 +56,12 @@
           <p class="text-body2 text-gray-500">{{ game.event ? game.event.name : 'N/A' }}</p>
           <div class="team-info">
             <div class="team-column">
-              <img :src="getMediaURL(game.team1.image)" alt="Team 1" class="team-image" />
+              <img src="~/assets/logo.png" alt="Team 1" class="team-image" />
               <p class="text-body2"><span class="text-primary">{{ game.team1 ? game.team1.name : 'N/A' }}</span></p>
             </div>
             <div class="vs-text text-primary">vs</div>
             <div class="team-column">
-              <img :src="getMediaURL(game.team2.image)" alt="Team 2" class="team-image" />
+              <img src="~/assets/logo.png" alt="Team 2" class="team-image" />
               <p class="text-body2"><span class="text-primary">{{ game.team2 ? game.team2.name : 'N/A' }}</span></p>
             </div>
           </div>
@@ -175,7 +175,7 @@ export default defineComponent({
 }
 
 .my-card {
-  width: 350px;
+  width: 500px;
   transition: transform 0.2s;
 }
 
@@ -195,6 +195,7 @@ export default defineComponent({
   display: flex;
   flex-direction: column;
   align-items: center;
+  max-width: 200px;
 }
 
 .team-image {
@@ -213,7 +214,7 @@ export default defineComponent({
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-top: 10px;
+  margin-top: 20px;
 }
 
 .score-container {
