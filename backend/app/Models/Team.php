@@ -49,8 +49,8 @@ class Team extends Model
         return $this->hasMany(Game::class, 'winner', 'id');
     }
 
-    public function teamAsLosser(): HasMany
+    public function teamAsLoser(): HasMany
     {
-        return $this->hasMany(Game::class, 'losser', 'id');
+        return $this->hasMany(Game::class, 'loser', 'id');
     }
 }

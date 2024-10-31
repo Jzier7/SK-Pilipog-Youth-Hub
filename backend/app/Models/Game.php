@@ -18,7 +18,7 @@ class Game extends Model
         'team1_score',
         'team2_score',
         'winner',
-        'losser',
+        'loser',
         'status',
         'date'
     ];
@@ -43,8 +43,8 @@ class Game extends Model
         return $this->belongsTo(Team::class, 'winner');
     }
 
-    public function losser(): BelongsTo
+    public function loser(): BelongsTo
     {
-        return $this->belongsTo(Team::class, 'losser');
+        return $this->belongsTo(Team::class, 'loser');
     }
 }

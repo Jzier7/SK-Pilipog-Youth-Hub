@@ -9,8 +9,15 @@ class GameSeeder extends Seeder
 {
     public function run()
     {
-        Game::factory()->count(10)->create();
+        $gamesToCreate = 10;
+
+        for ($i = 0; $i < $gamesToCreate; $i++) {
+            $game = Game::factory()->make();
+
+            if ($game->event_id && $game->team1_id && $game->team2_id) {
+                $game->save();
+            }
+        }
     }
 }
-
 

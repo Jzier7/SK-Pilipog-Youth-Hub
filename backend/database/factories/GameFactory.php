@@ -13,8 +13,20 @@ class GameFactory extends Factory
 
     public function definition()
     {
-        $team1 = Team::inRandomOrder()->first();
-        $team2 = Team::where('id', '!=', $team1->id)->inRandomOrder()->first();
+        $event = Event::inRandomOrder()->first();
+
+        if (!$event) {
+            return [];
+        }
+
+        $teams = Team::where('event_id', $event->id)->get();
+
+        if ($teams->count() < 2) {
+            return [];
+        }
+
+        $team1 = $teams->random();
+        $team2 = $teams->where('id', '!=', $team1->id)->random();
 
         $statuses = ['pending', 'completed', 'canceled'];
         $status = $this->faker->randomElement($statuses);
@@ -31,15 +43,26 @@ class GameFactory extends Factory
             $loser = null;
         }
 
+        $gameNames = [
+            'First Round',
+            'Quarter Finals',
+            'Semi Finals',
+            'Championship',
+            'Finals',
+            'Playoff Match',
+            'Friendly Match',
+            'Elimination Round',
+        ];
+
         return [
-            'name' => $this->faker->word,
-            'event_id' => Event::inRandomOrder()->first()->id,
+            'name' => $this->faker->randomElement($gameNames),
+            'event_id' => $event->id,
             'team1_id' => $team1->id,
             'team1_score' => $team1Score,
             'team2_id' => $team2->id,
             'team2_score' => $team2Score,
             'winner' => $winner,
-            'losser' => $loser,
+            'loser' => $loser,
             'status' => $status,
             'date' => $this->faker->dateTimeBetween('-1 month', '+1 month'),
         ];

@@ -65,6 +65,10 @@ class AuthRepository extends JsonResponseFormat
     public function logout($data): array
     {
         Auth::guard('web')->logout();
+
+        request()->session()->invalidate();
+        request()->session()->regenerateToken();
+
         return [
             'message' => 'Logout successful'
         ];

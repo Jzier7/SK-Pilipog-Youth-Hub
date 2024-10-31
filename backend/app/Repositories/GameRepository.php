@@ -158,7 +158,7 @@ class GameRepository extends JsonResponseFormat
                 'team2_score' => $data['team2_score'],
                 'status' => $data['status'],
                 'winner' => $winner,
-                'losser' => $loser
+                'loser' => $loser
             ]);
 
             DB::commit();

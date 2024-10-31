@@ -55,7 +55,7 @@ return new class extends Migration
             'birthdate' => '2002-01-01',
             'gender' => 'Male',
             'email' => 'guest@guest.com',
-            'username' => 'guest.user',
+            'username' => 'Guest',
             'password' => Hash::make('2M[4oD5BAaP4'),
             'role_id' => 4,
             'created_at' => now(),

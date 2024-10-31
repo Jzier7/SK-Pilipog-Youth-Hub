@@ -12,13 +12,21 @@ class EventFactory extends Factory
 
     public function definition(): array
     {
+        $names = [
+            '1 Day League',
+            'Inter Barangay',
+            'Annual Sports Fest',
+            'Purok Festival',
+            'Youth Summit',
+            'Health Awareness Campaign'
+        ];
+
         return [
-            'name' => $this->faker->word,
+            'name' => $this->faker->randomElement($names),
             'category_id' => Category::inRandomOrder()->first()->id,
             'created_at' => now(),
             'updated_at' => now(),
         ];
     }
 }
-
 

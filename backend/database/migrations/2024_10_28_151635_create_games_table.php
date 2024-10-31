@@ -20,7 +20,7 @@ return new class extends Migration
             $table->unsignedBigInteger('team2_id');
             $table->integer('team2_score')->nullable();
             $table->unsignedBigInteger('winner')->nullable();
-            $table->unsignedBigInteger('losser')->nullable();
+            $table->unsignedBigInteger('loser')->nullable();
             $table->string('status')->default('pending');
             $table->dateTime('date');
             $table->timestamps();
@@ -29,7 +29,7 @@ return new class extends Migration
             $table->foreign('team1_id')->references('id')->on('teams');
             $table->foreign('team2_id')->references('id')->on('teams');
             $table->foreign('winner')->references('id')->on('teams');
-            $table->foreign('losser')->references('id')->on('teams');
+            $table->foreign('loser')->references('id')->on('teams');
         });
     }
 
