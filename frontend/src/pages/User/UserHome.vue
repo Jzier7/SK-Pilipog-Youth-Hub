@@ -18,19 +18,24 @@
         outlined
         dense
         color="primary"
-        class="q-mr-sm"
-        :clearable="true"
+        :clearable="selectedCategory !== null"
         emit-value
         map-options
+        use-input
+        input-debounce="0"
+        label="Select Category"
+        @filter="filterCategories"
+        option-label="name"
+        option-value="id"
       />
     </div>
 
     <div class="q-mt-md">
-      <div v-if="filteredAnnouncements.length === 0" class="row justify-center q-ma-lg">
+      <div v-if="announcements.length === 0" class="row justify-center q-ma-lg">
         <p>No announcements found.</p>
       </div>
       <q-card
-        v-for="announcement in filteredAnnouncements"
+        v-for="announcement in announcements"
         :key="announcement.id"
         flat
         bordered
@@ -38,7 +43,7 @@
       >
         <q-card-section class="overflow-hidden">
           <h2 class="text-h6 font-bold text-primary">{{ announcement.title }}</h2>
-          <p class="text-body2 text-gray-500">{{ announcement.category.name }}</p>
+          <p class="text-body2 text-gray-500">{{ announcement.category?.name || 'No category' }}</p>
           <p class="text-caption text-secondary">{{ timeAgo(announcement.created_at) }}</p>
           <q-separator class="my-2" />
           <div class="overflow-hidden max-h-10">
@@ -58,6 +63,15 @@
       </q-card>
     </div>
 
+    <div class="row justify-center q-mt-md">
+      <q-pagination
+        v-model="currentPage"
+        :max="lastPage"
+        @update:model-value="updatePage"
+        direction-links
+      />
+    </div>
+
     <ViewAnnouncementModal :viewData="announcementData" />
   </q-page>
 </template>
@@ -66,7 +80,7 @@
 import { defineAsyncComponent } from 'vue';
 import { useModalStore } from 'src/stores/modules/modalStore';
 import { useUserStore } from 'src/stores/modules/userStore';
-import { useAnnouncementStore } from 'src/stores/modules/announcementStore';
+import announcementService from 'src/services/announcementService';
 import categoryService from 'src/services/categoryService';
 import dateMixin from 'src/utils/mixins/dateMixin';
 
@@ -80,38 +94,30 @@ export default {
       userData: {},
       announcements: [],
       announcementData: [],
-      categories: [],
+      currentPage: 1,
+      pageSize: 5,
+      lastPage: 1,
+      total: 0,
       selectedCategory: null,
+      originalCategoriesOptions: [],
+      categoryOptions: [],
     };
   },
-  computed: {
-    categoryOptions() {
-      return [
-        { label: 'Select Category', value: null, disabled: true },
-        ...this.categories.map(category => ({ label: category.name, value: category.id })),
-      ];
-    },
-    filteredAnnouncements() {
-      if (this.selectedCategory) {
-        return this.announcements.filter(
-          announcement => announcement.category.id === this.selectedCategory
-        );
-      }
-      return this.announcements;
+  watch: {
+    selectedCategory() {
+      this.fetchAnnouncement();
     },
   },
   async mounted() {
     const userStore = useUserStore();
-    const announcementStore = useAnnouncementStore();
 
     await Promise.all([
-      announcementStore.fetchAnnouncement(),
       userStore.fetchUser(),
+      this.fetchAnnouncement(),
       this.fetchCategories(),
     ]);
 
     this.userData = userStore.userData;
-    this.announcements = announcementStore.announcementData;
   },
   methods: {
     openViewModal(viewData) {
@@ -120,13 +126,51 @@ export default {
       const modalStore = useModalStore();
       modalStore.setShowViewAnnouncementModal(true);
     },
+    updatePage(page) {
+      this.currentPage = page;
+      this.fetchAnnouncement();
+    },
+    async fetchAnnouncement() {
+      try {
+        const response = await announcementService.getPaginatedAnnouncement({
+          currentPage: this.currentPage,
+          pageSize: this.pageSize,
+          category: this.selectedCategory,
+        });
+
+        this.announcements = response.data.body || [];
+
+        const details = response.data.details;
+        if (details) {
+          this.currentPage = details.current_page || 1;
+          this.lastPage = details.last_page || 1;
+          this.total = details.total || 0;
+        }
+      } catch (error) {
+        console.error('Error fetching announcement:', error);
+      }
+    },
     async fetchCategories() {
       try {
         const response = await categoryService.getAllCategories();
-        this.categories = response.data.body || [];
+        this.categoryOptions = response.data.body || [];
+        this.originalCategoriesOptions = [...this.categoryOptions];
       } catch (error) {
         console.error('Error fetching categories:', error);
       }
+    },
+    filterCategories(val, update) {
+      if (val === '') {
+        update(() => {
+          this.categoryOptions = [...this.originalCategoriesOptions];
+        });
+        return;
+      }
+
+      update(() => {
+        const needle = val.toLowerCase();
+        this.categoryOptions = this.originalCategoriesOptions.filter(category => category.name.toLowerCase().includes(needle));
+      });
     },
   },
 };
@@ -137,3 +181,4 @@ export default {
   margin-bottom: 0.5rem;
 }
 </style>
+

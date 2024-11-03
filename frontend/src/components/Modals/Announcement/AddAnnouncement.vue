@@ -1,14 +1,27 @@
 <template>
-  <q-dialog v-model="modalStore.showAddAnnouncementModal" @hide="resetForm">
+  <q-dialog v-model="modalStore.showAddAnnouncementModal" @hide="resetForm" >
     <q-card flat bordered class="q-pa-md text-white" style="width: 700px; max-width: 80vw;">
       <h3 class="text-primary pb-4">Add Announcement</h3>
       <q-form @submit.prevent>
         <CustomInput v-model="form.title" label="Title" />
-        <CustomSelect
+
+        <q-select
           v-model="form.category"
-          :options="categories.map(category => ({ label: category.name, value: category.id }))"
-          label="Categories"
+          :options="categoryOptions"
+          class="q-mb-md"
+          outlined
+          color="primary"
+          :clearable="form.category !== null"
+          emit-value
+          map-options
+          use-input
+          input-debounce="0"
+          label="Category"
+          @filter="filterCategories"
+          option-label="name"
+          option-value="id"
         />
+
         <q-editor v-model="form.content" min-height="10rem" class="editor q-mb-md" />
 
         <CustomUploader
@@ -36,7 +49,6 @@ import announcementService from 'src/services/announcementService';
 export default {
   components: {
     CustomInput: defineAsyncComponent(() => import('components/Widgets/CustomInput.vue')),
-    CustomSelect: defineAsyncComponent(() => import('components/Widgets/CustomSelect.vue')),
     CustomUploader: defineAsyncComponent(() => import('components/Widgets/CustomUploader.vue')),
   },
   props: {
@@ -54,7 +66,8 @@ export default {
         files: []
       },
       modalStore: useModalStore(),
-      categories: [],
+      originalCategoriesOptions: [],
+      categoryOptions: [],
     };
   },
   mounted() {
@@ -110,9 +123,10 @@ export default {
     async fetchCategories() {
       try {
         const response = await categoryService.getAllCategories();
-        this.categories = response.data.body || [];
+        this.categoryOptions = response.data.body || [];
+        this.originalCategoriesOptions = [...this.categoryOptions];
 
-      if (this.categories && this.categories.length === 0) {
+      if (this.categoryOptions && this.categoryOptions.length === 0) {
         Notify.create({
           type: 'warning',
           position: 'top',
@@ -125,6 +139,19 @@ export default {
       } catch (error) {
         console.error('Error fetching categories:', error);
       }
+    },
+    filterCategories(val, update) {
+      if (val === '') {
+        update(() => {
+          this.categoryOptions = [...this.originalCategoriesOptions];
+        });
+        return;
+      }
+
+      update(() => {
+        const needle = val.toLowerCase();
+        this.categoryOptions = this.originalCategoriesOptions.filter(category => category.name.toLowerCase().includes(needle));
+      });
     },
   },
 };

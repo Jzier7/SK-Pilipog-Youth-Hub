@@ -1,8 +1,13 @@
 import { api } from 'src/boot/axios'
 
 const eventService = {
-  async getEvents(params) {
-    const response = await api.get('/api/event/retrieve', { params });
+  async getPaginatedEvents(params) {
+    const response = await api.get('/api/event/retrieve/paginated', { params });
+    return response;
+  },
+
+  async getAllEvents() {
+    const response = await api.get('/api/event/retrieve/all');
     return response;
   },
 

@@ -85,7 +85,7 @@ export default {
   methods: {
     async fetchOfficials() {
       try {
-        const response = await officialService.getOfficials({ is_active: 1 });
+        const response = await officialService.getActiveOfficials();
         this.officials = response.data.body.officials || [];
 
         if (response.data.body.term) {

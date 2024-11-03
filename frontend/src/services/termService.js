@@ -1,8 +1,13 @@
 import { api } from 'src/boot/axios'
 
 const termService = {
-  async getTerms(params) {
-    const response = await api.get('/api/term/retrieve', { params });
+  async getPaginatedTerms(params) {
+    const response = await api.get('/api/term/retrieve/paginated', { params });
+    return response;
+  },
+
+  async getAllTerms() {
+    const response = await api.get('/api/term/retrieve/all');
     return response;
   },
 
@@ -16,13 +21,13 @@ const termService = {
     return response;
   },
 
-  async deleteTerm(data) {
-    const response = await api.delete('/api/term/delete', { data });
+  async setActiveTerm(data) {
+    const response = await api.patch('/api/term/update/status', data );
     return response;
   },
 
-  async setActiveTerm(data) {
-    const response = await api.patch('/api/term/update/status', data );
+  async deleteTerm(data) {
+    const response = await api.delete('/api/term/delete', { data });
     return response;
   },
 };

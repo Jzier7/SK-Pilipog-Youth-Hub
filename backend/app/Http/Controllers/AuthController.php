@@ -29,8 +29,14 @@ class AuthController extends Controller
      */
     public function login(LoginRequest $request): JsonResponse
     {
-        $data = $request->validated();
-        $response = $this->authRepository->login($data);
+        $data = [
+            'email' => $request->input('email'),
+            'password' => $request->input('password')
+        ];
+
+        $rememberMe = $request->input('rememberMe');
+
+        $response = $this->authRepository->login($data, $rememberMe);
         return $this->authRepository->getJsonResponse($response);
     }
 
@@ -65,10 +71,21 @@ class AuthController extends Controller
      * @param array $request
      * @return Illuminate\Http\Response
      */
-    public function register(RegisterRequest $request) # : JsonResponse
+    public function register(RegisterRequest $request): JsonResponse
     {
         $data = $request->validated();
         $response = $this->authRepository->register($data);
+        return $this->authRepository->getJsonResponse($response);
+    }
+
+    /**
+     * Checks Auth
+     *
+     * @return Illuminate\Http\Response
+     */
+    public function checkAuth(): JsonResponse
+    {
+        $response = $this->authRepository->checkAuth();
         return $this->authRepository->getJsonResponse($response);
     }
 }

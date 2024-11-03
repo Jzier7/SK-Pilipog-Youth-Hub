@@ -45,13 +45,13 @@ Route::middleware(['auth:sanctum', 'role.guard'])->group(function () {
         Route::prefix('update')->group(function () {
             Route::patch('data', [UserController::class, 'updateData']);
             Route::patch('status', [UserController::class, 'updateStatus']);
+            Route::patch('participation', [UserController::class, 'updateParticipationCount']);
         });
 
         Route::prefix('retrieve')->group(function () {
-            Route::get('all/users', [UserController::class, 'retrieveAllUsers']);
-            Route::get('all/admins', [UserController::class, 'retrieveAllAdmins']);
-            Route::get('all/merits', [UserController::class, 'retrieveUserMerits']);
-            Route::get('one', [UserController::class, 'retrieveOne']);
+            Route::get('users', [UserController::class, 'retrieveUsers']);
+            Route::get('admins', [UserController::class, 'retrieveAdmins']);
+            Route::get('players', [UserController::class, 'retrievePlayers']);
         });
 
         Route::prefix('voters')->group(function () {
@@ -71,7 +71,7 @@ Route::middleware(['auth:sanctum', 'role.guard'])->group(function () {
 
         Route::prefix('retrieve')->group(function () {
             Route::get('all', [CategoryController::class, 'retrieveAll']);
-            Route::get('one', [CategoryController::class, 'retrieveOne']);
+            Route::get('paginated', [CategoryController::class, 'retrievePaginate']);
         });
     });
 
@@ -82,7 +82,8 @@ Route::middleware(['auth:sanctum', 'role.guard'])->group(function () {
         Route::delete('delete', [AnnouncementController::class, 'delete']);
 
         Route::prefix('retrieve')->group(function () {
-            Route::get('all', [AnnouncementController::class, 'retrieveAll']);
+            Route::get('latest', [AnnouncementController::class, 'retrieveLatest']);
+            Route::get('paginated', [AnnouncementController::class, 'retrievePaginate']);
         });
     });
 
@@ -91,23 +92,37 @@ Route::middleware(['auth:sanctum', 'role.guard'])->group(function () {
         Route::post('store', [EventController::class, 'store']);
         Route::patch('update', [EventController::class, 'update']);
         Route::delete('delete', [EventController::class, 'delete']);
-        Route::get('retrieve', [EventController::class, 'retrieve']);
+
+        Route::prefix('retrieve')->group(function () {
+            Route::get('all', [EventController::class, 'retrieveAll']);
+            Route::get('paginated', [EventController::class, 'retrievePaginate']);
+        });
     });
 
     Route::prefix('team')->group(function () {
         Route::post('store', [TeamController::class, 'store']);
         Route::patch('update', [TeamController::class, 'update']);
         Route::delete('delete', [TeamController::class, 'delete']);
-        Route::get('retrieve', [TeamController::class, 'retrieve']);
+
+        Route::prefix('retrieve')->group(function () {
+            Route::get('all', [TeamController::class, 'retrieveAll']);
+            Route::get('paginated', [TeamController::class, 'retrievePaginate']);
+        });
     });
 
     Route::prefix('game')->group(function () {
         Route::post('store', [GameController::class, 'store']);
-        Route::patch('update', [GameController::class, 'update']);
         Route::delete('delete', [GameController::class, 'delete']);
-        Route::get('retrieve', [GameController::class, 'retrieve']);
 
-        Route::patch('update/result', [GameController::class, 'updateResult']);
+        Route::prefix('retrieve')->group(function () {
+            Route::get('all', [GameController::class, 'retrieveAll']);
+            Route::get('paginated', [GameController::class, 'retrievePaginate']);
+        });
+
+        Route::prefix('update')->group(function () {
+            Route::patch('', [GameController::class, 'update']);
+            Route::patch('result', [GameController::class, 'updateResult']);
+        });
     });
 
     //FOR SK OFFICIAL PAGE
@@ -115,23 +130,38 @@ Route::middleware(['auth:sanctum', 'role.guard'])->group(function () {
         Route::post('store', [OfficialController::class, 'store']);
         Route::patch('update', [OfficialController::class, 'update']);
         Route::delete('delete', [OfficialController::class, 'delete']);
-        Route::get('retrieve', [OfficialController::class, 'retrieve']);
+
+        Route::prefix('retrieve')->group(function () {
+            Route::get('active', [OfficialController::class, 'retrieveActive']);
+            Route::get('paginated', [OfficialController::class, 'retrievePaginate']);
+        });
     });
 
     Route::prefix('position')->group(function () {
         Route::post('store', [PositionController::class, 'store']);
         Route::patch('update', [PositionController::class, 'update']);
         Route::delete('delete', [PositionController::class, 'delete']);
-        Route::get('retrieve', [PositionController::class, 'retrieve']);
+
+        Route::prefix('retrieve')->group(function () {
+            Route::get('all', [PositionController::class, 'retrieveAll']);
+            Route::get('paginated', [PositionController::class, 'retrievePaginate']);
+        });
     });
 
     Route::prefix('term')->group(function () {
         Route::post('store', [TermController::class, 'store']);
-        Route::patch('update', [TermController::class, 'update']);
         Route::delete('delete', [TermController::class, 'delete']);
         Route::get('retrieve', [TermController::class, 'retrieve']);
 
-        Route::patch('update/status', [TermController::class, 'updateStatus']);
+        Route::prefix('retrieve')->group(function () {
+            Route::get('all', [TermController::class, 'retrieveAll']);
+            Route::get('paginated', [TermController::class, 'retrievePaginate']);
+        });
+
+        Route::prefix('update')->group(function () {
+            Route::patch('', [TermController::class, 'update']);
+            Route::patch('status', [TermController::class, 'updateStatus']);
+        });
     });
 
     //FOR FORUM PAGE
@@ -156,6 +186,7 @@ Route::prefix('auth')->group(function () {
     Route::post('login', [AuthController::class, 'login']);
     Route::post('login/guest', [AuthController::class, 'loginAsGuest']);
     Route::post('logout', [AuthController::class, 'logout']);
+    Route::get('check', [AuthController::class, 'checkAuth']);
 });
 
 Route::prefix('purok')->group(function () {

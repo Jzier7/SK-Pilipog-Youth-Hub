@@ -134,7 +134,7 @@ export default {
     },
     async fetchPositions() {
       try {
-        const response = await positionService.getPositions({
+        const response = await positionService.getPaginatedPositions({
           search: this.search,
           currentPage: this.currentPage,
           pageSize: this.pageSize,

@@ -1,8 +1,13 @@
 import { api } from 'src/boot/axios'
 
 const gameService = {
-  async getGames(params) {
-    const response = await api.get('/api/game/retrieve', { params });
+  async getPaginatedGames(params) {
+    const response = await api.get('/api/game/retrieve/paginated', { params });
+    return response;
+  },
+
+  async getAllGames(params) {
+    const response = await api.get('/api/game/retrieve/all', { params });
     return response;
   },
 
@@ -16,13 +21,13 @@ const gameService = {
     return response;
   },
 
-  async deleteGame(data) {
-    const response = await api.delete('/api/game/delete', { data });
+  async updateGameResult(data) {
+    const response = await api.patch('/api/game/update/result', data );
     return response;
   },
 
-  async updateGameResult(data) {
-    const response = await api.patch('/api/game/update/result', data );
+  async deleteGame(data) {
+    const response = await api.delete('/api/game/delete', { data });
     return response;
   },
 };

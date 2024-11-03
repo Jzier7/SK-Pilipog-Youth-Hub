@@ -10,15 +10,14 @@ class EventRepository extends JsonResponseFormat
 {
 
     /**
-     * Get events from a term
+     * Get paginated events
      *
      * @param array $params
      * @return array
      */
-    public function retrieve(array $params): array
+    public function retrievePaginate(array $params): array
     {
-        $query = Event::query();
-        $query->with(['games', 'category']);
+        $query = Event::query()->with(['games', 'category']);
 
         if (!empty($params['search'])) {
             $searchTerm = '%' . $params['search'] . '%';
@@ -34,8 +33,10 @@ class EventRepository extends JsonResponseFormat
 
         $events = $query->paginate($pageSize, ['*'], 'page', $currentPage);
 
+        $retrievedCount = count($events->items());
+
         return [
-            'message' => 'All events retrieved successfully',
+            'message' => "{$retrievedCount} events retrieved successfully",
             'body' => $events->items(),
             'current_page' => $events->currentPage(),
             'from' => $events->firstItem(),
@@ -44,6 +45,28 @@ class EventRepository extends JsonResponseFormat
             'skip' => ($currentPage - 1) * $pageSize,
             'take' => $pageSize,
             'total' => $events->total(),
+        ];
+    }
+
+    /**
+     * Get all events
+     *
+     * @param array $params
+     * @return array
+     */
+    public function retrieveAll(): array
+    {
+        $events = Event::with('category')->get()->map(function ($event) {
+            return [
+                'id' => $event->id,
+                'name' => $event->name_with_category,
+            ];
+        });
+
+        return [
+            'message' => 'All events retrieved successfully',
+            'body' => $events,
+            'total' => $events->count(),
         ];
     }
 

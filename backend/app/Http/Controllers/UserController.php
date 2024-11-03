@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\User\RetrieveAllUsers;
-use App\Http\Requests\User\RetrieveAllAdmins;
+use App\Http\Requests\User\RetrieveUsers;
+use App\Http\Requests\User\RetrieveAdmins;
 use App\Http\Requests\User\Store;
 use App\Http\Requests\User\UpdateData;
 use App\Http\Requests\User\UpdateStatus;
+use App\Http\Requests\User\UpdateParticipationCount;
 use App\Http\Requests\User\Delete;
 use App\Repositories\UserRepository;
 use Illuminate\Http\JsonResponse;
@@ -36,11 +37,11 @@ class UserController extends Controller
     }
 
     /**
-     * Retrieves all user.
+     * Retrieves paginated users.
      *
      * @return Illuminate\Http\JsonResponse The user's data in JSON format.
      */
-    public function retrieveAllUsers(RetrieveAllUsers $request): JsonResponse
+    public function retrieveUsers(RetrieveUsers $request): JsonResponse
     {
         $params = [
             'search' => $request->input('search'),
@@ -50,16 +51,16 @@ class UserController extends Controller
             'activeVoter' => $request->input('activeVoter'),
         ];
 
-        $response = $this->userRepository->retrieveAllUsers($params);
+        $response = $this->userRepository->retrieveUsers($params);
         return $this->userRepository->getJsonResponse($response);
     }
 
     /**
-     * Retrieves all user.
+     * Retrieves paginated admins.
      *
      * @return Illuminate\Http\JsonResponse The user's data in JSON format.
      */
-    public function retrieveAllAdmins(RetrieveAllAdmins $request): JsonResponse
+    public function retrieveAdmins(RetrieveAdmins $request): JsonResponse
     {
         $params = [
             'search' => $request->input('search'),
@@ -69,25 +70,18 @@ class UserController extends Controller
             'isAdmin' => true
         ];
 
-        $response = $this->userRepository->retrieveAllUsers($params);
+        $response = $this->userRepository->retrieveUsers($params);
         return $this->userRepository->getJsonResponse($response);
     }
 
     /**
-     * Retrieves all user merits.
+     * Retrieves all users.
      *
      * @return Illuminate\Http\JsonResponse The user's data in JSON format.
      */
-    public function retrieveUserMerits(RetrieveAllUsers $request): JsonResponse
+    public function retrievePlayers(): JsonResponse
     {
-        $params = [
-            'search' => $request->input('search'),
-            'currentPage' => $request->input('currentPage', 1),
-            'pageSize' => $request->input('pageSize', 10),
-            'orderBy' => $request->input('orderBy', 'desc'),
-        ];
-
-        $response = $this->userRepository->retrieveUserMerits($params);
+        $response = $this->userRepository->retrievePlayers();
         return $this->userRepository->getJsonResponse($response);
     }
 
@@ -168,6 +162,19 @@ class UserController extends Controller
 
         $response = $this->userRepository->updateStatus($data);
         return $this->userRepository->getJsonResponse($response);
+    }
+
+    /**
+     * Update user participation counts.
+     *
+     * @return \Illuminate\Http\JsonResponse The participation count of users in JSON format
+     */
+    public function updateParticipationCount(UpdateParticipationCount $request): JsonResponse
+    {
+        $data = $request->all();
+
+        $response = $this->userRepository->updateParticipationCount($data);
+        return response()->json($response);
     }
 
     /**

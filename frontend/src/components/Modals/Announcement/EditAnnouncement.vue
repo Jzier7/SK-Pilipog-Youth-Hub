@@ -1,14 +1,27 @@
 <template>
-  <q-dialog v-model="modalStore.showEditAnnouncementModal">
+  <q-dialog v-model="modalStore.showEditAnnouncementModal" @hide="resetForm">
     <q-card flat bordered class="q-pa-md text-white" style="width: 700px; max-width: 80vw;">
       <h3 class="text-primary pb-4">Edit Announcement</h3>
       <q-form @submit.prevent>
         <CustomInput v-model="localForm.title" label="Title" />
-        <CustomSelect
+
+        <q-select
           v-model="localForm.category"
-          :options="categories.map(category => ({ label: category.name, value: category.id }))"
-          label="Categories"
+          :options="categoryOptions"
+          class="q-mb-md"
+          outlined
+          color="primary"
+          :clearable="localForm.category !== null"
+          emit-value
+          map-options
+          use-input
+          input-debounce="0"
+          label="Category"
+          @filter="filterCategories"
+          option-label="name"
+          option-value="id"
         />
+
         <q-editor v-model="localForm.content" min-height="10rem" class="editor q-mb-md" />
 
         <CustomUploader
@@ -48,7 +61,6 @@ import handleMedia from 'src/utils/mixins/handleMedia';
 export default {
   components: {
     CustomInput: defineAsyncComponent(() => import('components/Widgets/CustomInput.vue')),
-    CustomSelect: defineAsyncComponent(() => import('components/Widgets/CustomSelect.vue')),
     CustomUploader: defineAsyncComponent(() => import('components/Widgets/CustomUploader.vue')),
   },
   mixins: [handleMedia],
@@ -67,11 +79,12 @@ export default {
       localForm: {
         ...this.editData,
         category: this.editData.category ? this.editData.category.id : '',
-        files: [] // New files that will be uploaded
+        files: []
       },
-      oldFiles: this.editData.files || [], // Existing files
+      oldFiles: this.editData.files || [],
       modalStore: useModalStore(),
-      categories: [],
+      originalCategoriesOptions: [],
+      categoryOptions: [],
     };
   },
   watch: {
@@ -92,6 +105,15 @@ export default {
   methods: {
     closeModal() {
       this.modalStore.setShowEditAnnouncementModal(false);
+      this.resetForm();
+    },
+    resetForm() {
+      this.localForm = {
+        ...this.editData,
+        category: this.editData.category ? this.editData.category.id : '',
+        files: []
+      };
+      this.oldFiles = this.editData.files || [];
     },
     async publish() {
       const formData = new FormData();
@@ -100,13 +122,11 @@ export default {
       formData.append('category', this.localForm.category);
       formData.append('content', this.localForm.content);
 
-      // Add new files if any
       if (this.localForm.files.length > 0) {
         this.localForm.files.forEach(file => {
           formData.append('files[]', file);
         });
       } else {
-        // If no new files, retain old files for upload
         this.oldFiles.forEach(file => {
           formData.append('oldFiles[]', file);
         });
@@ -139,11 +159,25 @@ export default {
     async fetchCategories() {
       try {
         const response = await categoryService.getAllCategories();
-        this.categories = response.data.body || [];
+        this.categoryOptions = response.data.body || [];
+        this.originalCategoriesOptions = [...this.categoryOptions];
 
       } catch (error) {
         console.error('Error fetching categories:', error);
       }
+    },
+    filterCategories(val, update) {
+      if (val === '') {
+        update(() => {
+          this.categoryOptions = [...this.originalCategoriesOptions];
+        });
+        return;
+      }
+
+      update(() => {
+        const needle = val.toLowerCase();
+        this.categoryOptions = this.originalCategoriesOptions.filter(category => category.name.toLowerCase().includes(needle));
+      });
     },
     replaceFiles(newFiles) {
       if (newFiles.length > 0) {

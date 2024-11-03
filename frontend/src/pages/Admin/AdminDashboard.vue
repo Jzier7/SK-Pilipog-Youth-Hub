@@ -87,7 +87,7 @@ export default {
     const announcementStore = useAnnouncementStore();
 
     await Promise.all([
-      announcementStore.fetchAnnouncement(),
+      announcementStore.fetchLatestAnnouncement(),
       userStore.fetchUser(),
       userStore.fetchVotersCount(),
       userStore.fetchUsersCountPerPurok(),

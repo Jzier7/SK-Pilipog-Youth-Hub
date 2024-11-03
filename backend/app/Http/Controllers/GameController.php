@@ -24,11 +24,11 @@ class GameController extends Controller
     }
 
     /**
-     * Retrieves all game.
+     * Retrieves paginated game.
      *
      * @return Illuminate\Http\JsonResponse The game's data in JSON format.
      */
-    public function retrieve(Retrieve $request): JsonResponse
+    public function retrievePaginate(Retrieve $request): JsonResponse
     {
         $params = [
             'search' => $request->input('search'),
@@ -39,7 +39,24 @@ class GameController extends Controller
             'status' => $request->input('status')
         ];
 
-        $response = $this->gameRepository->retrieve($params);
+        $response = $this->gameRepository->retrievePaginate($params);
+        return $this->gameRepository->getJsonResponse($response);
+    }
+
+    /**
+     * Retrieves all game.
+     *
+     * @return Illuminate\Http\JsonResponse The game's data in JSON format.
+     */
+    public function retrieveAll(Retrieve $request): JsonResponse
+    {
+        $params = [
+            'search' => $request->input('search'),
+            'event' => $request->input('event'),
+            'status' => $request->input('status')
+        ];
+
+        $response = $this->gameRepository->retrieveAll($params);
         return $this->gameRepository->getJsonResponse($response);
     }
 

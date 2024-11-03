@@ -1,25 +1,17 @@
 <?php
 
-namespace App\Http\Requests\User;
+namespace App\Http\Requests\Announcement;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Facades\Auth;
 
-class RetrieveAllAdmins extends FormRequest
+class Retrieve extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-
-        $user = Auth::user();
-
-        if ($user && $user->isSuperAdmin()) {
-            return true;
-        }
-
-        return false;
+        return true;
     }
 
     /**
@@ -34,6 +26,8 @@ class RetrieveAllAdmins extends FormRequest
             'currentPage' => ['nullable', 'integer', 'min:1'],
             'pageSize' => ['nullable', 'integer', 'min:1', 'max:100'],
             'orderBy' => ['nullable', 'string', 'max:255'],
+            'latest' => ['nullable', 'string', 'max:255'],
+            'category' => ['nullable', 'integer']
         ];
     }
 }

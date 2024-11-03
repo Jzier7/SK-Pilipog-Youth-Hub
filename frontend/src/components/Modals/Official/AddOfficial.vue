@@ -1,20 +1,42 @@
 <template>
-  <q-dialog v-model="modalStore.showAddOfficialModal">
+  <q-dialog v-model="modalStore.showAddOfficialModal" @hide="resetForm">
     <q-card flat bordered class="q-pa-md text-white" style="width: 700px; max-width: 80vw;">
       <h3 class="text-primary pb-4">Add Official</h3>
       <q-form @submit.prevent>
         <CustomInput v-model="localForm.name" label="Name" />
 
-        <CustomSelect
+        <q-select
           v-model="localForm.position"
-          :options="positionData.map(position => ({ label: position.name, value: position.id }))"
-          label="Position"
+          :options="positionOptions"
+          class="q-mb-md"
+          outlined
+          color="primary"
+          :clearable="localForm.position !== null"
+          emit-value
+          map-options
+          use-input
+          input-debounce="0"
+          label="Select Position"
+          @filter="filterPositions"
+          option-label="name"
+          option-value="id"
         />
 
-        <CustomSelect
+        <q-select
           v-model="localForm.term"
-          :options="formattedTermOptions"
-          label="Term"
+          :options="termOptions"
+          class="q-mb-md"
+          outlined
+          color="primary"
+          :clearable="localForm.term !== null"
+          emit-value
+          map-options
+          use-input
+          input-debounce="0"
+          label="Select Term"
+          @filter="filterTerms"
+          option-label="date_range"
+          option-value="id"
         />
 
         <div class="row justify-end">
@@ -38,7 +60,6 @@ import dateMixin from 'src/utils/mixins/dateMixin';
 export default {
   components: {
     CustomInput: defineAsyncComponent(() => import('components/Widgets/CustomInput.vue')),
-    CustomSelect: defineAsyncComponent(() => import('components/Widgets/CustomSelect.vue')),
   },
   mixins: [dateMixin],
   props: {
@@ -54,8 +75,10 @@ export default {
         position: '',
         term: '',
       },
-      positionData: [],
-      termData: [],
+      originalPositionOptions: [],
+      originalTermOptions: [],
+      positionOptions: [],
+      termOptions: [],
       errors: {},
       modalStore: useModalStore(),
       latestTermId: null,
@@ -65,27 +88,16 @@ export default {
     this.fetchPositionData();
     this.fetchTermData();
   },
-  computed: {
-    formattedTermOptions() {
-      return this.termData.map(term => {
-        const label = `${this.formatDate(term.start_date, 'D MMMM YYYY')} - ${this.formatDate(term.end_date, 'D MMMM YYYY')}`;
-        return {
-          label: term.is_active ? `${label} (Active)` : label,
-          value: term.id,
-        };
-      });
-    },
-  },
   methods: {
     closeModal() {
       this.modalStore.setShowAddOfficialModal(false);
-      this.clearForm();
+      this.resetForm();
     },
-    clearForm() {
+    resetForm() {
       this.localForm = {
         name: '',
         position: '',
-        term: '', // Reset term
+        term: '',
       };
       this.errors = {};
     },
@@ -118,10 +130,11 @@ export default {
     },
     async fetchPositionData() {
       try {
-        const response = await positionService.getPositions();
-        this.positionData = response.data.body || [];
+        const response = await positionService.getAllPositions();
+        this.positionOptions = response.data.body || [];
+        this.originalPositionOptions = [...this.positionOptions];
 
-        if (this.positionData.length === 0) {
+        if (this.positionOptions.length === 0) {
           Notify.create({
             type: 'warning',
             position: 'top',
@@ -137,10 +150,16 @@ export default {
     },
     async fetchTermData() {
       try {
-        const response = await termService.getTerms();
-        this.termData = response.data.body || [];
+        const response = await termService.getAllTerms();
+        const terms = response.data.body || [];
 
-        if (this.termData.length === 0) {
+        this.termOptions = terms.map(term => ({
+          id: term.id,
+          date_range: `${this.formatDate(term.start_date, 'D MMMM YYYY')} - ${this.formatDate(term.end_date, 'D MMMM YYYY')}` + (term.is_active ? ' (Active)' : ''),
+        }));
+        this.originalTermOptions = [...this.termOptions];
+
+        if (terms.length === 0) {
           Notify.create({
             type: 'warning',
             position: 'top',
@@ -150,14 +169,40 @@ export default {
           });
         }
 
-        const activeTerm = this.termData.find(term => term.is_active);
+        const activeTerm = terms.find(term => term.is_active);
         if (activeTerm) {
             this.localForm.term = activeTerm.id;
         }
       } catch (error) {
         console.error('Error fetching terms:', error);
       }
-    }
+    },
+    filterPositions(val, update) {
+      if (val === '') {
+        update(() => {
+          this.positionOptions = [...this.originalPositionOptions];
+        });
+        return;
+      }
+
+      update(() => {
+        const needle = val.toLowerCase();
+        this.positionOptions = this.originalPositionOptions.filter(position => position.name.toLowerCase().includes(needle));
+      });
+    },
+    filterTerms(val, update) {
+      if (val === '') {
+        update(() => {
+          this.termOptions = [...this.originalTermOptions];
+        });
+        return;
+      }
+
+      update(() => {
+        const needle = val.toLowerCase();
+        this.termOptions = this.originalTermOptions.filter(term => term.date_range.toLowerCase().includes(needle));
+      });
+    },
   },
 };
 </script>

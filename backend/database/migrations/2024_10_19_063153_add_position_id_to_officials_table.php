@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::table('officials', function (Blueprint $table) {
             $table->unsignedBigInteger('position_id')->nullable()->after('term_id');
 
-            $table->foreign('position_id')->references('id')->on('positions')->onDelete('set null');
+            $table->foreign('position_id')->references('id')->on('positions')->onDelete('cascade');
         });
     }
 

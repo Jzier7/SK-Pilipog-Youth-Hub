@@ -27,7 +27,7 @@
               </span>
 
               <span class="w-3/4 q-mt-md">
-                <CustomCheckbox v-model="rememberMe" label="Remember Me" />
+                <CustomCheckbox v-model="form.rememberMe" label="Remember Me" />
                 <CustomButton label="Sign in" type="submit" />
 
                 <div class="w-full text-center">
@@ -77,8 +77,8 @@
         form: {
           email: '',
           password: '',
+          rememberMe: false,
         },
-        rememberMe: false,
         errors: {},
       };
     },

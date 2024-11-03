@@ -11,12 +11,12 @@ class OfficialRepository extends JsonResponseFormat
 {
 
     /**
-     * Get officials from a term
+     * Get paginated officials
      *
      * @param array $params
      * @return array
      */
-    public function retrieve(array $params): array
+    public function retrievePaginate(array $params): array
     {
         $query = Official::query();
         $isActiveTerm = null;
@@ -67,8 +67,10 @@ class OfficialRepository extends JsonResponseFormat
 
         $officials = $query->paginate($pageSize, ['*'], 'page', $currentPage);
 
+        $retrievedCount = count($officials->items());
+
         return [
-            'message' => 'All officials retrieved successfully',
+            'message' => "{$retrievedCount} officials retrieved successfully",
             'body' => [
                 'officials' => $officials->items(),
                 'term' => !empty($params['term']) ? $term : $isActiveTerm,
@@ -80,6 +82,42 @@ class OfficialRepository extends JsonResponseFormat
             'skip' => ($currentPage - 1) * $pageSize,
             'take' => $pageSize,
             'total' => $officials->total(),
+        ];
+    }
+
+    /**
+     * Get active officials
+     *
+     * @return array
+     */
+    public function retrieveActive(): array
+    {
+        $query = Official::query();
+        $isActiveTerm = Term::where('is_active', 1)->first();
+
+        if (!$isActiveTerm) {
+            return [
+                'message' => 'No active term found',
+                'body' => [
+                    'officials' => [],
+                    'term' => null,
+                ],
+                'total' => 0,
+            ];
+        }
+
+        $query->where('term_id', $isActiveTerm->id);
+        $query->with(['position', 'term']);
+
+        $officials = $query->get();
+
+        return [
+            'message' => 'All active officials retrieved successfully',
+            'body' => [
+                'officials' => $officials,
+                'term' => $isActiveTerm,
+            ],
+            'total' => count($officials),
         ];
     }
 

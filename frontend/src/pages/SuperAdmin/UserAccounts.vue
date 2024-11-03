@@ -148,7 +148,7 @@ export default {
     },
     async fetchUsers() {
       try {
-        const response = await userService.getAllUser({
+        const response = await userService.getUsers({
           search: this.search,
           currentPage: this.currentPage,
           pageSize: this.pageSize,

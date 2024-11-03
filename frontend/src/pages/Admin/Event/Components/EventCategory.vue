@@ -16,6 +16,7 @@
         v-model="search"
         placeholder="Search by category name"
         class="q-mr-sm"
+        @input="debounceFetchCategories"
       >
         <template v-slot:prepend>
           <q-icon name="search" />
@@ -99,10 +100,12 @@ export default {
         { name: 'name', label: 'Category Name', align: 'center', field: 'name' },
         { name: 'actions', label: 'Actions', align: 'center', field: 'actions' },
       ],
+      debounceTimeout: null,
     };
   },
   watch: {
     search() {
+      this.currentPage = 1;
       this.debounceFetchCategories();
     },
   },
@@ -136,7 +139,7 @@ export default {
     },
     async fetchCategories() {
       try {
-        const response = await categoryService.getAllCategories({
+        const response = await categoryService.getPaginatedCategories({
           search: this.search,
           currentPage: this.currentPage,
           pageSize: this.pageSize

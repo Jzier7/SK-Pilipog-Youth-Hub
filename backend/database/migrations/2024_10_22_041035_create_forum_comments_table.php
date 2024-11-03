@@ -16,7 +16,6 @@ return new class extends Migration
             $table->unsignedBigInteger('author_id')->nullable();
             $table->unsignedBigInteger('post_id')->nullable();
             $table->text('comment')->nullable();
-            $table->softDeletes();
             $table->timestamps();
 
             $table->foreign('author_id')->references('id')->on('users')->onDelete('cascade');

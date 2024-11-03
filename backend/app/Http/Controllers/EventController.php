@@ -23,11 +23,11 @@ class EventController extends Controller
     }
 
     /**
-     * Retrieves all event.
+     * Retrieves paginated event.
      *
      * @return Illuminate\Http\JsonResponse The event's data in JSON format.
      */
-    public function retrieve(Retrieve $request): JsonResponse
+    public function retrievePaginate(Retrieve $request): JsonResponse
     {
         $params = [
             'search' => $request->input('search'),
@@ -37,7 +37,18 @@ class EventController extends Controller
             'category' => $request->input('category'),
         ];
 
-        $response = $this->eventRepository->retrieve($params);
+        $response = $this->eventRepository->retrievePaginate($params);
+        return $this->eventRepository->getJsonResponse($response);
+    }
+
+    /**
+     * Retrieves all event.
+     *
+     * @return Illuminate\Http\JsonResponse The event's data in JSON format.
+     */
+    public function retrieveAll(): JsonResponse
+    {
+        $response = $this->eventRepository->retrieveAll();
         return $this->eventRepository->getJsonResponse($response);
     }
 

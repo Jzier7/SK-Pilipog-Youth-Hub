@@ -120,7 +120,7 @@ export default {
     };
   },
   watch: {
-    search(newVal) {
+    search() {
       clearTimeout(this.debounceTimeout);
       this.debounceTimeout = setTimeout(() => {
         this.fetchUsers();
@@ -161,7 +161,7 @@ export default {
     },
     async fetchUsers() {
       try {
-        const response = await userService.getAllAdmin({
+        const response = await userService.getAdmins({
           search: this.search,
           currentPage: this.currentPage,
           pageSize: this.pageSize,

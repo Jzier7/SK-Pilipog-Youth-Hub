@@ -17,10 +17,15 @@
           outlined
           dense
           color="primary"
-          class="q-mr-sm"
           :clearable="selectedEvent !== null"
           emit-value
           map-options
+          use-input
+          input-debounce="0"
+          label="Select Event"
+          @filter="filterEvents"
+          option-label="name"
+          option-value="id"
         />
         <q-select
           v-model="selectedStatus"
@@ -53,7 +58,7 @@
       <q-card v-for="game in games" :key="game.id" class="my-card m-1" flat bordered>
         <q-card-section>
           <h4 class="text-primary text-bold">{{ game.name }}</h4>
-          <p class="text-body2 text-gray-500">{{ game.event ? game.event.name : 'N/A' }}</p>
+          <p class="text-body2 text-gray-500">{{ game.event ? `${game.event.name} (${game.event.category.name})` : 'N/A' }}</p>
           <div class="team-info">
             <div class="team-column">
               <img src="~/assets/logo.png" alt="Team 1" class="team-image" />
@@ -101,8 +106,9 @@ export default defineComponent({
       gameData: [],
       search: '',
       selectedEvent: null,
+      originalEventOptions: [],
+      eventOptions: [],
       selectedStatus: null,
-      events: [],
     };
   },
   computed: {
@@ -112,12 +118,6 @@ export default defineComponent({
         { label: 'Completed', value: 'completed' },
         { label: 'Pending', value: 'pending' },
         { label: 'Canceled', value: 'canceled' },
-      ];
-    },
-    eventOptions() {
-      return [
-        { label: 'Select Event', value: null, disabled: true },
-        ...this.events.map(event => ({ label: event.name, value: event.id })),
       ];
     },
   },
@@ -139,7 +139,7 @@ export default defineComponent({
   methods: {
     async fetchGames() {
       try {
-        const response = await gameService.getGames({
+        const response = await gameService.getAllGames({
           search: this.search,
           event: this.selectedEvent,
           status: this.selectedStatus,
@@ -151,11 +151,25 @@ export default defineComponent({
     },
     async fetchEvents() {
       try {
-        const response = await eventService.getEvents();
-        this.events = response.data.body || [];
+        const response = await eventService.getAllEvents();
+        this.eventOptions = response.data.body || [];
+        this.originalEventOptions = [...this.eventOptions];
       } catch (error) {
         console.error('Error fetching events:', error);
       }
+    },
+    filterEvents(val, update) {
+      if (val === '') {
+        update(() => {
+          this.eventOptions = [...this.originalEventOptions];
+        });
+        return;
+      }
+
+      update(() => {
+        const needle = val.toLowerCase();
+        this.eventOptions = this.originalEventOptions.filter(event => event.name.toLowerCase().includes(needle));
+      });
     },
     debounceFetchGames() {
       clearTimeout(this.debounceTimeout);

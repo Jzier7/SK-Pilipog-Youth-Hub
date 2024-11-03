@@ -1,8 +1,13 @@
 import { api } from 'src/boot/axios'
 
 const announcementService = {
-  async getAllAnnouncement(params) {
-    const response = await api.get('/api/announcement/retrieve/all', { params });
+  async getPaginatedAnnouncement(params) {
+    const response = await api.get('/api/announcement/retrieve/paginated', { params });
+    return response;
+  },
+
+  async getLatestAnnouncement() {
+    const response = await api.get('/api/announcement/retrieve/latest');
     return response;
   },
 

@@ -25,11 +25,11 @@ return new class extends Migration
             $table->dateTime('date');
             $table->timestamps();
 
-            $table->foreign('event_id')->references('id')->on('events');
-            $table->foreign('team1_id')->references('id')->on('teams');
-            $table->foreign('team2_id')->references('id')->on('teams');
-            $table->foreign('winner')->references('id')->on('teams');
-            $table->foreign('loser')->references('id')->on('teams');
+            $table->foreign('event_id')->references('id')->on('events')->onDelete('cascade');
+            $table->foreign('team1_id')->references('id')->on('teams')->onDelete('cascade');
+            $table->foreign('team2_id')->references('id')->on('teams')->onDelete('cascade');
+            $table->foreign('winner')->references('id')->on('teams')->onDelete('cascade');
+            $table->foreign('loser')->references('id')->on('teams')->onDelete('cascade');
         });
     }
 

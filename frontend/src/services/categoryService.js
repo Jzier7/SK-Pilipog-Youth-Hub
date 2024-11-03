@@ -1,8 +1,13 @@
 import { api } from 'src/boot/axios'
 
 const categoryService = {
-  async getAllCategories(params = null) {
-    const response = await api.get('/api/category/retrieve/all', { params });
+  async getPaginatedCategories(params = null) {
+    const response = await api.get('/api/category/retrieve/paginated', { params });
+    return response;
+  },
+
+  async getAllCategories() {
+    const response = await api.get('/api/category/retrieve/all');
     return response;
   },
 

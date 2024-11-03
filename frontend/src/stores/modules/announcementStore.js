@@ -7,9 +7,9 @@ export const useAnnouncementStore = defineStore('announcement', {
   }),
   actions: {
 
-    async fetchAnnouncement() {
+    async fetchLatestAnnouncement() {
       try {
-        const response = await announcementService.getAllAnnouncement({
+        const response = await announcementService.getLatestAnnouncement({
           latest: 'latest'
         });
         this.announcementData = response.data.body;

@@ -6,18 +6,18 @@ const userService = {
     return response;
   },
 
-  async getUserMerits(params) {
-    const response = await api.get('/api/users/retrieve/all/merits', { params });
+  async getUsers(params) {
+    const response = await api.get('/api/users/retrieve/users', { params });
     return response;
   },
 
-  async getAllUser(params) {
-    const response = await api.get('/api/users/retrieve/all/users', { params });
+  async getAdmins(params) {
+    const response = await api.get('/api/users/retrieve/admins', { params });
     return response;
   },
 
-  async getAllAdmin(params) {
-    const response = await api.get('/api/users/retrieve/all/admins', { params });
+  async getPlayers() {
+    const response = await api.get('/api/users/retrieve/players');
     return response;
   },
 
@@ -33,6 +33,11 @@ const userService = {
 
   async updateUserStatus(data) {
     const response = await api.patch('/api/users/update/status', data);
+    return response;
+  },
+
+  async updateUserParticipation(data) {
+    const response = await api.patch('/api/users/update/participation', data);
     return response;
   },
 

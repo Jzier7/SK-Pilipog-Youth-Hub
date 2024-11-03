@@ -5,20 +5,21 @@ namespace App\Repositories;
 use App\Classes\JsonResponseFormat;
 use App\Models\Announcement;
 use App\Models\File;
-use App\Services\FileUploadService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
+use App\Services\FileUploadService;
 
 class AnnouncementRepository extends JsonResponseFormat
 {
     /**
-     * Get all announcements with optional filtering and pagination.
+     * Get paginated announcements.
      *
      * @param array $params
      * @return array
      */
-    public function retrieveAll(array $params): array
+    public function retrievePaginate(array $params): array
     {
         $query = Announcement::with([
             'category' => function ($query) {
@@ -29,6 +30,10 @@ class AnnouncementRepository extends JsonResponseFormat
             },
             'files'
         ]);
+
+        if (!empty($params['category'])) {
+            $query->where('category_id', $params['category']);
+        }
 
         if (!empty($params['latest'])) {
             $todayStart = Carbon::today();
@@ -54,8 +59,10 @@ class AnnouncementRepository extends JsonResponseFormat
 
         $announcements = $query->paginate($pageSize, ['*'], 'page', $currentPage);
 
+        $retrievedCount = count($announcements->items());
+
         return [
-            'message' => 'All announcements retrieved successfully',
+            'message' => "{$retrievedCount} announcements retrieved successfully",
             'body' => $announcements->items(),
             'current_page' => $announcements->currentPage(),
             'from' => $announcements->firstItem(),
@@ -64,6 +71,35 @@ class AnnouncementRepository extends JsonResponseFormat
             'skip' => ($currentPage - 1) * $pageSize,
             'take' => $pageSize,
             'total' => $announcements->total(),
+        ];
+    }
+
+    /**
+     * Get latest announcements.
+     *
+     * @param array $params
+     * @return array
+     */
+    public function retrieveLatest(array $params): array
+    {
+        $query = Announcement::with([
+            'category' => function ($query) {
+                $query->select('id', 'name');
+            },
+        ]);
+
+        if (!empty($params['latest'])) {
+            $todayStart = Carbon::today();
+            $todayEnd = Carbon::tomorrow();
+            $query->whereBetween('created_at', [$todayStart, $todayEnd]);
+        }
+
+        $announcements = $query->get();
+
+        return [
+            'message' => 'All latest announcements retrieved successfully',
+            'body' => $announcements,
+            'total' => $announcements->count(),
         ];
     }
 
@@ -151,7 +187,7 @@ class AnnouncementRepository extends JsonResponseFormat
             }
             elseif (is_array($files) && count($files) > 0) {
                 foreach ($announcement->files as $old_file) {
-                    \Storage::delete($old_file->path);
+                    Storage::delete($old_file->path);
                     $old_file->delete();
                 }
 

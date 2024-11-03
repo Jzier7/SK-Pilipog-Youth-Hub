@@ -11,24 +11,34 @@
       <q-select
         v-model="selectedPosition"
         :options="positionOptions"
-        outlined
         dense
+        outlined
         color="primary"
-        class="q-mr-sm"
         :clearable="selectedPosition !== null"
         emit-value
         map-options
+        use-input
+        input-debounce="0"
+        label="Select Position"
+        @filter="filterPositions"
+        option-label="name"
+        option-value="id"
       />
       <q-select
         v-model="selectedTerm"
         :options="termOptions"
-        outlined
         dense
+        outlined
         color="primary"
-        class="q-mr-sm"
         :clearable="selectedTerm !== null"
         emit-value
         map-options
+        use-input
+        input-debounce="0"
+        label="Select Term"
+        @filter="filterTerms"
+        option-label="date_range"
+        option-value="id"
       />
       <q-input
         rounded
@@ -121,8 +131,10 @@ export default {
       pageSize: 12,
       lastPage: 1,
       total: 0,
-      positions: [],
-      terms: [],
+      positionOptions: [],
+      termOptions: [],
+      originalPositionOptions: [],
+      originalTermOptions: [],
       selectedPosition: null,
       selectedTerm: null,
       columns: [
@@ -133,28 +145,8 @@ export default {
       ],
     };
   },
-  computed: {
-    positionOptions() {
-      return [
-        { label: 'Select Position', value: null, disabled: true },
-        ...this.positions.map(position => ({ label: position.name, value: position.id }))
-      ];
-    },
-    termOptions() {
-      return [
-        { label: 'Select Term', value: null, disabled: true },
-        ...this.terms.map(term => {
-          const label = `${this.formatDate(term.start_date, 'D MMMM YYYY')} - ${this.formatDate(term.end_date, 'D MMMM YYYY')}`;
-          return {
-            label: term.is_active ? `[ID: ${term.id}] ${label} (Active)` : `[ID: ${term.id}] ${label}`,
-            value: term.id,
-          };
-        })
-      ];
-    },
-  },
   watch: {
-    search(newVal) {
+    search() {
       this.debounceFetchOfficials();
     },
     selectedPosition() {
@@ -197,7 +189,7 @@ export default {
     },
     async fetchOfficials() {
       try {
-        const response = await officialService.getOfficials({
+        const response = await officialService.getPaginatedOfficials({
           search: this.search,
           currentPage: this.currentPage,
           pageSize: this.pageSize,
@@ -213,22 +205,56 @@ export default {
     },
     async fetchPositions() {
       try {
-        const response = await positionService.getPositions();
-        this.positions = response.data.body || [];
+        const response = await positionService.getAllPositions();
+        this.positionOptions = response.data.body || [];
+        this.originalPositionOptions = [...this.positionOptions];
+
       } catch (error) {
         console.error('Error fetching positions:', error);
       }
     },
     async fetchTerms() {
       try {
-        const response = await termService.getTerms();
-        this.terms = response.data.body || [];
+        const response = await termService.getAllTerms();
+        const terms = response.data.body || [];
 
-        const activeTerm = this.terms.find(term => term.is_active);
+        this.termOptions = terms.map(term => ({
+          id: term.id,
+          date_range: `${this.formatDate(term.start_date, 'D MMMM YYYY')} - ${this.formatDate(term.end_date, 'D MMMM YYYY')}`,
+        }));
+        this.originalTermOptions = [...this.termOptions];
+
+        const activeTerm = this.termOptions.find(term => term.is_active);
         this.selectedTerm = activeTerm ? activeTerm.id : null;
       } catch (error) {
         console.error('Error fetching terms:', error);
       }
+    },
+    filterPositions(val, update) {
+      if (val === '') {
+        update(() => {
+          this.positionOptions = [...this.originalPositionOptions];
+        });
+        return;
+      }
+
+      update(() => {
+        const needle = val.toLowerCase();
+        this.positionOptions = this.originalPositionOptions.filter(position => position.name.toLowerCase().includes(needle));
+      });
+    },
+    filterTerms(val, update) {
+      if (val === '') {
+        update(() => {
+          this.termOptions = [...this.originalTermOptions];
+        });
+        return;
+      }
+
+      update(() => {
+        const needle = val.toLowerCase();
+        this.termOptions = this.originalTermOptions.filter(term => term.date_range.toLowerCase().includes(needle));
+      });
     },
   },
 };

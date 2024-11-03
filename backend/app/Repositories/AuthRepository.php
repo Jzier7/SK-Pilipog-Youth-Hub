@@ -8,17 +8,17 @@ use App\Models\User;
 use App\Services\FileUploadService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Route;
 
 class AuthRepository extends JsonResponseFormat
 {
+
     /**
      * @param array $data
      * @return array
      */
-    public function login($data): array
+    public function login(array $data, bool $rememberMe): array
     {
-        if (!Auth::attempt($data)) {
+        if (!Auth::attempt($data, $rememberMe)) {
             return [
                 'message' => 'Invalid credentials',
                 'status' => 401
@@ -26,6 +26,17 @@ class AuthRepository extends JsonResponseFormat
         }
 
         $user = User::with(['files', 'role.abilities.route'])->find(Auth::id());
+
+        if ($user->role_id === 3 && !$user->active_voter) {
+            Auth::guard('web')->logout();
+
+            request()->session()->invalidate();
+            request()->session()->regenerateToken();
+            return [
+                'message' => 'Account is inactive. Please contact support.',
+                'status' => 401
+            ];
+        }
 
         return [
             'message' => 'Login successful',
@@ -62,7 +73,7 @@ class AuthRepository extends JsonResponseFormat
      * @param array $data
      * @return array
      */
-    public function logout($data): array
+    public function logout(): array
     {
         Auth::guard('web')->logout();
 
@@ -123,5 +134,29 @@ class AuthRepository extends JsonResponseFormat
                 'status' => 500
             ];
         }
+    }
+
+    /**
+     * Checks Auth
+     *
+     * @return array
+     */
+    public function checkAuth(): array
+    {
+        $user = null;
+        $isAuthenticated = Auth::check();
+        $viaRemember = Auth::viaRemember();
+
+        if ($isAuthenticated && $viaRemember) {
+            $user = User::with(['files', 'role.abilities.route'])->find(Auth::id());
+        }
+
+        return [
+            'body' => [
+                'isAuthenticated' => $isAuthenticated,
+                'viaRemember' => $viaRemember,
+                'user' => $user
+            ]
+        ];
     }
 }

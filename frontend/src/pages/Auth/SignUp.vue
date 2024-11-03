@@ -33,8 +33,13 @@
                 />
                 <CustomSelect
                   v-model="form.purok"
-                  :options="purokData.map(purok => ({ label: purok.name, value: purok.id }))"
+                  :options="purokOptions"
                   label="Purok"
+                  use-input
+                  input-debounce="0"
+                  @filter="filterPurok"
+                  option-label="name"
+                  option-value="id"
                   :errorMessage="errors.purok ? errors.purok[0] : ''"
                 />
                 <CustomUploader
@@ -87,7 +92,8 @@ export default {
         password: '',
         confirm_password: '',
       },
-      purokData: [],
+      originalPurokOptions: [],
+      purokOptions: [],
       genderOptions: [
         { label: 'Select Gender', value: '' },
         { label: 'Male', value: 'male' },
@@ -98,7 +104,7 @@ export default {
   },
   watch: {
     form: {
-      handler(value, oldValue) {
+      handler() {
         this.errors = {};
       },
       deep: true,
@@ -142,9 +148,10 @@ export default {
     async fetchPurok() {
       try {
         const response = await purokService.getAllPurok();
-        this.purokData = response.data.body || [];
+        this.purokOptions = response.data.body || [];
+        this.originalPurokOptions = [...this.purokOptions];
 
-        if (this.purokData.length === 0) {
+        if (this.purokOptions.length === 0) {
           Notify.create({
             type: 'warning',
             position: 'top',
@@ -157,6 +164,19 @@ export default {
       } catch (error) {
         console.error('Error fetching purok:', error);
       }
+    },
+    filterPurok(val, update) {
+      if (val === '') {
+        update(() => {
+          this.purokOptions = [...this.originalPurokOptions];
+        });
+        return;
+      }
+
+      update(() => {
+        const needle = val.toLowerCase();
+        this.purokOptions = this.originalPurokOptions.filter(purok => purok.name.toLowerCase().includes(needle));
+      });
     },
   }
 };

@@ -10,6 +10,13 @@
 
     <div class="q-pa-none">
       <div class="q-mb-md q-gutter-sm flex items-center">
+        <q-btn
+          v-show="isAuthorized"
+          :label="isEditing ? 'Submit' : 'Edit Participation Count'"
+          color="primary"
+          @click="handleEdit"
+          class="q-mr-sm"
+        />
         <q-space />
         <q-input
           rounded
@@ -35,6 +42,18 @@
         :pagination="{ rowsPerPage: pageSize }"
         hide-bottom
       >
+        <template v-slot:body-cell-participation_count="props">
+          <q-td :props="props" align="center">
+            <template v-if="isEditing">
+              <q-btn flat color="negative" icon="remove" @click="decrementCount(props.row)" />
+              {{ getParticipationCount(props.row.id) }}
+              <q-btn flat color="secondary" icon="add" @click="incrementCount(props.row)" />
+            </template>
+            <template v-else>
+              {{ getParticipationCount(props.row.id) }}
+            </template>
+          </q-td>
+        </template>
         <template v-slot:header="props">
           <q-tr :props="props">
             <q-th v-for="col in props.cols" :key="col.name" :props="props" class="text-primary text-bold">
@@ -58,6 +77,8 @@
 
 <script>
 import userService from 'src/services/userService';
+import { useUserStore } from 'src/stores/modules/userStore';
+import { USER_ROLES } from 'src/utils/constants';
 
 export default {
   data() {
@@ -68,18 +89,27 @@ export default {
       pageSize: 12,
       lastPage: 1,
       debounceTimeout: null,
+      isEditing: false,
+      editedCounts: {},
       columns: [
         { name: 'name', label: 'Name', align: 'center', field: row => `${row.first_name} ${row.last_name}` },
-        { name: 'activity', label: 'Activity Participated', align: 'center', field: 'activity_count' }
+        { name: 'participation_count', label: 'Activity Participated', align: 'center' }
       ]
     };
   },
   watch: {
-    search(newVal) {
+    search() {
       clearTimeout(this.debounceTimeout);
       this.debounceTimeout = setTimeout(() => {
         this.fetchMeritData();
       }, 1000);
+    }
+  },
+  computed: {
+    isAuthorized() {
+      const userStore = useUserStore();
+      const role = userStore.userData?.role.slug;
+      return role === USER_ROLES.SUPERADMIN || role === USER_ROLES.ADMIN;
     }
   },
   mounted() {
@@ -90,17 +120,56 @@ export default {
       this.currentPage = page;
       this.fetchMeritData();
     },
+    handleEdit() {
+      this.isEditing = !this.isEditing;
+      if (!this.isEditing) {
+        this.submitEdits();
+      }
+    },
     async fetchMeritData() {
       try {
-        const response = await userService.getUserMerits({
+        const response = await userService.getUsers({
           search: this.search,
           currentPage: this.currentPage,
           pageSize: this.pageSize,
         });
         this.meritData = response.data.body || [];
         this.lastPage = response.data.details.last_page || 1;
+
+        this.meritData.forEach(item => {
+          if (!(item.id in this.editedCounts)) {
+            this.editedCounts[item.id] = item.participation_count;
+          }
+        });
       } catch (error) {
         console.error('Error fetching merit data:', error);
+      }
+    },
+    incrementCount(row) {
+      row.participation_count++;
+      this.trackEditedCount(row.id, row.participation_count);
+    },
+    decrementCount(row) {
+      if (row.participation_count > 0) {
+        row.participation_count--;
+        this.trackEditedCount(row.id, row.participation_count);
+      }
+    },
+    trackEditedCount(id, count) {
+      this.editedCounts[id] = count;
+    },
+    getParticipationCount(id) {
+      return this.editedCounts[id] !== undefined ? this.editedCounts[id] : 0;
+    },
+    async submitEdits() {
+      const updatedCounts = Object.entries(this.editedCounts).map(([id, count]) => ({ id: parseInt(id), count }));
+      if (updatedCounts.length > 0) {
+        try {
+          await userService.updateUserParticipation(updatedCounts);
+          this.fetchMeritData();
+        } catch (error) {
+          console.error('Error submitting participation counts:', error);
+        }
       }
     }
   }

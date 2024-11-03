@@ -1,5 +1,5 @@
 <template>
-  <div class="q-pa-none">
+  <div class="q-pa-md">
     <div class="q-mb-md q-gutter-sm flex items-center">
       <q-btn
         label="Add Game"
@@ -14,10 +14,15 @@
         outlined
         dense
         color="primary"
-        class="q-mr-sm"
         :clearable="selectedEvent !== null"
         emit-value
         map-options
+        use-input
+        input-debounce="0"
+        label="Select Event"
+        @filter="filterEvents"
+        option-label="name"
+        option-value="id"
       />
       <q-select
         v-model="selectedStatus"
@@ -25,10 +30,13 @@
         outlined
         dense
         color="primary"
-        class="q-mr-sm"
         :clearable="selectedStatus !== null"
         emit-value
         map-options
+        use-input
+        input-debounce="0"
+        label="Select Status"
+        @filter="filterStatuses"
       />
       <q-input
         rounded
@@ -38,6 +46,7 @@
         v-model="search"
         placeholder="Search by team or game name"
         class="q-mr-sm"
+        @input="debounceFetchGames"
       >
         <template v-slot:prepend>
           <q-icon name="search" />
@@ -107,12 +116,12 @@
         direction-links
       />
     </div>
-  </div>
 
-  <AddGameModal :fetchGames="fetchGames" />
-  <EditGameModal :fetchGames="fetchGames" :editData="gameData" />
-  <DeleteGameModal :fetchGames="fetchGames" :deleteData="gameData" />
-  <GameResultModal :fetchGames="fetchGames" :resultData="gameData" />
+    <AddGameModal :fetchGames="fetchGames" />
+    <EditGameModal :fetchGames="fetchGames" :editData="gameData" />
+    <DeleteGameModal :fetchGames="fetchGames" :deleteData="gameData" />
+    <GameResultModal :fetchGames="fetchGames" :resultData="gameData" />
+  </div>
 </template>
 
 <script>
@@ -138,36 +147,26 @@ export default {
       currentPage: 1,
       pageSize: 12,
       lastPage: 1,
-      categories: [],
       selectedEvent: null,
       selectedStatus: null,
-      events: [],
+      originalEventOptions: [],
+      originalStatusOptions: [
+        { label: 'Completed', value: 'completed' },
+        { label: 'Pending', value: 'pending' },
+        { label: 'Canceled', value: 'canceled' },
+      ],
+      statusOptions: [],
+      eventOptions: [],
       columns: [
         { name: 'name', label: 'Game Name', align: 'center', field: 'name' },
-        { name: 'event', label: 'Event', align: 'center', field: row => row.event?.name },
+        { name: 'event', label: 'Event', align: 'center', field: row => row.event?.name || 'N/A' },
         { name: 'date', label: 'Date', align: 'center', field: row => this.formatDate(row.date, 'D MMMM YYYY') },
-        { name: 'team1', label: 'Team 1', align: 'center', field: row => row.team1?.name },
-        { name: 'team2', label: 'Team 2', align: 'center', field: row => row.team2?.name },
+        { name: 'team1', label: 'Team 1', align: 'center', field: row => row.team1?.name || 'N/A' },
+        { name: 'team2', label: 'Team 2', align: 'center', field: row => row.team2?.name || 'N/A' },
         { name: 'status', label: 'Status', align: 'center', field: 'status' },
         { name: 'actions', label: 'Actions', align: 'center', field: 'actions' },
       ],
     };
-  },
-  computed: {
-    statusOptions() {
-      return [
-        { label: 'All Statuses', value: null },
-        { label: 'Completed', value: 'completed' },
-        { label: 'Pending', value: 'pending' },
-        { label: 'Canceled', value: 'canceled' },
-      ];
-    },
-    eventOptions() {
-      return [
-        { label: 'Select Event', value: null, disabled: true },
-        ...this.events.map(event => ({ label: event.name, value: event.id })),
-      ];
-    },
   },
   watch: {
     search() {
@@ -183,6 +182,7 @@ export default {
   mounted() {
     this.fetchGames();
     this.fetchEvents();
+    this.statusOptions = [...this.originalStatusOptions];
   },
   methods: {
     openAddModal() {
@@ -216,7 +216,7 @@ export default {
     },
     async fetchGames() {
       try {
-        const response = await gameService.getGames({
+        const response = await gameService.getPaginatedGames({
           search: this.search,
           currentPage: this.currentPage,
           pageSize: this.pageSize,
@@ -231,11 +231,38 @@ export default {
     },
     async fetchEvents() {
       try {
-        const response = await eventService.getEvents();
-        this.events = response.data.body || [];
+        const response = await eventService.getAllEvents();
+        this.eventOptions = response.data.body || [];
+        this.originalEventOptions = [...this.eventOptions];
       } catch (error) {
         console.error('Error fetching events:', error);
       }
+    },
+    filterEvents(val, update) {
+      if (val === '') {
+        update(() => {
+          this.eventOptions = this.originalEventOptions;
+        });
+        return;
+      }
+
+      update(() => {
+        const needle = val.toLowerCase();
+        this.eventOptions = this.originalEventOptions.filter(event => event.name.toLowerCase().includes(needle));
+      });
+    },
+    filterStatuses(val, update) {
+      if (val === '') {
+        update(() => {
+          this.statusOptions = [...this.originalStatusOptions];
+        });
+        return;
+      }
+
+      update(() => {
+        const needle = val.toLowerCase();
+        this.statusOptions = this.originalStatusOptions.filter(status => status.label.toLowerCase().includes(needle));
+      });
     },
     getStatusColor(status) {
       switch (status) {

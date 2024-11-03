@@ -1,8 +1,13 @@
 import { api } from 'src/boot/axios'
 
 const positionService = {
-  async getPositions(params) {
-    const response = await api.get('/api/position/retrieve', { params });
+  async getPaginatedPositions(params) {
+    const response = await api.get('/api/position/retrieve/paginated', { params });
+    return response;
+  },
+
+  async getAllPositions() {
+    const response = await api.get('/api/position/retrieve/all');
     return response;
   },
 

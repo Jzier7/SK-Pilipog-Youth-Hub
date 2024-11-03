@@ -1,14 +1,25 @@
 <template>
-  <q-dialog v-model="modalStore.showAddEventModal">
+  <q-dialog v-model="modalStore.showAddEventModal" @hide="resetForm">
     <q-card flat bordered class="q-pa-md text-white" style="width: 700px; max-width: 80vw;">
       <h3 class="text-primary pb-4">Add Event</h3>
       <q-form @submit.prevent>
         <CustomInput v-model="localForm.name" label="Event Name" />
 
-        <CustomSelect
+        <q-select
           v-model="localForm.category"
-          :options="categoryData.map(category => ({ label: category.name, value: category.id }))"
+          :options="categoryOptions"
+          class="q-mb-md"
+          outlined
+          color="primary"
+          :clearable="localForm.category !== null"
+          emit-value
+          map-options
+          use-input
+          input-debounce="0"
           label="Category"
+          @filter="filterCategories"
+          option-label="name"
+          option-value="id"
         />
 
         <div class="row justify-end">
@@ -30,7 +41,6 @@ import categoryService from 'src/services/categoryService';
 export default {
   components: {
     CustomInput: defineAsyncComponent(() => import('components/Widgets/CustomInput.vue')),
-    CustomSelect: defineAsyncComponent(() => import('components/Widgets/CustomSelect.vue')),
   },
   props: {
     fetchEvents: {
@@ -44,7 +54,8 @@ export default {
         name: '',
         category: '',
       },
-      categoryData: [],
+      originalCategoriesOptions: [],
+      categoryOptions: [],
       errors: {},
       modalStore: useModalStore(),
     };
@@ -55,9 +66,9 @@ export default {
   methods: {
     closeModal() {
       this.modalStore.setShowAddEventModal(false);
-      this.clearForm();
+      this.resetForm();
     },
-    clearForm() {
+    resetForm() {
       this.localForm = {
         name: '',
         category: '',
@@ -93,9 +104,10 @@ export default {
     async fetchCategoryData() {
       try {
         const response = await categoryService.getAllCategories();
-        this.categoryData = response.data.body || [];
+        this.categoryOptions = response.data.body || [];
+        this.originalCategoriesOptions = [...this.categoryOptions];
 
-        if (this.categoryData.length === 0) {
+        if (this.categoryOptions.length === 0) {
           Notify.create({
             type: 'warning',
             position: 'top',
@@ -108,6 +120,19 @@ export default {
       } catch (error) {
         console.error('Error fetching categories:', error);
       }
+    },
+    filterCategories(val, update) {
+      if (val === '') {
+        update(() => {
+          this.categoryOptions = [...this.originalCategoriesOptions];
+        });
+        return;
+      }
+
+      update(() => {
+        const needle = val.toLowerCase();
+        this.categoryOptions = this.originalCategoriesOptions.filter(category => category.name.toLowerCase().includes(needle));
+      });
     },
   },
 };

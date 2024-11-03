@@ -14,10 +14,15 @@
         outlined
         dense
         color="primary"
-        class="q-mr-sm"
         :clearable="selectedCategory !== null"
         emit-value
         map-options
+        use-input
+        input-debounce="0"
+        label="Select Category"
+        @filter="filterCategories"
+        option-label="name"
+        option-value="id"
       />
       <q-input
         rounded
@@ -109,22 +114,15 @@ export default {
       pageSize: 12,
       lastPage: 1,
       total: 0,
-      categories: [],
       selectedCategory: null,
+      originalCategoriesOptions: [],
+      categoryOptions: [],
       columns: [
         { name: 'name', label: 'Event Name', align: 'center', field: 'name' },
         { name: 'category', label: 'Category', align: 'center', field: row => row.category?.name },
         { name: 'actions', label: 'Actions', align: 'center', field: 'actions' },
       ],
     };
-  },
-  computed: {
-    categoryOptions() {
-      return [
-        { label: 'Select Category', value: null, disabled: true },
-        ...this.categories.map(category => ({ label: category.name, value: category.id }))
-      ];
-    },
   },
   watch: {
     search() {
@@ -137,7 +135,6 @@ export default {
   mounted() {
     this.fetchEvents();
     this.fetchCategories();
-    this.selectedCategory = null;
   },
   methods: {
     openAddModal() {
@@ -166,7 +163,7 @@ export default {
     },
     async fetchEvents() {
       try {
-        const response = await eventService.getEvents({
+        const response = await eventService.getPaginatedEvents({
           search: this.search,
           currentPage: this.currentPage,
           pageSize: this.pageSize,
@@ -182,10 +179,24 @@ export default {
     async fetchCategories() {
       try {
         const response = await categoryService.getAllCategories();
-        this.categories = response.data.body || [];
+        this.categoryOptions = response.data.body || [];
+        this.originalCategoriesOptions = [...this.categoryOptions];
       } catch (error) {
         console.error('Error fetching categories:', error);
       }
+    },
+    filterCategories(val, update) {
+      if (val === '') {
+        update(() => {
+          this.categoryOptions = [...this.originalCategoriesOptions];
+        });
+        return;
+      }
+
+      update(() => {
+        const needle = val.toLowerCase();
+        this.categoryOptions = this.originalCategoriesOptions.filter(category => category.name.toLowerCase().includes(needle));
+      });
     },
   },
 };

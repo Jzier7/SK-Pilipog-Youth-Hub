@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\Category\RetrieveAll;
+use App\Http\Requests\Category\Retrieve;
 use App\Http\Requests\Category\Store;
 use App\Http\Requests\Category\Update;
 use App\Http\Requests\Category\Delete;
@@ -21,11 +21,11 @@ class CategoryController extends Controller
     }
 
     /**
-     * Retrieves all category.
+     * Retrieves paginated category.
      *
      * @return Illuminate\Http\JsonResponse The category data in JSON format.
      */
-    public function retrieveAll(RetrieveAll $request): JsonResponse
+    public function retrievePaginate(Retrieve $request): JsonResponse
     {
         $params = [
             'search' => $request->input('search'),
@@ -33,7 +33,18 @@ class CategoryController extends Controller
             'pageSize' => $request->input('pageSize', 10),
         ];
 
-        $response = $this->categoryRepository->retrieveAll($params);
+        $response = $this->categoryRepository->retrievePaginate($params);
+        return $this->categoryRepository->getJsonResponse($response);
+    }
+
+    /**
+     * Retrieves all category.
+     *
+     * @return Illuminate\Http\JsonResponse The category data in JSON format.
+     */
+    public function retrieveAll(): JsonResponse
+    {
+        $response = $this->categoryRepository->retrieveAll();
         return $this->categoryRepository->getJsonResponse($response);
     }
 

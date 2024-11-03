@@ -35,12 +35,6 @@ export default {
   components: {
     CustomButtonLink: defineAsyncComponent(() => import('components/Widgets/CustomButtonLink.vue')),
   },
-  props: {
-    version: {
-      type: String,
-      required: true
-    }
-  },
   computed: {
     isGuest() {
       const userStore = useUserStore();
@@ -53,9 +47,10 @@ export default {
   methods: {
     async logout() {
       const authStore = useAuthStore();
+      const isGuest = this.isGuest;
       const { message } = await authStore.logout();
 
-      if (!this.isGuest) {
+      if (!isGuest) {
         Notify.create({
           type: 'positive',
           position: 'top',

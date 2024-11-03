@@ -23,11 +23,11 @@ class TeamController extends Controller
     }
 
     /**
-     * Retrieves all team.
+     * Retrieves paginated team.
      *
      * @return Illuminate\Http\JsonResponse The team's data in JSON format.
      */
-    public function retrieve(Retrieve $request): JsonResponse
+    public function retrievePaginate(Retrieve $request): JsonResponse
     {
         $params = [
             'search' => $request->input('search'),
@@ -37,7 +37,22 @@ class TeamController extends Controller
             'event' => $request->input('event'),
         ];
 
-        $response = $this->teamRepository->retrieve($params);
+        $response = $this->teamRepository->retrievePaginate($params);
+        return $this->teamRepository->getJsonResponse($response);
+    }
+
+    /**
+     * Retrieves all team.
+     *
+     * @return Illuminate\Http\JsonResponse The team's data in JSON format.
+     */
+    public function retrieveAll(Retrieve $request): JsonResponse
+    {
+        $params = [
+            'event' => $request->input('event'),
+        ];
+
+        $response = $this->teamRepository->retrieveAll($params);
         return $this->teamRepository->getJsonResponse($response);
     }
 

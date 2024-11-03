@@ -23,7 +23,7 @@ return new class extends Migration
             $table->string('username');
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
-            $table->softDeletes();
+            $table->integer('participation_count')->default(0);
             $table->rememberToken();
             $table->timestamps();
         });

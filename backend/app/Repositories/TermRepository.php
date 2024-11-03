@@ -9,12 +9,12 @@ use Illuminate\Support\Facades\DB;
 class TermRepository extends JsonResponseFormat
 {
     /**
-     * Get all term records with optional filtering and pagination.
+     * Get paginated term records
      *
      * @param array $params
      * @return array
      */
-    public function retrieve(array $params): array
+    public function retrievePaginate(array $params): array
     {
         $query = Term::query();
 
@@ -33,8 +33,10 @@ class TermRepository extends JsonResponseFormat
 
         $termRecords = $query->paginate($pageSize, ['*'], 'page', $currentPage);
 
+        $retrievedCount = count($termRecords->items());
+
         return [
-            'message' => 'Term records retrieved successfully',
+            'message' => "{$retrievedCount} Term records retrieved successfully",
             'body' => $termRecords->items(),
             'current_page' => $termRecords->currentPage(),
             'from' => $termRecords->firstItem(),
@@ -43,6 +45,23 @@ class TermRepository extends JsonResponseFormat
             'skip' => ($currentPage - 1) * $pageSize,
             'take' => $pageSize,
             'total' => $termRecords->total(),
+        ];
+    }
+
+    /**
+     * Get all term records
+     *
+     * @param array $params
+     * @return array
+     */
+    public function retrieveAll(): array
+    {
+        $terms = Term::select('id', 'start_date', 'end_date', 'is_active')->get();
+
+        return [
+            'message' => 'All Term records retrieved successfully',
+            'body' => $terms,
+            'total' => $terms->count(),
         ];
     }
 

@@ -35,15 +35,14 @@ class UserRepository extends JsonResponseFormat
     }
 
     /**
-     * Get all users with optional filtering and pagination.
+     * Get paginated users
      *
      * @param array $params
      * @return array
      */
-    public function retrieveAllUsers(array $params): array
+    public function retrieveUsers(array $params): array
     {
         $query = User::query();
-
 
         if (!empty($params['isAdmin'])) {
             $query->where('role_id', 2);
@@ -67,7 +66,6 @@ class UserRepository extends JsonResponseFormat
             $query->where('active_voter', 0);
         }
 
-
         if (!empty($params['orderBy'])) {
             $query->orderBy('created_at', $params['orderBy']);
         }
@@ -79,8 +77,10 @@ class UserRepository extends JsonResponseFormat
 
         $users = $query->paginate($pageSize, ['*'], 'page', $currentPage);
 
+        $retrievedCount = count($users->items());
+
         return [
-            'message' => 'All users retrieved successfully',
+            'message' => "{$retrievedCount} users retrieved successfully",
             'body' => $users->items(),
             'current_page' => $users->currentPage(),
             'from' => $users->firstItem(),
@@ -89,6 +89,31 @@ class UserRepository extends JsonResponseFormat
             'skip' => ($currentPage - 1) * $pageSize,
             'take' => $pageSize,
             'total' => $users->total(),
+        ];
+    }
+
+    /**
+     * Get all players
+     *
+     * @return array
+     */
+    public function retrievePlayers(): array
+    {
+        $players = User::select('id', 'first_name', 'last_name')
+            ->whereNotIn('role_id', [1, 2, 4])
+            ->where('active_voter', 1)
+            ->get()
+            ->map(function ($player) {
+                return [
+                    'id' => $player->id,
+                    'name' => "{$player->first_name} {$player->last_name}",
+                ];
+            });
+
+        return [
+            'message' => 'All users retrieved successfully',
+            'body' => $players,
+            'total' => $players->count(),
         ];
     }
 
@@ -133,61 +158,6 @@ class UserRepository extends JsonResponseFormat
                 'status' => 500,
             ];
         }
-    }
-
-    /**
-     * Get all users merits with optional filtering and pagination.
-     *
-     * @param array $params
-     * @return array
-     */
-    public function retrieveUserMerits(array $params): array
-    {
-        $query = User::query()
-            ->withCount(['teams as activity_count' => function ($query) {
-                $query->whereHas('teamAsTeam1', function ($q) {
-                    $q->where('status', 'completed');
-                })->orWhereHas('teamAsTeam2', function ($q) {
-                        $q->where('status', 'completed');
-                    });
-            }]);
-
-        if (!empty($params['isAdmin'])) {
-            $query->where('role_id', 2);
-        } else {
-            $query->whereNotIn('role_id', [1, 2, 4]);
-        }
-
-        if (!empty($params['search'])) {
-            $searchTerm = '%' . $params['search'] . '%';
-            $query->where(function ($subQuery) use ($searchTerm) {
-                $subQuery->where('first_name', 'like', $searchTerm)
-                    ->orWhere('last_name', 'like', $searchTerm)
-                    ->orWhere('email', 'like', $searchTerm)
-                    ->orWhere('username', 'like', $searchTerm);
-            });
-        }
-
-        if (!empty($params['orderBy'])) {
-            $query->orderBy('created_at', $params['orderBy']);
-        }
-
-        $currentPage = $params['currentPage'] ?? 1;
-        $pageSize = $params['pageSize'] ?? 10;
-
-        $users = $query->paginate($pageSize, ['*'], 'page', $currentPage);
-
-        return [
-            'message' => 'All users retrieved successfully',
-            'body' => $users->items(),
-            'current_page' => $users->currentPage(),
-            'from' => $users->firstItem(),
-            'to' => $users->lastItem(),
-            'last_page' => $users->lastPage(),
-            'skip' => ($currentPage - 1) * $pageSize,
-            'take' => $pageSize,
-            'total' => $users->total(),
-        ];
     }
 
     /**
@@ -288,6 +258,46 @@ class UserRepository extends JsonResponseFormat
                     'body' => $user,
                 ];
             }
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return [
+                'error' => $e->getMessage(),
+                'status' => 500,
+            ];
+        }
+    }
+
+    /**
+     * Update user participation counts.
+     *
+     * @param array $data
+     * @return array
+     */
+    public function updateParticipationCount(array $data): array
+    {
+        DB::beginTransaction();
+        try {
+            $responses = [];
+
+            foreach ($data as $item) {
+                $user = User::findOrFail($item['id']);
+
+                $user->update([
+                    'participation_count' => $item['count'],
+                ]);
+
+                $responses[] = [
+                    'user_id' => $user->id,
+                    'new_count' => $user->participation_count,
+                ];
+            }
+
+            DB::commit();
+            return [
+                'message' => 'Users updated successfully',
+                'body' => $responses,
+            ];
 
         } catch (\Exception $e) {
             DB::rollBack();

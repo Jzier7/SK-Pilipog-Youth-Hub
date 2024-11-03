@@ -184,7 +184,7 @@ export default {
     },
     async fetchTerms() {
       try {
-        const response = await termService.getTerms({
+        const response = await termService.getPaginatedTerms({
           search: this.search,
           currentPage: this.currentPage,
           pageSize: this.pageSize,

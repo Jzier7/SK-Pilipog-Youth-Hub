@@ -9,12 +9,12 @@ use Illuminate\Support\Facades\DB;
 class PositionRepository extends JsonResponseFormat
 {
     /**
-     * Get all position records with optional filtering and pagination.
+     * Get paginated position
      *
      * @param array $params
      * @return array
      */
-    public function retrieve(array $params): array
+    public function retrievePaginate(array $params): array
     {
         $query = Position::query();
 
@@ -33,8 +33,10 @@ class PositionRepository extends JsonResponseFormat
 
         $positionRecords = $query->paginate($pageSize, ['*'], 'page', $currentPage);
 
+        $retrievedCount = count($positionRecords->items());
+
         return [
-            'message' => 'Position records retrieved successfully',
+            'message' => "{$retrievedCount} Position records retrieved successfully",
             'body' => $positionRecords->items(),
             'current_page' => $positionRecords->currentPage(),
             'from' => $positionRecords->firstItem(),
@@ -43,6 +45,23 @@ class PositionRepository extends JsonResponseFormat
             'skip' => ($currentPage - 1) * $pageSize,
             'take' => $pageSize,
             'total' => $positionRecords->total(),
+        ];
+    }
+
+    /**
+     * Get all position
+     *
+     * @param array $params
+     * @return array
+     */
+    public function retrieveAll(): array
+    {
+        $positions = Position::select('id', 'name')->get();
+
+        return [
+            'message' => "All Position records retrieved successfully",
+            'body' => $positions,
+            'total' => $positions->count(),
         ];
     }
 

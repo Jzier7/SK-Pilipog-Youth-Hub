@@ -23,11 +23,11 @@ class OfficialController extends Controller
     }
 
     /**
-     * Retrieves all official.
+     * Retrieves paginated official.
      *
      * @return Illuminate\Http\JsonResponse The official's data in JSON format.
      */
-    public function retrieve(Retrieve $request): JsonResponse
+    public function retrievePaginate(Retrieve $request): JsonResponse
     {
         $params = [
             'search' => $request->input('search'),
@@ -36,10 +36,20 @@ class OfficialController extends Controller
             'orderBy' => $request->input('orderBy', 'desc'),
             'term' => $request->input('term'),
             'position' => $request->input('position'),
-            'is_active' => $request->input('is_active')
         ];
 
-        $response = $this->officialRepository->retrieve($params);
+        $response = $this->officialRepository->retrievePaginate($params);
+        return $this->officialRepository->getJsonResponse($response);
+    }
+
+    /**
+     * Retrieves all official.
+     *
+     * @return Illuminate\Http\JsonResponse The official's data in JSON format.
+     */
+    public function retrieveActive(): JsonResponse
+    {
+        $response = $this->officialRepository->retrieveActive();
         return $this->officialRepository->getJsonResponse($response);
     }
 

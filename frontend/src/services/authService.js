@@ -7,6 +7,12 @@ const authService = {
     return response.data;
   },
 
+  async checkAuth() {
+    await api.get('/sanctum/csrf-cookie');
+    const response = await api.get('/api/auth/check');
+    return response.data;
+  },
+
   async loginAsGuest() {
     await api.get('/sanctum/csrf-cookie');
     const response = await api.post('/api/auth/login/guest');

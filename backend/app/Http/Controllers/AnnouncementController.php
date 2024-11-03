@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\Announcement\RetrieveAll;
+use App\Http\Requests\Announcement\Retrieve;
 use App\Http\Requests\Announcement\Store;
 use App\Http\Requests\Announcement\Update;
 use App\Http\Requests\Announcement\Delete;
@@ -23,21 +23,36 @@ class AnnouncementController extends Controller
     }
 
     /**
-     * Retrieves all announcement.
+     * Retrieves paginated announcement.
      *
      * @return Illuminate\Http\JsonResponse The announcement's data in JSON format.
      */
-    public function retrieveAll(RetrieveAll $request): JsonResponse
+    public function retrievePaginate(Retrieve $request): JsonResponse
     {
         $params = [
             'search' => $request->input('search'),
             'currentPage' => $request->input('currentPage', 1),
             'pageSize' => $request->input('pageSize', 10),
             'orderBy' => $request->input('orderBy', 'desc'),
+            'category' => $request->input('category')
+        ];
+
+        $response = $this->announcementRepository->retrievePaginate($params);
+        return $this->announcementRepository->getJsonResponse($response);
+    }
+
+    /**
+     * Retrieves latest announcement.
+     *
+     * @return Illuminate\Http\JsonResponse The announcement's data in JSON format.
+     */
+    public function retrieveLatest(Retrieve $request): JsonResponse
+    {
+        $params = [
             'latest' => $request->input('latest')
         ];
 
-        $response = $this->announcementRepository->retrieveAll($params);
+        $response = $this->announcementRepository->retrieveLatest($params);
         return $this->announcementRepository->getJsonResponse($response);
     }
 

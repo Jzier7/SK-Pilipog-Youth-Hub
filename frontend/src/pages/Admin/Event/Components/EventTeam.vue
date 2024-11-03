@@ -151,7 +151,7 @@ export default {
     },
     async fetchTeams() {
       try {
-        const response = await teamService.getTeams({
+        const response = await teamService.getPaginatedTeams({
           search: this.search,
           currentPage: this.currentPage,
           pageSize: this.pageSize

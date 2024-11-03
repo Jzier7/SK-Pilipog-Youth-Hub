@@ -1,5 +1,5 @@
 <template>
-  <q-dialog v-model="modalStore.showEditTeamModal">
+  <q-dialog v-model="modalStore.showEditTeamModal" @hide="resetForm">
     <q-card flat bordered class="q-pa-md text-white" style="width: 700px; max-width: 80vw;">
       <h3 class="text-primary pb-4">Edit Team</h3>
       <q-form @submit.prevent>
@@ -8,24 +8,35 @@
         <q-select
           v-model="localForm.event"
           :options="eventOptions"
-          label="Select Event"
           class="q-mb-md"
           outlined
+          color="primary"
+          :clearable="localForm.event !== null"
           emit-value
           map-options
+          use-input
+          input-debounce="0"
+          label="Select Event"
+          @filter="filterEvents"
+          option-label="name"
+          option-value="id"
         />
 
         <q-select
           v-model="localForm.players"
-          :options="userOptions"
+          :options="playerOptions"
           label="Select Players"
           class="q-mb-md"
           outlined
           multiple
           use-input
+          input-debounce="0"
           map-options
           emit-value
           fill-input
+          @filter="filterPlayers"
+          option-label="name"
+          option-value="id"
         >
           <template v-slot:selected-item="scope">
             <q-chip
@@ -37,7 +48,7 @@
               text-color="secondary"
               class="q-ma-none"
             >
-              {{ scope.opt.label }}
+              {{ scope.opt.name }}
             </q-chip>
           </template>
         </q-select>
@@ -80,7 +91,9 @@ export default {
         event: '',
         players: [],
       },
-      userOptions: [],
+      originalEventOptions: [],
+      originalPlayerOptions: [],
+      playerOptions: [],
       eventOptions: [],
       modalStore: useModalStore(),
       errors: {},
@@ -101,10 +114,11 @@ export default {
   methods: {
     closeModal() {
       this.modalStore.setShowEditTeamModal(false);
-      this.clearForm();
+      this.resetForm();
     },
-    clearForm() {
+    resetForm() {
       this.errors = {};
+      this.setInitialData(this.editData)
     },
     setInitialData(editData) {
       if (editData) {
@@ -143,25 +157,49 @@ export default {
     },
     async fetchUserOptions() {
       try {
-        const response = await userService.getAllUser();
-        this.userOptions = response.data.body.map(user => ({
-          label: `${user.first_name} ${user.last_name}`,
-          value: user.id,
-        })) || [];
+        const response = await userService.getPlayers();
+        this.playerOptions = response.data.body || [];
+        this.originalPlayerOptions = [...this.playerOptions];
+
       } catch (error) {
         console.error('Error fetching users:', error);
       }
     },
     async fetchEventOptions() {
       try {
-        const response = await eventService.getEvents();
-        this.eventOptions = response.data.body.map(event => ({
-          label: event.name,
-          value: event.id,
-        })) || [];
+        const response = await eventService.getAllEvents();
+        this.eventOptions = response.data.body || [];
+        this.originalEventOptions = [...this.eventOptions];
+
       } catch (error) {
         console.error('Error fetching events:', error);
       }
+    },
+    filterEvents(val, update) {
+      if (val === '') {
+        update(() => {
+          this.eventOptions = this.originalEventOptions;
+        });
+        return;
+      }
+
+      update(() => {
+        const needle = val.toLowerCase();
+        this.eventOptions = this.originalEventOptions.filter(event => event.name.toLowerCase().includes(needle));
+      });
+    },
+    filterPlayers(val, update) {
+      if (val === '') {
+        update(() => {
+          this.playerOptions = this.originalPlayerOptions;
+        });
+        return;
+      }
+
+      update(() => {
+        const needle = val.toLowerCase();
+        this.playerOptions = this.originalPlayerOptions.filter(player => player.name.toLowerCase().includes(needle));
+      });
     },
   },
 };

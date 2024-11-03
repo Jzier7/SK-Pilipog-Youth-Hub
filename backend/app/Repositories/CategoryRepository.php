@@ -9,12 +9,12 @@ use Illuminate\Support\Facades\DB;
 class CategoryRepository extends JsonResponseFormat
 {
     /**
-     * Get all category with optional filtering and pagination.
+     * Get paginated category
      *
      * @param array $params
      * @return array
      */
-    public function retrieveAll(array $params): array
+    public function retrievePaginate(array $params): array
     {
         $query = Category::query();
 
@@ -31,8 +31,10 @@ class CategoryRepository extends JsonResponseFormat
 
         $category = $query->paginate($pageSize, ['*'], 'page', $currentPage);
 
+        $retrievedCount = count($category->items());
+
         return [
-            'message' => 'All category retrieved successfully',
+            'message' => "{$retrievedCount} category retrieved successfully",
             'body' => $category->items(),
             'current_page' => $category->currentPage(),
             'from' => $category->firstItem(),
@@ -41,6 +43,22 @@ class CategoryRepository extends JsonResponseFormat
             'skip' => ($currentPage - 1) * $pageSize,
             'take' => $pageSize,
             'total' => $category->total(),
+        ];
+    }
+
+    /**
+     * Get all categories
+     *
+     * @return array
+     */
+    public function retrieveAll(): array
+    {
+        $categories = Category::select('id', 'name')->get();
+
+        return [
+            'message' => 'All categories retrieved successfully',
+            'body' => $categories,
+            'total' => $categories->count(),
         ];
     }
 

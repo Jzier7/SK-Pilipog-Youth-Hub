@@ -37,33 +37,40 @@ class SyncUserAbilities extends Command
 
         $allRouteIds = DB::table('routes')->pluck('id')->toArray();
 
-        $adminRouteIds = array_diff($allRouteIds, [6, 11]);
+        $adminRouteIds = array_diff($allRouteIds, [6, 12]);
 
         $userRouteIds = [
             1,
             2,
             8,
-            12,
-            24,
-            51, 52, 53, 54,
-            55, 56, 57, 58,
-            28,
-            41,
-            36,
-            19
+            19,
+            25,
+            29,
+            59,
+            60,
+            61,
+            62,
+            63,
+            64,
+            65,
+            66,
+            38,
+            45,
+            11
         ];
 
         $guestRouteIds = [
             1,
             2,
-            24,
-            54,
-            58,
-            28,
-            36,
+            8,
             19,
-            41,
-            12
+            25,
+            62,
+            66,
+            29,
+            38,
+            45,
+            11
         ];
 
         // Syncing abilities for Super Admin

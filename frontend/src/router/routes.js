@@ -1,3 +1,8 @@
+import { guest } from 'src/middleware/guest';
+import { user } from 'src/middleware/user';
+import { admin } from 'src/middleware/admin';
+import { superadmin } from 'src/middleware/superadmin';
+
 const routes = [
   {
     path: '/',
@@ -18,6 +23,7 @@ const routes = [
   {
     path: '/guest',
     component: () => import('layouts/GuestLayout.vue'),
+    meta: { middlewares: [guest] },
     children: [
       { path: 'home', component: () => import('pages/User/UserHome.vue') },
       { path: 'forum', component: () => import('pages/Public/PublicForum/PublicForum.vue') },
@@ -31,6 +37,7 @@ const routes = [
   {
     path: '/user',
     component: () => import('layouts/UserLayout.vue'),
+    meta: { middlewares: [user] },
     children: [
       { path: 'home', component: () => import('pages/User/UserHome.vue') },
       { path: 'forum', component: () => import('pages/Public/PublicForum/PublicForum.vue') },
@@ -45,6 +52,7 @@ const routes = [
   {
     path: '/admin',
     component: () => import('layouts/AdminLayout.vue'),
+    meta: { middlewares: [admin] },
     children: [
       { path: 'dashboard', component: () => import('pages/Admin/AdminDashboard.vue') },
       { path: 'announcement', component: () => import('pages/Admin/AdminAnnouncement.vue') },
@@ -61,6 +69,7 @@ const routes = [
   {
     path: '/superadmin',
     component: () => import('layouts/SuperAdminLayout.vue'),
+    meta: { middlewares: [superadmin] },
     children: [
       { path: 'dashboard', component: () => import('pages/Admin/AdminDashboard.vue') },
       { path: 'announcement', component: () => import('pages/Admin/AdminAnnouncement.vue') },

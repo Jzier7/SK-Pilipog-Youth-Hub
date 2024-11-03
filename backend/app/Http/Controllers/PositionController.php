@@ -23,11 +23,11 @@ class PositionController extends Controller
     }
 
     /**
-     * Retrieves all position.
+     * Retrieves paginated position.
      *
      * @return Illuminate\Http\JsonResponse The position's data in JSON format.
      */
-    public function retrieve(Retrieve $request): JsonResponse
+    public function retrievePaginate(Retrieve $request): JsonResponse
     {
         $params = [
             'search' => $request->input('search'),
@@ -36,7 +36,18 @@ class PositionController extends Controller
             'orderBy' => $request->input('orderBy', 'desc'),
         ];
 
-        $response = $this->positionRepository->retrieve($params);
+        $response = $this->positionRepository->retrievePaginate($params);
+        return $this->positionRepository->getJsonResponse($response);
+    }
+
+    /**
+     * Retrieves all position.
+     *
+     * @return Illuminate\Http\JsonResponse The position's data in JSON format.
+     */
+    public function retrieveAll(): JsonResponse
+    {
+        $response = $this->positionRepository->retrieveAll();
         return $this->positionRepository->getJsonResponse($response);
     }
 

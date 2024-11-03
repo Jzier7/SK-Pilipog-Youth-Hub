@@ -1,8 +1,13 @@
 import { api } from 'src/boot/axios'
 
 const teamService = {
-  async getTeams(params) {
-    const response = await api.get('/api/team/retrieve', { params });
+  async getPaginatedTeams(params) {
+    const response = await api.get('/api/team/retrieve/paginated', { params });
+    return response;
+  },
+
+  async getAllTeams(params) {
+    const response = await api.get('/api/team/retrieve/all', { params });
     return response;
   },
 

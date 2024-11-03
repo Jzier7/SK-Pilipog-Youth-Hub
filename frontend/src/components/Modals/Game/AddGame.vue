@@ -1,5 +1,5 @@
 <template>
-  <q-dialog v-model="modalStore.showAddGameModal">
+  <q-dialog v-model="modalStore.showAddGameModal" @hide="resetForm">
     <q-card flat bordered class="q-pa-md text-white" style="width: 500px; max-width: 80vw;">
       <h3 class="text-primary pb-4">Add Game</h3>
       <q-form @submit.prevent>
@@ -10,31 +10,57 @@
           class="q-mb-md"
         />
 
-        <CustomSelect
+        <q-select
           v-model="localForm.event"
           :options="eventOptions"
+          class="q-mb-md"
+          outlined
+          color="primary"
+          :clearable="localForm.event !== null"
+          emit-value
+          map-options
+          use-input
+          input-debounce="0"
           label="Select Event"
-          @update:model-value="fetchTeamOptions"
+          @filter="filterEvents"
+          option-label="name"
+          option-value="id"
         />
 
-        <CustomSelect
-          class="q-mb-md"
+        <q-select
           v-model="localForm.team1"
           :options="teamOptions"
+          class="q-mb-md"
+          outlined
+          color="primary"
+          :clearable="localForm.team1 !== null"
+          emit-value
+          map-options
+          use-input
+          input-debounce="0"
           label="Select Team 1"
           :disable="!localForm.event"
-          hint="Select an event first"
-          outlined
+          @filter="filterTeams"
+          option-label="name"
+          option-value="id"
         />
 
-        <CustomSelect
-          class="q-mb-md"
+        <q-select
           v-model="localForm.team2"
           :options="teamOptions"
+          class="q-mb-md"
+          outlined
+          color="primary"
+          :clearable="localForm.team2 !== null"
+          emit-value
+          map-options
+          use-input
+          input-debounce="0"
           label="Select Team 2"
           :disable="!localForm.event"
-          hint="Select an event first"
-          outlined
+          @filter="filterTeams"
+          option-label="name"
+          option-value="id"
         />
 
         <q-input
@@ -56,16 +82,12 @@
 
 <script>
 import { Notify } from 'quasar';
-import { defineAsyncComponent } from 'vue';
 import { useModalStore } from 'src/stores/modules/modalStore';
 import gameService from 'src/services/gameService';
 import teamService from 'src/services/teamService';
 import eventService from 'src/services/eventService';
 
 export default {
-  components: {
-    CustomSelect: defineAsyncComponent(() => import('components/Widgets/CustomSelect.vue')),
-  },
   props: {
     fetchGames: {
       type: Function,
@@ -81,6 +103,8 @@ export default {
         team2: null,
         date: '',
       },
+      originalEventOptions: [],
+      originalTeamOptions: [],
       eventOptions: [],
       teamOptions: [],
       errors: {},
@@ -91,10 +115,14 @@ export default {
     'localForm.event': {
       immediate: true,
       handler(newEvent) {
-        this.fetchTeamOptions();
         if (newEvent) {
+          this.fetchTeamOptions(newEvent);
           this.localForm.team1 = null;
           this.localForm.team2 = null;
+        } else {
+          this.localForm.team1 = null;
+          this.localForm.team2 = null;
+          this.teamOptions = [];
         }
       }
     }
@@ -105,9 +133,9 @@ export default {
   methods: {
     closeModal() {
       this.modalStore.setShowAddGameModal(false);
-      this.clearForm();
+      this.resetForm();
     },
-    clearForm() {
+    resetForm() {
       this.localForm = {
         name: '',
         event: null,
@@ -148,11 +176,9 @@ export default {
     },
     async fetchEventOptions() {
       try {
-        const response = await eventService.getEvents();
-        this.eventOptions = response.data.body.map(event => ({
-          label: event.name,
-          value: event.id,
-        })) || [];
+        const response = await eventService.getAllEvents();
+        this.eventOptions = response.data.body || [];
+        this.originalEventOptions = [...this.eventOptions];
 
         if (this.eventOptions.length === 0) {
           Notify.create({
@@ -171,13 +197,11 @@ export default {
     async fetchTeamOptions() {
       if (!this.localForm.event) return;
       try {
-        const response = await teamService.getTeams({
+        const response = await teamService.getAllTeams({
           event: this.localForm.event
         });
-        this.teamOptions = response.data.body.map(team => ({
-          label: team.name,
-          value: team.id,
-        })) || [];
+        this.teamOptions = response.data.body || [];
+        this.originalTeamOptions = [...this.teamOptions];
 
         if (this.teamOptions.length === 0) {
           Notify.create({
@@ -192,6 +216,32 @@ export default {
       } catch (error) {
         console.error('Error fetching teams:', error);
       }
+    },
+    filterEvents(val, update) {
+      if (val === '') {
+        update(() => {
+          this.eventOptions = this.originalEventOptions;
+        });
+        return;
+      }
+
+      update(() => {
+        const needle = val.toLowerCase();
+        this.eventOptions = this.originalEventOptions.filter(event => event.name.toLowerCase().includes(needle));
+      });
+    },
+    filterTeams(val, update) {
+      if (val === '') {
+        update(() => {
+          this.teamOptions = this.originalTeamOptions;
+        });
+        return;
+      }
+
+      update(() => {
+        const needle = val.toLowerCase();
+        this.teamOptions = this.originalTeamOptions.filter(team => team.name.toLowerCase().includes(needle));
+      });
     },
   },
 };

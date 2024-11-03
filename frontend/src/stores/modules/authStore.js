@@ -22,7 +22,7 @@ export const useAuthStore = defineStore('auth', {
 
         return {
           data: null,
-          message: 'Login failed, please check your credentials',
+          message: error.response.data.message,
           status: error.status
         };
 
@@ -72,6 +72,21 @@ export const useAuthStore = defineStore('auth', {
           data: null,
           message: 'Logout failed'
         };
+      }
+    },
+
+    async checkAuth() {
+      const userStore = useUserStore();
+
+      try {
+        const response = await authService.checkAuth();
+        userStore.setUserData(response.body.user);
+
+        return response.body.user;
+
+      } catch (error) {
+        console.error("Remember me check failed:", error);
+        return { isAuthenticated: false, viaRemember: false };
       }
     },
   }

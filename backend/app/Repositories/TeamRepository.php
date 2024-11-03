@@ -10,12 +10,12 @@ class TeamRepository extends JsonResponseFormat
 {
 
     /**
-     * Get teams from a term
+     * Get paginated teams
      *
      * @param array $params
      * @return array
      */
-    public function retrieve(array $params): array
+    public function retrievePaginate(array $params): array
     {
         $query = Team::with('users');
 
@@ -51,8 +51,10 @@ class TeamRepository extends JsonResponseFormat
             ];
         });
 
+        $retrievedCount = count($teams->items());
+
         return [
-            'message' => 'All teams retrieved successfully',
+            'message' => "{$retrievedCount} teams retrieved successfully",
             'body' => $teamsData,
             'current_page' => $teams->currentPage(),
             'from' => $teams->firstItem(),
@@ -61,6 +63,29 @@ class TeamRepository extends JsonResponseFormat
             'skip' => ($currentPage - 1) * $pageSize,
             'take' => $pageSize,
             'total' => $teams->total(),
+        ];
+    }
+
+    /**
+     * Get all teams
+     *
+     * @param array $params
+     * @return array
+     */
+    public function retrieveAll(array $params): array
+    {
+        $query = Team::select('id', 'name');
+
+        if (!empty($params['event'])) {
+            $query->where('event_id', $params['event']);
+        }
+
+        $teams = $query->get();
+
+        return [
+            'message' => 'All teams retrieved successfully',
+            'body' => $teams,
+            'total' => $teams->count(),
         ];
     }
 

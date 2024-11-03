@@ -46,10 +46,11 @@ export const useUserStore = defineStore('user', {
       }
     },
     removeUser() {
-      localStorage.removeItem('user');
+      this.userData = {};
     }
   },
   persist: {
+    storage: sessionStorage,
     pick: ['userData'],
   },
 });
