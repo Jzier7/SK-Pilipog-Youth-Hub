@@ -43,9 +43,12 @@ class SyncUserAbilities extends Command
             1,
             2,
             8,
+            11,
             19,
             25,
             29,
+            38,
+            45,
             59,
             60,
             61,
@@ -54,23 +57,23 @@ class SyncUserAbilities extends Command
             64,
             65,
             66,
-            38,
-            45,
-            11
+            67,
+            68
         ];
 
         $guestRouteIds = [
             1,
             2,
             8,
+            11,
             19,
             25,
-            62,
-            66,
             29,
             38,
             45,
-            11
+            62,
+            66,
+            68
         ];
 
         // Syncing abilities for Super Admin

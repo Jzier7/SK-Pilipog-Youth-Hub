@@ -32,6 +32,7 @@ class Store extends FormRequest
             'name' => ['required', 'string', 'max:255'],
             'position' => ['required', 'integer', 'exists:positions,id'],
             'term' => ['required', 'integer', 'exists:terms,id'],
+            'file' => ['required', 'file', 'image', 'max:' . env('MAX_FILE_UPLOAD_SIZE', '5000')]
         ];
     }
 }

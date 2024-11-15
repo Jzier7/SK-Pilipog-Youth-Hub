@@ -1,6 +1,6 @@
 <template>
   <q-dialog v-model="modalStore.showEditOfficialModal" @hide="resetForm">
-    <q-card flat bordered class="q-pa-md text-white" style="width: 700px; max-width: 80vw;">
+    <q-card flat bordered class="q-pa-md text-primary" style="width: 700px; max-width: 80vw;">
       <h3 class="text-primary pb-4">Edit Official</h3>
       <q-form @submit.prevent>
         <CustomInput v-model="localForm.name" label="Name" />
@@ -39,6 +39,21 @@
           option-value="id"
         />
 
+        <CustomCroppa
+          :existingImage="oldFiles"
+          @imageCropped="updateCroppedImage"
+          :stencil-size="{
+              width: 300,
+              height: 300
+            }"
+          :stencil-props="{
+              handlers: {},
+              resizable: false,
+              aspectRatio: 1,
+            }"
+          :isCircular="true"
+        />
+
         <div class="row justify-end">
           <q-btn label="Save" color="primary" @click="editOfficial"></q-btn>
           <q-btn label="Cancel" color="negative" @click="closeModal" class="q-ml-sm"></q-btn>
@@ -56,12 +71,14 @@ import officialService from 'src/services/officialService';
 import positionService from 'src/services/positionService';
 import termService from 'src/services/termService';
 import dateMixin from 'src/utils/mixins/dateMixin';
+import handleMedia from 'src/utils/mixins/handleMedia';
 
 export default {
   components: {
     CustomInput: defineAsyncComponent(() => import('components/Widgets/CustomInput.vue')),
+    CustomCroppa: defineAsyncComponent(() => import('components/Widgets/CustomCroppa.vue')),
   },
-  mixins: [dateMixin],
+  mixins: [dateMixin, handleMedia],
   props: {
     fetchOfficials: {
       type: Function,
@@ -78,7 +95,9 @@ export default {
         name: '',
         position: '',
         term: '',
+        files: this.editData.files || [],
       },
+      oldFiles: this.editData.files && this.editData.files.length > 0 ? this.getMediaURL(this.editData.files[0]) : [],
       originalPositionOptions: [],
       originalTermOptions: [],
       positionOptions: [],
@@ -93,6 +112,7 @@ export default {
       immediate: true,
       handler(newValue) {
         this.setInitialData(newValue);
+        this.oldFiles = newValue.files && newValue.files.length > 0 ? this.getMediaURL(newValue.files[0]) : [];
       }
     }
   },
@@ -108,21 +128,39 @@ export default {
     resetForm() {
       this.errors = {};
       this.setInitialData(this.editData);
+      this.oldFiles = this.getMediaURL(this.editData.files[0]) || [];
     },
     setInitialData(editData) {
       if (editData) {
         this.localForm.name = editData.name || '';
         this.localForm.position = editData.position?.id || '';
         this.localForm.term = editData.term?.id || this.latestTermId;
+        this.localForm.files = editData.files ? editData.files : null;
       }
     },
+    updateCroppedImage(croppedImage) {
+      this.localForm.files = croppedImage;
+    },
     async editOfficial() {
+      const formData = new FormData();
+      formData.append('id', this.editData.id);
+      formData.append('name', this.localForm.name);
+      formData.append('position', this.localForm.position);
+      formData.append('term', this.localForm.term);
+
+      if (this.localForm.files) {
+        formData.append('file', this.localForm.files);
+      } else {
+        this.oldFiles.forEach(file => {
+          formData.append('oldFiles[]', file);
+        });
+      }
+
       try {
-        const response = await officialService.updateOfficial({
-          id: this.editData.id,
-          name: this.localForm.name,
-          position: this.localForm.position,
-          term: this.localForm.term,
+        const response = await officialService.updateOfficial(formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
         });
 
         Notify.create({
@@ -198,6 +236,12 @@ export default {
         const needle = val.toLowerCase();
         this.termOptions = this.originalTermOptions.filter(term => term.date_range.toLowerCase().includes(needle));
       });
+    },
+    replaceFiles(newFile) {
+      if (newFile) {
+        this.oldFiles = [];
+        this.localForm.files = newFile;
+      }
     },
   },
 };

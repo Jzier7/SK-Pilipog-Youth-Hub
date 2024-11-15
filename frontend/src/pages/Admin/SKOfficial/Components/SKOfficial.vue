@@ -157,9 +157,9 @@ export default {
     },
   },
   mounted() {
+    this.fetchTerms();
     this.fetchOfficials();
     this.fetchPositions();
-    this.fetchTerms();
     this.selectedPosition = null;
   },
   methods: {
@@ -194,7 +194,7 @@ export default {
           currentPage: this.currentPage,
           pageSize: this.pageSize,
           position: this.selectedPosition,
-          term: this.selectedTerm
+          term: this.selectedTerm,
         });
         this.officials = response.data.body.officials || [];
         this.lastPage = response.data.details.last_page || 1;
@@ -221,6 +221,7 @@ export default {
         this.termOptions = terms.map(term => ({
           id: term.id,
           date_range: `${this.formatDate(term.start_date, 'D MMMM YYYY')} - ${this.formatDate(term.end_date, 'D MMMM YYYY')}`,
+          is_active: term.is_active
         }));
         this.originalTermOptions = [...this.termOptions];
 

@@ -17,7 +17,7 @@ const officialService = {
   },
 
   async updateOfficial(data) {
-    const response = await api.patch('/api/official/update', data );
+    const response = await api.post('/api/official/update', data );
     return response;
   },
 

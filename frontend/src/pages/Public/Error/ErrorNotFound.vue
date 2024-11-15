@@ -1,5 +1,5 @@
 <template>
-  <div class="fullscreen bg-blue text-white text-center q-pa-md flex flex-center">
+  <div class="fullscreen text-primary text-center q-pa-md flex flex-center">
     <div>
       <div style="font-size: 30vh">
         404
@@ -12,10 +12,10 @@
       <q-btn
         class="q-mt-xl"
         color="white"
-        text-color="blue"
+        text-color="primary"
         unelevated
-        to="/"
-        label="Go Home"
+        label="Close"
+        :onClick="logout"
         no-caps
       />
     </div>
@@ -23,9 +23,18 @@
 </template>
 
 <script>
+import { useAuthStore } from 'src/stores/modules/authStore';
 import { defineComponent } from 'vue';
 
 export default defineComponent({
-  name: 'ErrorNotFound'
+  name: 'ErrorNotFound',
+  methods: {
+    async logout() {
+      const authStore = useAuthStore();
+      await authStore.logout();
+
+      this.$router.push('/');
+    }
+  }
 });
 </script>

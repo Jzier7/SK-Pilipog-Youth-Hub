@@ -8,14 +8,8 @@ export function superadmin({ next }) {
 
     if (userRole === USER_ROLES.SUPERADMIN) {
         return next();
-    } else if (userRole === USER_ROLES.ADMIN) {
-        return next({ path: '/admin/dashboard' });
-    } else if (userRole === USER_ROLES.USER) {
-        return next({ path: '/user/home' });
-    } else if (userRole === USER_ROLES.GUEST) {
-        return next({ path: '/guest/home' });
     } else {
-        return next({ path: '/' });
+        return next({ path: '/page-not-found' });
     }
 
 }

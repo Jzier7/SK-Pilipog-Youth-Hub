@@ -36,7 +36,7 @@ class Update extends FormRequest
             'title' => ['required', 'string', 'max:255'],
             'category' => ['required', 'integer', 'exists:categories,id'],
             'content' => ['required', 'string'],
-            'files' => ['required', 'array', 'max:1'],
+            'file' => ['required', 'file', 'image', 'max:' . env('MAX_FILE_UPLOAD_SIZE', '5000')]
         ];
     }
 

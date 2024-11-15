@@ -70,18 +70,22 @@ class GameRepository extends JsonResponseFormat
     public function retrieveAll(array $params): array
     {
         $query = Game::query();
-        $query->with(['event.category', 'team1', 'team2']);
+        $query->with([
+            'event.category',
+            'team1.teamLikes',
+            'team2.teamLikes'
+        ]);
 
         if (!empty($params['search'])) {
             $searchTerm = '%' . $params['search'] . '%';
             $query->where(function($q) use ($searchTerm) {
                 $q->where('name', 'like', $searchTerm)
-                    ->orWhereHas('team1', function($q) use ($searchTerm) {
-                        $q->where('name', 'like', $searchTerm);
-                    })
-                    ->orWhereHas('team2', function($q) use ($searchTerm) {
-                        $q->where('name', 'like', $searchTerm);
-                    });
+                  ->orWhereHas('team1', function($q) use ($searchTerm) {
+                      $q->where('name', 'like', $searchTerm);
+                  })
+                  ->orWhereHas('team2', function($q) use ($searchTerm) {
+                      $q->where('name', 'like', $searchTerm);
+                  });
             });
         }
 
@@ -95,10 +99,34 @@ class GameRepository extends JsonResponseFormat
 
         $games = $query->get();
 
+        // Add likes data for each team based on the game context
+        $gamesWithLikes = $games->map(function ($game) {
+            // Count likes based on the game id and user_id relation for team1
+            $team1Likes = $game->team1->teamLikes()->where('game_id', $game->id)->count();
+            $team2Likes = $game->team2->teamLikes()->where('game_id', $game->id)->count();
+
+            return [
+                'id' => $game->id,
+                'name' => $game->name,
+                'event' => $game->event,
+                'status' => $game->status,
+                'team1' => [
+                    'details' => $game->team1,
+                    'score' => $game->team1_score,
+                    'likes' => $team1Likes
+                ],
+                'team2' => [
+                    'details' => $game->team2,
+                    'score' => $game->team2_score,
+                    'likes' => $team2Likes
+                ],
+            ];
+        });
+
         return [
-            'message' => "all games retrieved successfully",
-            'body' => $games,
-            'total' => $games->count(),
+            'message' => "All games retrieved successfully",
+            'body' => $gamesWithLikes->toArray(),
+            'total' => $gamesWithLikes->count(),
         ];
     }
 

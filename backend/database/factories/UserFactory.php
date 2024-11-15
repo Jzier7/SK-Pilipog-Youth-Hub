@@ -29,9 +29,9 @@ class UserFactory extends Factory
             'email' => $this->faker->unique()->safeEmail,
             'username' => $this->faker->unique()->userName,
             'password' => Hash::make('password'),
+            'purok_id' => Purok::pluck('id')->random(),
             'created_at' => now(),
             'updated_at' => now(),
-            'purok_id' => Purok::pluck('id')->random(),
         ];
     }
     /**

@@ -62,12 +62,40 @@
           <div class="team-info">
             <div class="team-column">
               <img src="~/assets/logo.png" alt="Team 1" class="team-image" />
-              <p class="text-body2"><span class="text-primary">{{ game.team1 ? game.team1.name : 'N/A' }}</span></p>
+              <p class="text-body2">
+                <span class="text-primary">{{ game.team1.details ? game.team1.details.name : 'N/A' }}</span>
+              </p>
+              <div class="like-section">
+                <q-btn
+                    dense
+                    flat
+                    :icon="isLikedByUser(game.team1.details.team_likes, game.id) ? 'favorite' : 'favorite_border'"
+                    color="primary"
+                    @click="toggleLike(game.id, game.team1.details.id)"
+                    :disable="isGuest"
+                    />
+                  <span class="text-caption">{{ game.team1.likes }}</span>
+              </div>
             </div>
+
             <div class="vs-text text-primary">vs</div>
+
             <div class="team-column">
               <img src="~/assets/logo.png" alt="Team 2" class="team-image" />
-              <p class="text-body2"><span class="text-primary">{{ game.team2 ? game.team2.name : 'N/A' }}</span></p>
+              <p class="text-body2">
+                <span class="text-primary">{{ game.team2.details ? game.team2.details.name : 'N/A' }}</span>
+              </p>
+              <div class="like-section">
+                <q-btn
+                    dense
+                    flat
+                    :icon="isLikedByUser(game.team2.details.team_likes, game.id) ? 'favorite' : 'favorite_border'"
+                    color="primary"
+                    @click="toggleLike(game.id, game.team2.details.id)"
+                    :disable="isGuest"
+                    />
+                  <span class="text-caption">{{ game.team2.likes }}</span>
+              </div>
             </div>
           </div>
           <div class="game-status">
@@ -77,8 +105,8 @@
             <template v-else-if="game.status === 'completed'">
               <q-badge color="primary" label="Final Score" class="text-white" />
               <div class="score-container">
-                <span :class="{'text-primary text-bold': game.team1_score > game.team2_score, 'text-gray-500': game.team1_score <= game.team2_score}">{{ game.team1_score }}</span> |
-                <span :class="{'text-primary text-bold': game.team2_score > game.team1_score, 'text-gray-500': game.team2_score <= game.team1_score}">{{ game.team2_score }}</span>
+                <span :class="{'text-primary text-bold': game.team1.score > game.team2.score, 'text-gray-500': game.team1.score <= game.team2.score}">{{ game.team1.score }}</span> |
+                <span :class="{'text-primary text-bold': game.team2.score > game.team1.score, 'text-gray-500': game.team2.score <= game.team1.score}">{{ game.team2.score }}</span>
               </div>
             </template>
             <template v-else-if="game.status === 'canceled'">
@@ -94,16 +122,18 @@
 <script>
 import { defineComponent } from 'vue';
 import gameService from 'src/services/gameService';
+import teamLikeService from 'src/services/teamLikeService';
 import eventService from 'src/services/eventService';
 import dateMixin from 'src/utils/mixins/dateMixin';
 import handleMedia from 'src/utils/mixins/handleMedia';
+import { useUserStore } from 'src/stores/modules/userStore';
+import { USER_ROLES } from 'src/utils/constants';
 
 export default defineComponent({
   mixins: [dateMixin, handleMedia],
   data() {
     return {
       games: [],
-      gameData: [],
       search: '',
       selectedEvent: null,
       originalEventOptions: [],
@@ -120,6 +150,10 @@ export default defineComponent({
         { label: 'Canceled', value: 'canceled' },
       ];
     },
+    isGuest() {
+      const userStore = useUserStore();
+      return userStore.userData?.role.slug === USER_ROLES.GUEST;
+    }
   },
   watch: {
     search() {
@@ -144,7 +178,9 @@ export default defineComponent({
           event: this.selectedEvent,
           status: this.selectedStatus,
         });
-        this.games = response.data.body || [];
+        this.games = (response.data.body || []).map(game => ({
+          ...game,
+        }));
       } catch (error) {
         console.error('Error fetching games:', error);
       }
@@ -168,7 +204,9 @@ export default defineComponent({
 
       update(() => {
         const needle = val.toLowerCase();
-        this.eventOptions = this.originalEventOptions.filter(event => event.name.toLowerCase().includes(needle));
+        this.eventOptions = this.originalEventOptions.filter(event =>
+          event.name.toLowerCase().includes(needle)
+        );
       });
     },
     debounceFetchGames() {
@@ -176,6 +214,24 @@ export default defineComponent({
       this.debounceTimeout = setTimeout(() => {
         this.fetchGames();
       }, 1000);
+    },
+    isLikedByUser(teamLikes, gameId) {
+      const userStore = useUserStore();
+      const userId = userStore.userData?.id;
+
+      return teamLikes.some(like => like.user_id === userId && like.game_id === gameId);
+    },
+    async toggleLike(gameId, teamId) {
+      try {
+        await teamLikeService.like({
+          game_id: gameId,
+          team_id: teamId,
+        });
+        this.fetchGames();
+
+      } catch (error) {
+        console.error('Error liking the game:', error);
+      }
     },
   },
 });
@@ -215,6 +271,7 @@ export default defineComponent({
 .team-image {
   width: 60px;
   height: auto;
+  padding-top: 2rem;
   margin-bottom: 5px;
 }
 
@@ -224,11 +281,23 @@ export default defineComponent({
   color: #000;
 }
 
+.like-section {
+  display: flex;
+  align-items: center;
+  margin-top: 5px;
+}
+
+.text-caption {
+  margin-left: 5px;
+  font-size: 0.8rem;
+  color: #666;
+}
+
 .game-status {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-top: 20px;
+  margin-top: 3rem;
 }
 
 .score-container {

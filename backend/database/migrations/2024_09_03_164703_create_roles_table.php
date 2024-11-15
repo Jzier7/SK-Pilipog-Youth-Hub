@@ -40,7 +40,7 @@ return new class extends Migration
             'last_name' => 'User',
             'birthdate' => '2002-01-01',
             'gender' => 'Male',
-            'email' => 'admin@admin.com',
+            'email' => 'superadmin@admin.com',
             'username' => 'admin.user',
             'password' => Hash::make('password'),
             'role_id' => 1,

@@ -26,8 +26,8 @@
             <q-card-section>
               <div class="image-container">
                 <img
-                  v-if="official.image"
-                  :src="official.image"
+                  v-if="official.files.length > 0"
+                  :src="getMediaURL(official.files[0])"
                   alt="Official Image"
                   class="official-image"
                 />
@@ -45,10 +45,11 @@
 
 <script>
 import dateMixin from 'src/utils/mixins/dateMixin';
+import handleMedia from 'src/utils/mixins/handleMedia';
 import officialService from 'src/services/officialService';
 
 export default {
-  mixins: [dateMixin],
+  mixins: [dateMixin, handleMedia],
   data() {
     return {
       officials: [],
@@ -115,8 +116,8 @@ export default {
 }
 
 .official-image {
-  width: 100px;
-  height: 100px;
+  width: 150px;
+  height: 150px;
   border-radius: 50%;
   margin-bottom: 10px;
 }

@@ -52,4 +52,9 @@ class Team extends Model
     {
         return $this->hasMany(Game::class, 'loser', 'id');
     }
+
+    public function teamLikes(): HasMany
+    {
+        return $this->hasMany(TeamLike::class, 'team_id', 'id');
+    }
 }

@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Classes\JsonResponseFormat;
 use App\Models\Team;
+use App\Models\TeamLike;
 use Illuminate\Support\Facades\DB;
 
 class TeamRepository extends JsonResponseFormat
@@ -150,6 +151,69 @@ class TeamRepository extends JsonResponseFormat
             return [
                 'message' => 'Team updated successfully with players',
                 'body' => $team,
+            ];
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return [
+                'error' => $e->getMessage(),
+                'status' => 500,
+            ];
+        }
+    }
+
+    /**
+     * Add like.
+     *
+     * @param array $data
+     * @return array
+     */
+    public function like(array $data): array
+    {
+        DB::beginTransaction();
+        try {
+            $teamLike = TeamLike::create([
+                'team_id' => $data['team_id'],
+                'game_id' => $data['game_id'],
+                'user_id' => $data['user_id'],
+            ]);
+
+            DB::commit();
+            return [
+                'message' => 'Team liked successfully',
+                'body' => $teamLike,
+            ];
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return [
+                'error' => $e->getMessage(),
+                'status' => 500,
+            ];
+        }
+    }
+
+    /**
+     * Remove like.
+     *
+     * @param array $data
+     * @return array
+     */
+    public function unlike(array $data): array
+    {
+        DB::beginTransaction();
+        try {
+            $teamLike = TeamLike::where('team_id', $data['team_id'])
+                ->where('user_id', $data['user_id'])
+                ->where('game_id', $data['game_id'])
+                ->firstOrFail();
+
+            $teamLike->delete();
+
+            DB::commit();
+            return [
+                'message' => 'Team unliked successfully',
+                'body' => $teamLike,
             ];
 
         } catch (\Exception $e) {

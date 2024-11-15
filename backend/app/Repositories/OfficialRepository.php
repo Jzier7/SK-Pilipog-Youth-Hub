@@ -6,6 +6,9 @@ use App\Classes\JsonResponseFormat;
 use App\Models\Official;
 use App\Models\Term;
 use Illuminate\Support\Facades\DB;
+use App\Models\File;
+use Illuminate\Support\Facades\Storage;
+use App\Services\FileUploadService;
 
 class OfficialRepository extends JsonResponseFormat
 {
@@ -18,7 +21,7 @@ class OfficialRepository extends JsonResponseFormat
      */
     public function retrievePaginate(array $params): array
     {
-        $query = Official::query();
+        $query = Official::with('files');
         $isActiveTerm = null;
 
         if (!empty($params['is_active'])) {
@@ -92,7 +95,7 @@ class OfficialRepository extends JsonResponseFormat
      */
     public function retrieveActive(): array
     {
-        $query = Official::query();
+        $query = Official::with('files');
         $isActiveTerm = Term::where('is_active', 1)->first();
 
         if (!$isActiveTerm) {
@@ -131,12 +134,29 @@ class OfficialRepository extends JsonResponseFormat
     {
         DB::beginTransaction();
         try {
+            $file = $data['file'] ?? null;
+            unset($data['file']);
 
             $official = Official::create([
                 'name' => $data['name'],
                 'position_id' => $data['position'],
                 'term_id' => $data['term'],
             ]);
+
+            if ($file) {
+                $fileUploadService = new FileUploadService();
+
+                $file_size = $fileUploadService->getFileSize($file);
+                $file_path = $fileUploadService->upload($file, 'officials');
+                $file_name = $file->getClientOriginalName();
+
+                $new_file = new File();
+                $new_file->path = $file_path;
+                $new_file->size = $file_size;
+                $new_file->name = $file_name;
+
+                $official->files()->save($new_file);
+            }
 
             DB::commit();
             return [
@@ -165,11 +185,36 @@ class OfficialRepository extends JsonResponseFormat
         try {
             $official = Official::findOrFail($data['id']);
 
+            $file = $data['file'] ?? null;
+            unset($data['file']);
+
             $official->update([
                 'name' => $data['name'],
                 'position_id' => $data['position'],
                 'term_id' => $data['term'],
             ]);
+
+            if ($file) {
+                foreach ($official->files as $old_file) {
+                    Storage::delete($old_file->path);
+                    $old_file->delete();
+                }
+
+                $fileUploadService = new FileUploadService();
+
+                $file_size = $fileUploadService->getFileSize($file);
+                $file_path = $fileUploadService->upload($file, 'officials');
+                $file_name = $file->getClientOriginalName();
+
+                $new_file = new File();
+                $new_file->path = $file_path;
+                $new_file->size = $file_size;
+                $new_file->name = $file_name;
+
+                $official->files()->save($new_file);
+            }
+
+            $official->touch();
 
             DB::commit();
             return [

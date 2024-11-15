@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Game extends Model
 {
@@ -46,5 +47,10 @@ class Game extends Model
     public function loser(): BelongsTo
     {
         return $this->belongsTo(Team::class, 'loser');
+    }
+
+    public function teamLikes(): hasMany
+    {
+        return $this->hasMany(TeamLike::class, 'game_id', 'id');
     }
 }

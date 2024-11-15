@@ -89,6 +89,11 @@ class User extends Authenticatable
         return $this->hasMany(ForumComment::class, 'author_id', 'id');
     }
 
+    public function teamLikes(): HasMany
+    {
+        return $this->hasMany(TeamLike::class, 'user_id', 'id');
+    }
+
     public function teams(): BelongsToMany
     {
         return $this->belongsToMany(Team::class, 'user_team', 'player_id', 'team_id');
@@ -97,6 +102,16 @@ class User extends Authenticatable
     public function isSuperAdmin(): bool
     {
         return $this->role_id === 1;
+    }
+
+    public function isUser(): bool
+    {
+        return $this->role_id === 3;
+    }
+
+    public function isActiveVoter(): bool
+    {
+        return $this->active_voter === 1;
     }
 
 }

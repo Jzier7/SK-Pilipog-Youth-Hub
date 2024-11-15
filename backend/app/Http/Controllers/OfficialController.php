@@ -65,6 +65,7 @@ class OfficialController extends Controller
             'name' => $request->input('name'),
             'position' => $request->input('position'),
             'term' => $request->input('term'),
+            'file' => $request->file('file')
         ];
 
         $response = $this->officialRepository->store($data);
@@ -84,6 +85,8 @@ class OfficialController extends Controller
             'name' => $request->input('name'),
             'position' => $request->input('position'),
             'term' => $request->input('term'),
+            'file' => $request->input('file'),
+            'file' => $request->file('file')
         ];
 
         $response = $this->officialRepository->update($data);

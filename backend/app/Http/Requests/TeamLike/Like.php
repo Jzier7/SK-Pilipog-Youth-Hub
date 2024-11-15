@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Requests\Official;
+namespace App\Http\Requests\TeamLike;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
 
-class Update extends FormRequest
+class Like extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -14,7 +14,7 @@ class Update extends FormRequest
     {
         $user = Auth::user();
 
-        if ($user && $user->isSuperAdmin()) {
+        if ($user && $user->isUser() && $user->isActiveVoter()) {
             return true;
         }
 
@@ -29,20 +29,16 @@ class Update extends FormRequest
     public function rules(): array
     {
         return [
-            'id' => ['required', 'integer', 'exists:officials,id'],
-            'name' => ['required', 'string', 'max:255'],
-            'position' => ['required', 'integer', 'exists:positions,id'],
-            'term' => ['required', 'integer', 'exists:terms,id'],
-            'file' => ['required', 'file', 'image', 'max:' . env('MAX_FILE_UPLOAD_SIZE', '5000')]
+            'team_id' => ['required', 'integer', 'exists:teams,id'],
+            'game_id' => ['required', 'integer', 'exists:games,id'],
         ];
     }
 
     public function messages(): array
     {
         return [
-            'id.exists' => 'Official does not exist.',
-            'position.exists' => 'Position does not exist.',
-            'term.exists' => 'Term does not exist.',
+            'team_id.exists' => 'Team does not exist.',
+            'game_id.exists' => 'Game does not exist.',
         ];
     }
 }

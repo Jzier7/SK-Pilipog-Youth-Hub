@@ -68,7 +68,7 @@ class AnnouncementController extends Controller
             'title' => $request->input('title'),
             'category_id' => $request->input('category'),
             'content' => $request->input('content'),
-            'files' => $request->file('files')
+            'file' => $request->file('file')
         ];
 
         $response = $this->announcementRepository->store($data);
@@ -88,8 +88,8 @@ class AnnouncementController extends Controller
             'title' => $request->input('title'),
             'category_id' => $request->input('category'),
             'content' => $request->input('content'),
-            'files' => $request->input('files'),
-            'files' => $request->file('files')
+            'file' => $request->input('file'),
+            'file' => $request->file('file')
         ];
 
         $response = $this->announcementRepository->update($data);

@@ -16,6 +16,7 @@ use App\Http\Controllers\ForumCommentController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\TeamController;
 use App\Http\Controllers\GameController;
+use App\Http\Controllers\TeamLikeController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth:sanctum', 'role.guard'])->group(function () {
@@ -128,7 +129,7 @@ Route::middleware(['auth:sanctum', 'role.guard'])->group(function () {
     //FOR SK OFFICIAL PAGE
     Route::prefix('official')->group(function () {
         Route::post('store', [OfficialController::class, 'store']);
-        Route::patch('update', [OfficialController::class, 'update']);
+        Route::post('update', [OfficialController::class, 'update']);
         Route::delete('delete', [OfficialController::class, 'delete']);
 
         Route::prefix('retrieve')->group(function () {
@@ -179,6 +180,9 @@ Route::middleware(['auth:sanctum', 'role.guard'])->group(function () {
         Route::get('retrieve', [ForumCommentController::class, 'retrieve']);
     });
 
+    Route::prefix('like')->group(function () {
+        Route::post('', [TeamLikeController::class, 'like']);
+    });
 });
 
 Route::prefix('auth')->group(function () {

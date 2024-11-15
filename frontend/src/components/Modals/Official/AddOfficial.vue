@@ -1,6 +1,6 @@
 <template>
   <q-dialog v-model="modalStore.showAddOfficialModal" @hide="resetForm">
-    <q-card flat bordered class="q-pa-md text-white" style="width: 700px; max-width: 80vw;">
+    <q-card flat bordered class="q-pa-md text-primary" style="width: 700px; max-width: 80vw;">
       <h3 class="text-primary pb-4">Add Official</h3>
       <q-form @submit.prevent>
         <CustomInput v-model="localForm.name" label="Name" />
@@ -39,6 +39,20 @@
           option-value="id"
         />
 
+        <CustomCroppa
+          @imageCropped="updateCroppedImage"
+          :stencil-size="{
+              width: 300,
+              height: 300
+            }"
+          :stencil-props="{
+              handlers: {},
+              resizable: false,
+              aspectRatio: 1,
+            }"
+          :isCircular="true"
+        />
+
         <div class="row justify-end">
           <q-btn label="Add" color="primary" @click="addOfficial"></q-btn>
           <q-btn label="Cancel" color="negative" @click="closeModal" class="q-ml-sm"></q-btn>
@@ -60,6 +74,7 @@ import dateMixin from 'src/utils/mixins/dateMixin';
 export default {
   components: {
     CustomInput: defineAsyncComponent(() => import('components/Widgets/CustomInput.vue')),
+    CustomCroppa: defineAsyncComponent(() => import('components/Widgets/CustomCroppa.vue')),
   },
   mixins: [dateMixin],
   props: {
@@ -74,6 +89,7 @@ export default {
         name: '',
         position: '',
         term: '',
+        croppedImage: null,
       },
       originalPositionOptions: [],
       originalTermOptions: [],
@@ -98,15 +114,28 @@ export default {
         name: '',
         position: '',
         term: '',
+        croppedImage: null,
       };
       this.errors = {};
     },
+    updateCroppedImage(croppedImage) {
+      this.localForm.croppedImage = croppedImage;
+    },
     async addOfficial() {
+      const formData = new FormData();
+      formData.append('name', this.localForm.name);
+      formData.append('position', this.localForm.position);
+      formData.append('term', this.localForm.term);
+
+      if (this.localForm.croppedImage) {
+        formData.append('file', this.localForm.croppedImage);
+      }
+
       try {
-        const response = await officialService.storeOfficial({
-          name: this.localForm.name,
-          position: this.localForm.position,
-          term: this.localForm.term
+        const response = await officialService.storeOfficial(formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
         });
 
         Notify.create({
@@ -207,3 +236,8 @@ export default {
 };
 </script>
 
+<style scoped>
+.preview {
+  border: dashed 1px rgba(255,255,255, 0.25);
+}
+</style>

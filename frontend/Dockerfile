@@ -15,9 +15,6 @@ COPY . ./
 # Install additional dependencies from package.json
 RUN npm install
 
-# Install dependencies including pinia-plugin-persistedstate
-RUN npm install pinia-plugin-persistedstate
-
 # Specify the command to run your application
 CMD sh -c "quasar dev --host=0.0.0.0 --port 3000"
 

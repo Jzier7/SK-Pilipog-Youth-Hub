@@ -1,6 +1,6 @@
 <template>
   <q-dialog v-model="modalStore.showViewAnnouncementModal">
-    <q-card flat bordered class="q-pa-md text-white" style="width: 700px; max-width: 80vw;">
+    <q-card flat bordered class="text-white" style="width: 700px; max-width: 80vw;">
       <div>
         <div v-if="viewData.files && viewData.files.length > 0" class="q-mb-md">
           <img
@@ -10,11 +10,13 @@
           />
         </div>
 
-        <h4 class="font-bold text-primary">{{ localForm.title }}</h4>
-        <p class="text-gray-700 q-mb-lg">{{ localForm.categoryName }}</p>
-        <div v-html="localForm.content" class="q-mb-md text-black"></div>
+        <div class="q-px-md">
+          <h4 class="font-bold text-primary">{{ localForm.title }}</h4>
+          <p class="text-gray-700 q-mb-lg">{{ localForm.categoryName }}</p>
+          <div v-html="localForm.content" class="q-mb-md text-black"></div>
+        </div>
       </div>
-      <div class="row justify-end">
+      <div class="row justify-end q-pa-md">
         <q-btn label="Close" color="negative" @click="closeModal"></q-btn>
       </div>
     </q-card>
@@ -65,9 +67,8 @@ export default {
 .cover-image {
   width: 100%;
   height: auto;
-  max-height: 200px;
+  max-height: 500px;
   object-fit: cover;
-  border-radius: 8px 8px 0 0;
 }
 </style>
 

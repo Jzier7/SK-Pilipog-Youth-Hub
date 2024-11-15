@@ -1,6 +1,6 @@
 <template>
   <q-dialog v-model="modalStore.showEditAnnouncementModal" @hide="resetForm">
-    <q-card flat bordered class="q-pa-md text-white" style="width: 700px; max-width: 80vw;">
+    <q-card flat bordered class="q-pa-md text-primary" style="width: 700px; max-width: 80vw;">
       <h3 class="text-primary pb-4">Edit Announcement</h3>
       <q-form @submit.prevent>
         <CustomInput v-model="localForm.title" label="Title" />
@@ -20,26 +20,23 @@
           @filter="filterCategories"
           option-label="name"
           option-value="id"
-        />
 
+        />
         <q-editor v-model="localForm.content" min-height="10rem" class="editor q-mb-md" />
 
-        <CustomUploader
-          label="Images"
-          v-model="localForm.files"
-          uploaderClass="q-mb-md"
-          @file-added="replaceFiles"
+        <CustomCroppa
+          :existingImage="oldFiles"
+          @imageCropped="updateCroppedImage"
+          :stencil-size="{
+              width: 700,
+              height: 500
+            }"
+          :stencil-props="{
+              handlers: {},
+              movable: false,
+              resizable: false,
+            }"
         />
-
-        <div v-if="oldFiles.length > 0" class="q-my-md text-center">
-          <div v-for="(file, index) in oldFiles" :key="index" class="my-card q-mb-md">
-            <img
-              :src="getMediaURL(file)"
-              alt="Image"
-              style="max-width: 100%; max-height: 300px;"
-            />
-          </div>
-        </div>
 
         <div class="row justify-end">
           <q-btn label="Publish" color="primary" @click="publish"></q-btn>
@@ -61,7 +58,7 @@ import handleMedia from 'src/utils/mixins/handleMedia';
 export default {
   components: {
     CustomInput: defineAsyncComponent(() => import('components/Widgets/CustomInput.vue')),
-    CustomUploader: defineAsyncComponent(() => import('components/Widgets/CustomUploader.vue')),
+    CustomCroppa: defineAsyncComponent(() => import('components/Widgets/CustomCroppa.vue')),
   },
   mixins: [handleMedia],
   props: {
@@ -79,9 +76,9 @@ export default {
       localForm: {
         ...this.editData,
         category: this.editData.category ? this.editData.category.id : '',
-        files: []
+        files: this.editData.files || [],
       },
-      oldFiles: this.editData.files || [],
+      oldFiles: this.editData.files && this.editData.files.length > 0 ? this.getMediaURL(this.editData.files[0]) : [],
       modalStore: useModalStore(),
       originalCategoriesOptions: [],
       categoryOptions: [],
@@ -95,7 +92,7 @@ export default {
           ...newValue,
           category: newValue.category ? newValue.category.id : '',
         };
-        this.oldFiles = newValue.files || [];
+        this.oldFiles = newValue.files && newValue.files.length > 0 ? this.getMediaURL(newValue.files[0]) : [];
       }
     }
   },
@@ -111,9 +108,12 @@ export default {
       this.localForm = {
         ...this.editData,
         category: this.editData.category ? this.editData.category.id : '',
-        files: []
+        files: this.editData.files ? this.editData.files : null,
       };
-      this.oldFiles = this.editData.files || [];
+      this.oldFiles = this.getMediaURL(this.editData.files[0]) || [];
+    },
+    updateCroppedImage(croppedImage) {
+      this.localForm.files = croppedImage;
     },
     async publish() {
       const formData = new FormData();
@@ -122,10 +122,8 @@ export default {
       formData.append('category', this.localForm.category);
       formData.append('content', this.localForm.content);
 
-      if (this.localForm.files.length > 0) {
-        this.localForm.files.forEach(file => {
-          formData.append('files[]', file);
-        });
+      if (this.localForm.files) {
+        formData.append('file', this.localForm.files);
       } else {
         this.oldFiles.forEach(file => {
           formData.append('oldFiles[]', file);
@@ -179,10 +177,10 @@ export default {
         this.categoryOptions = this.originalCategoriesOptions.filter(category => category.name.toLowerCase().includes(needle));
       });
     },
-    replaceFiles(newFiles) {
-      if (newFiles.length > 0) {
+    replaceFiles(newFile) {
+      if (newFile) {
         this.oldFiles = [];
-        this.localForm.files = newFiles;
+        this.localForm.files = newFile;
       }
     },
   },
@@ -202,4 +200,5 @@ export default {
   right: 5px;
 }
 </style>
+
 

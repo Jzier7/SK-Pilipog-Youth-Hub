@@ -51,7 +51,7 @@ class AnnouncementRepository extends JsonResponseFormat
         }
 
         if (!empty($params['orderBy'])) {
-            $query->orderBy('created_at', $params['orderBy']);
+            $query->orderBy('updated_at', $params['orderBy']);
         }
 
         $currentPage = $params['currentPage'] ?? 1;
@@ -113,27 +113,25 @@ class AnnouncementRepository extends JsonResponseFormat
     {
         DB::beginTransaction();
         try {
-            $files = $data['files'];
-            unset($data['files']);
+            $file = $data['file'] ?? null;
+            unset($data['file']);
+
             $data['author_id'] = Auth::id();
             $announcement = Announcement::create($data);
 
-            if ($files) {
-
+            if ($file) {
                 $fileUploadService = new FileUploadService();
 
-                foreach ($files as $file) {
-                    $file_size = $fileUploadService->getFileSize($file);
-                    $file_path = $fileUploadService->upload($file, 'users');
-                    $file_name = $file->getClientOriginalName();
+                $file_size = $fileUploadService->getFileSize($file);
+                $file_path = $fileUploadService->upload($file, 'announcements');
+                $file_name = $file->getClientOriginalName();
 
-                    $new_file = new File();
-                    $new_file->path = $file_path;
-                    $new_file->size = $file_size;
-                    $new_file->name = $file_name;
+                $new_file = new File();
+                $new_file->path = $file_path;
+                $new_file->size = $file_size;
+                $new_file->name = $file_name;
 
-                    $announcement->files()->save($new_file);
-                }
+                $announcement->files()->save($new_file);
             }
 
             DB::commit();
@@ -151,12 +149,9 @@ class AnnouncementRepository extends JsonResponseFormat
         }
     }
 
-
-
     /**
      * Update an existing announcement.
      *
-     * @param int $id
      * @param array $data
      * @return array
      */
@@ -166,17 +161,22 @@ class AnnouncementRepository extends JsonResponseFormat
         try {
             $announcement = Announcement::findOrFail($data['id']);
 
-            $files = $data['files'] ?? null;
-            unset($data['files']);
+            $file = $data['file'] ?? null;
+            unset($data['file']);
 
             $announcement->update($data);
 
-            if ($files && !is_array($files)) {
+            if ($file) {
+                foreach ($announcement->files as $old_file) {
+                    Storage::delete($old_file->path);
+                    $old_file->delete();
+                }
+
                 $fileUploadService = new FileUploadService();
 
-                $file_size = $fileUploadService->getFileSize($files);
-                $file_path = $fileUploadService->upload($files, 'users');
-                $file_name = $files->getClientOriginalName();
+                $file_size = $fileUploadService->getFileSize($file);
+                $file_path = $fileUploadService->upload($file, 'announcements');
+                $file_name = $file->getClientOriginalName();
 
                 $new_file = new File();
                 $new_file->path = $file_path;
@@ -185,29 +185,11 @@ class AnnouncementRepository extends JsonResponseFormat
 
                 $announcement->files()->save($new_file);
             }
-            elseif (is_array($files) && count($files) > 0) {
-                foreach ($announcement->files as $old_file) {
-                    Storage::delete($old_file->path);
-                    $old_file->delete();
-                }
 
-                foreach ($files as $file) {
-                    $fileUploadService = new FileUploadService();
-
-                    $file_size = $fileUploadService->getFileSize($file);
-                    $file_path = $fileUploadService->upload($file, 'users');
-                    $file_name = $file->getClientOriginalName();
-
-                    $new_file = new File();
-                    $new_file->path = $file_path;
-                    $new_file->size = $file_size;
-                    $new_file->name = $file_name;
-
-                    $announcement->files()->save($new_file);
-                }
-            }
+            $announcement->touch();
 
             DB::commit();
+
             return [
                 'message' => 'Announcement updated successfully',
                 'body' => $announcement,

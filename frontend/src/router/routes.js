@@ -85,6 +85,11 @@ const routes = [
 
   {
     path: '/:catchAll(.*)*',
+    redirect: 'page-not-found'
+  },
+
+  {
+    path: '/page-not-found',
     component: () => import('pages/Public/Error/ErrorNotFound.vue')
   }
 ]

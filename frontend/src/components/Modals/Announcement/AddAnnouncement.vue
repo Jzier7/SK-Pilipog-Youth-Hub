@@ -1,6 +1,6 @@
 <template>
-  <q-dialog v-model="modalStore.showAddAnnouncementModal" @hide="resetForm" >
-    <q-card flat bordered class="q-pa-md text-white" style="width: 700px; max-width: 80vw;">
+  <q-dialog v-model="modalStore.showAddAnnouncementModal" @hide="resetForm">
+    <q-card flat bordered class="q-pa-md text-primary" style="width: 700px; max-width: 80vw;">
       <h3 class="text-primary pb-4">Add Announcement</h3>
       <q-form @submit.prevent>
         <CustomInput v-model="form.title" label="Title" />
@@ -24,10 +24,17 @@
 
         <q-editor v-model="form.content" min-height="10rem" class="editor q-mb-md" />
 
-        <CustomUploader
-          label="Image"
-          v-model="form.files"
-          uploaderClass="q-mb-md"
+        <CustomCroppa
+          @imageCropped="updateCroppedImage"
+          :stencil-size="{
+              width: 700,
+              height: 500
+            }"
+          :stencil-props="{
+              handlers: {},
+              movable: false,
+              resizable: false,
+            }"
         />
 
         <div class="row justify-end">
@@ -40,7 +47,7 @@
 </template>
 
 <script>
-import { Notify } from 'quasar'
+import { Notify } from 'quasar';
 import { defineAsyncComponent } from 'vue';
 import { useModalStore } from 'src/stores/modules/modalStore';
 import categoryService from 'src/services/categoryService';
@@ -49,7 +56,7 @@ import announcementService from 'src/services/announcementService';
 export default {
   components: {
     CustomInput: defineAsyncComponent(() => import('components/Widgets/CustomInput.vue')),
-    CustomUploader: defineAsyncComponent(() => import('components/Widgets/CustomUploader.vue')),
+    CustomCroppa: defineAsyncComponent(() => import('components/Widgets/CustomCroppa.vue')),
   },
   props: {
     fetchAnnouncements: {
@@ -63,7 +70,7 @@ export default {
         title: '',
         category: '',
         content: '',
-        files: []
+        croppedImage: null,
       },
       modalStore: useModalStore(),
       originalCategoriesOptions: [],
@@ -82,8 +89,11 @@ export default {
         title: '',
         category: '',
         content: '',
-        files: []
+        croppedImage: null,
       };
+    },
+    updateCroppedImage(croppedImage) {
+      this.form.croppedImage = croppedImage;
     },
     async publish() {
       const formData = new FormData();
@@ -91,9 +101,9 @@ export default {
       formData.append('category', this.form.category);
       formData.append('content', this.form.content);
 
-      this.form.files.forEach(file => {
-        formData.append('files[]', file);
-      });
+      if (this.form.croppedImage) {
+        formData.append('file', this.form.croppedImage);
+      }
 
       try {
         const response = await announcementService.storeAnnouncement(formData, {
@@ -126,15 +136,15 @@ export default {
         this.categoryOptions = response.data.body || [];
         this.originalCategoriesOptions = [...this.categoryOptions];
 
-      if (this.categoryOptions && this.categoryOptions.length === 0) {
-        Notify.create({
-          type: 'warning',
-          position: 'top',
-          textColor: 'white',
-          timeout: 10000,
-          message: 'No categories found. Please add categories on the Events page before creating announcements.'
-        });
-      }
+        if (this.categoryOptions && this.categoryOptions.length === 0) {
+          Notify.create({
+            type: 'warning',
+            position: 'top',
+            textColor: 'white',
+            timeout: 10000,
+            message: 'No categories found. Please add categories on the Events page before creating announcements.'
+          });
+        }
 
       } catch (error) {
         console.error('Error fetching categories:', error);
