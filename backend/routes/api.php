@@ -17,6 +17,7 @@ use App\Http\Controllers\EventController;
 use App\Http\Controllers\TeamController;
 use App\Http\Controllers\GameController;
 use App\Http\Controllers\TeamLikeController;
+use App\Http\Controllers\MessageController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth:sanctum', 'role.guard'])->group(function () {
@@ -182,6 +183,16 @@ Route::middleware(['auth:sanctum', 'role.guard'])->group(function () {
 
     Route::prefix('like')->group(function () {
         Route::post('', [TeamLikeController::class, 'like']);
+    });
+
+    Route::prefix('message')->group(function () {
+        Route::post('send', [MessageController::class, 'send']);
+        Route::patch('read', [MessageController::class, 'seen']);
+
+        Route::prefix('retrieve')->group(function () {
+            Route::get('user', [MessageController::class, 'retrieveUser']);
+            Route::get('admin', [MessageController::class, 'retrieveAdmin']);
+        });
     });
 });
 

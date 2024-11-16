@@ -99,6 +99,11 @@ class User extends Authenticatable
         return $this->belongsToMany(Team::class, 'user_team', 'player_id', 'team_id');
     }
 
+    public function messages(): HasMany
+    {
+        return $this->hasMany(Message::class, 'user_id', 'id');
+    }
+
     public function isSuperAdmin(): bool
     {
         return $this->role_id === 1;

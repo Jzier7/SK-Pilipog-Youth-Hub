@@ -7,11 +7,19 @@
       <router-view />
     </q-page-container>
 
+    <q-page-sticky position="bottom-right" :offset="[18, 18]" v-if="!modalStore.showChatBox">
+      <q-btn fab icon="chat" color="secondary" @click="toggleChatBox">
+        <q-badge v-if="unreadMessages > 0" color="negative" floating label="!" />
+      </q-btn>
+    </q-page-sticky>
+
+    <AdminChatBox :unreadMessages="unreadMessages" />
   </q-layout>
 </template>
 
 <script>
 import { defineComponent, defineAsyncComponent } from 'vue';
+import { useModalStore } from 'src/stores/modules/modalStore';
 
 const menuList = [
   {
@@ -75,17 +83,27 @@ export default defineComponent({
   components: {
     AppHeader: defineAsyncComponent(() => import('components/AppHeader/AppHeader.vue')),
     SideNav: defineAsyncComponent(() => import('components/SideNav/SideNav.vue')),
+    AdminChatBox: defineAsyncComponent(() => import('components/ChatBox/AdminChatBox.vue')),
   },
   data() {
     return {
       leftDrawerOpen: false,
-      menuList
+      menuList,
+      unreadMessages: 5,
+      modalStore: useModalStore()
     };
   },
   methods: {
     toggleLeftDrawer() {
       this.leftDrawerOpen = !this.leftDrawerOpen;
-    }
+    },
+    updateUnreadMessages(count) {
+      this.unreadMessages = count;
+    },
+    toggleChatBox() {
+      const modalStore = useModalStore();
+      modalStore.setShowChatBox(true);
+    },
   }
 });
 </script>

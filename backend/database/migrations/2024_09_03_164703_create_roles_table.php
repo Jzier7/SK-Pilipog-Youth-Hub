@@ -35,7 +35,7 @@ return new class extends Migration
         });
 
         DB::table('users')->insert([
-            'first_name' => 'Admin',
+            'first_name' => 'Superadmin',
             'middle_name' => null,
             'last_name' => 'User',
             'birthdate' => '2002-01-01',

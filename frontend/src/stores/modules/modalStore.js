@@ -41,6 +41,8 @@ export const useModalStore = defineStore('modal', {
     showAddCategoryModal: false,
     showEditCategoryModal: false,
     showDeleteCategoryModal: false,
+
+    showChatBox: false,
   }),
   actions: {
 
@@ -155,6 +157,10 @@ export const useModalStore = defineStore('modal', {
       this.showDeleteCategoryModal = params;
     },
 
+    //ChatBox
+    setShowChatBox(params) {
+      this.showChatBox = params;
+    },
   },
 })
 

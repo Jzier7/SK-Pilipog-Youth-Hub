@@ -109,6 +109,7 @@ class GameRepository extends JsonResponseFormat
                 'id' => $game->id,
                 'name' => $game->name,
                 'event' => $game->event,
+                'date' => $game->date,
                 'status' => $game->status,
                 'team1' => [
                     'details' => $game->team1,

@@ -58,7 +58,9 @@ class SyncUserAbilities extends Command
             65,
             66,
             67,
-            68
+            68,
+            69,
+            70,
         ];
 
         $guestRouteIds = [

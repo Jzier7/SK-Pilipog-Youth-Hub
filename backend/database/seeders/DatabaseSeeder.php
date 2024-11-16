@@ -27,6 +27,7 @@ class DatabaseSeeder extends Seeder
             TeamSeeder::class,
             GameSeeder::class,
             DefaultUserSeeder::class,
+            MessageSeeder::class,
         ]);
 
     }
