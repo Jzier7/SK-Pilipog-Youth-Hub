@@ -71,12 +71,12 @@ class MessageRepository extends JsonResponseFormat
         $query = Message::query();
         $query->where(function ($q) use ($user) {
             $q->where('sender_id', $user->id)
-              ->orWhere('receiver_id', $user->id);
+                ->orWhere('receiver_id', $user->id);
         });
 
         $messages = $query->with(['sender', 'receiver'])
-                          ->orderBy('created_at', 'asc')
-                          ->get();
+            ->orderBy('created_at', 'asc')
+            ->get();
 
         $messagesGrouped = $messages->map(function ($message) {
             return [
@@ -215,4 +215,3 @@ class MessageRepository extends JsonResponseFormat
         }
     }
 }
-

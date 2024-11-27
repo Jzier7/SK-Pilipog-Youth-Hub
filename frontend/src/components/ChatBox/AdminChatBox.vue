@@ -21,20 +21,22 @@
         </q-card-section>
 
         <q-card-section v-if="selectedConversation" ref="messageList">
-          <div v-if="selectedConversation.messages.length > 0" class="p-6 message-list">
-            <q-chat-message v-for="(message, idx) in selectedConversation.messages" :key="idx"
-              :name="message.sender_id === userId ? userName : (message.sender_role === 'super-admin' || message.sender_role === 'admin' ? message.sender_name : selectedConversation.chat_mate)"
-              :text="[message.content]"
-              :text-color="message.sender_id === userId || message.sender_role === 'super-admin' || message.sender_role === 'admin' ? 'white' : 'black'"
-              :bg-color="message.sender_id === userId || message.sender_role === 'super-admin' || message.sender_role === 'admin' ? 'secondary' : 'grey-4'"
-              :sent="message.sender_id === userId || message.sender_role === 'super-admin' || message.sender_role === 'admin'"
-              :class="{
-                'my-message': message.sender_id === userId || message.sender_role === 'super-admin' || message.sender_role === 'admin',
-                'other-message': message.sender_id !== userId && message.sender_role !== 'super-admin' && message.sender_role !== 'admin'
-              }" />
-          </div>
-          <div v-else>
-            <p>No messages.</p>
+          <div class="message-list">
+            <div v-if="selectedConversation.messages.length > 0" class="p-6">
+              <q-chat-message v-for="(message, idx) in selectedConversation.messages" :key="idx"
+                :name="message.sender_id === userId ? userName : (message.sender_role === 'super-admin' || message.sender_role === 'admin' ? message.sender_name : selectedConversation.chat_mate)"
+                :text="[message.content]"
+                :text-color="message.sender_id === userId || message.sender_role === 'super-admin' || message.sender_role === 'admin' ? 'white' : 'black'"
+                :bg-color="message.sender_id === userId || message.sender_role === 'super-admin' || message.sender_role === 'admin' ? 'secondary' : 'grey-4'"
+                :sent="message.sender_id === userId || message.sender_role === 'super-admin' || message.sender_role === 'admin'"
+                :class="{
+                  'my-message': message.sender_id === userId || message.sender_role === 'super-admin' || message.sender_role === 'admin',
+                  'other-message': message.sender_id !== userId && message.sender_role !== 'super-admin' && message.sender_role !== 'admin'
+                }" />
+            </div>
+            <div v-else>
+              <p>No messages.</p>
+            </div>
           </div>
           <div class="sticky-input-container">
             <q-input v-model="newMessage" placeholder="Type your message..." type="textarea" outlined dense auto-grow
@@ -178,10 +180,28 @@ export default {
   right: 18px;
   z-index: 1000;
   width: 800px;
-  max-width: 100%;
 
   &.single-conversation-width {
     width: 300px;
+  }
+
+  @media (max-width: 1024px) {
+    width: 100%;
+    max-width: 600px;
+
+    &.single-conversation-width {
+      width: 100%;
+    }
+  }
+
+  @media (max-width: 768px) {
+    width: 100%;
+    bottom: 0;
+    right: 0;
+
+    &.single-conversation-width {
+      width: 100%;
+    }
   }
 }
 
@@ -196,17 +216,15 @@ export default {
   &.single-conversation-card {
     min-width: 300px;
   }
-}
 
-.q-card-actions {
-  justify-content: flex-end;
-}
+  @media (max-width: 1024px) {
+    min-width: 100%;
+  }
 
-.close-btn {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  z-index: 2000;
+  @media (max-width: 768px) {
+    min-width: 100%;
+    border-radius: 0;
+  }
 }
 
 .chat-layout {
@@ -227,6 +245,22 @@ export default {
     overflow-y: auto;
     display: flex;
     flex-direction: column-reverse;
+    padding-bottom: 60px;
+  }
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+
+    .conversation-list {
+      width: 100%;
+      max-height: 200px;
+      border-right: none;
+      border-bottom: 2px solid #ccc;
+    }
+
+    .message-list {
+      width: 100%;
+    }
   }
 }
 
@@ -243,12 +277,12 @@ export default {
 
   .message-list {
     width: 100%;
-    max-height: calc(100% - 200px);
   }
 }
 
 .q-input {
   margin-top: 10px;
+  width: 100%;
 }
 
 .q-separator {
@@ -257,14 +291,18 @@ export default {
 
 .my-message {
   margin-left: 150px;
+
+  @media (max-width: 768px) {
+    margin-left: 0;
+  }
 }
 
 .other-message {
   margin-right: 150px;
-}
 
-.q-card__section--vert {
-  padding: 0 !important;
+  @media (max-width: 768px) {
+    margin-right: 0;
+  }
 }
 
 .sticky-input-container {
@@ -277,27 +315,10 @@ export default {
   padding: 10px;
 }
 
-@media (max-width: 1024px) {
-  .floating-chatbox {
-    width: 90%;
-  }
-
-  .q-card {
-    min-width: 100%;
-  }
-
-  .chat-layout {
-    flex-direction: column;
-  }
-
-  .conversation-list {
-    width: 100%;
-    max-height: 200px;
-    border-right: none;
-  }
-
-  .message-list {
-    max-height: 300px;
-  }
+.close-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 11;
 }
 </style>
