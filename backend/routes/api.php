@@ -201,6 +201,8 @@ Route::prefix('auth')->group(function () {
     Route::post('login', [AuthController::class, 'login']);
     Route::post('login/guest', [AuthController::class, 'loginAsGuest']);
     Route::post('logout', [AuthController::class, 'logout']);
+    Route::post('forgot-password', [AuthController::class, 'forgotPassword']);
+    Route::post('update-password', [AuthController::class, 'updatePassword']);
     Route::get('check', [AuthController::class, 'checkAuth']);
 });
 

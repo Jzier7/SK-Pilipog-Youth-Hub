@@ -137,6 +137,79 @@ class AuthRepository extends JsonResponseFormat
     }
 
     /**
+     * @param array $data
+     * @return array
+     */
+    public function forgotPassword(array $data): array
+    {
+        try {
+            $user = User::where('username', $data['username'])
+                ->where('first_name', $data['first_name'])
+                ->where('middle_name', $data['middle_name'])
+                ->where('last_name', $data['last_name'])
+                ->where('gender', $data['gender'])
+                ->where('birthdate', $data['birthdate'])
+                ->first();
+
+            if ($user) {
+                return [
+                    'message' => 'User exists',
+                    'body' => $user,
+                    'status' => 200
+                ];
+            }
+
+            return [
+                'message' => 'User not found',
+                'status' => 404
+            ];
+        } catch (\Exception $e) {
+            return [
+                'error' => $e->getMessage(),
+                'status' => 500
+            ];
+        }
+    }
+
+    /**
+     * @param array $data
+     * @return array
+     */
+    public function updatePassword(array $data): array
+    {
+        try {
+            $user = User::find($data['userId']);
+
+            if (!$user) {
+                return [
+                    'message' => 'User not found',
+                    'status' => 404
+                ];
+            }
+
+            if ($data['password'] !== $data['confirm_password']) {
+                return [
+                    'message' => 'Passwords do not match',
+                    'status' => 422
+                ];
+            }
+
+            $user->password = bcrypt($data['password']);
+            $user->save();
+
+            return [
+                'message' => 'Password updated successfully',
+                'status' => 200
+            ];
+        } catch (\Exception $e) {
+            return [
+                'error' => $e->getMessage(),
+                'status' => 500
+            ];
+        }
+    }
+
+    /**
      * Checks Auth
      *
      * @return array

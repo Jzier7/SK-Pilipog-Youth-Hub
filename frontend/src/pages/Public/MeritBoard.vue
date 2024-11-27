@@ -10,38 +10,19 @@
 
     <div class="q-pa-none">
       <div class="q-mb-md q-gutter-sm flex items-center">
-        <q-btn
-          v-show="isAuthorized"
-          :label="isEditing ? 'Submit' : 'Edit Participation Count'"
-          color="primary"
-          @click="handleEdit"
-          class="q-mr-sm"
-        />
+        <q-btn v-show="isAuthorized" :label="isEditing ? 'Submit' : 'Edit Participation Count'" color="primary"
+          @click="handleEdit" class="q-mr-sm" />
         <q-space />
-        <q-input
-          rounded
-          outlined
-          dense
-          color="primary"
-          v-model="search"
-          placeholder="Search by name or activity"
-          class="q-mr-sm"
-        >
+        <q-input rounded outlined dense color="primary" v-model="search" placeholder="Search by name or activity"
+          class="q-mr-sm">
           <template v-slot:prepend>
             <q-icon name="search" />
           </template>
         </q-input>
       </div>
 
-      <q-table
-        flat
-        bordered
-        :rows="meritData"
-        :columns="columns"
-        row-key="id"
-        :pagination="{ rowsPerPage: pageSize }"
-        hide-bottom
-      >
+      <q-table flat bordered :rows="meritData" :columns="columns" row-key="id" :pagination="{ rowsPerPage: pageSize }"
+        hide-bottom>
         <template v-slot:body-cell-participation_count="props">
           <q-td :props="props" align="center">
             <template v-if="isEditing">
@@ -64,12 +45,7 @@
       </q-table>
 
       <div class="row justify-end q-mt-md">
-        <q-pagination
-          v-model="currentPage"
-          :max="lastPage"
-          @update:model-value="updatePage"
-          direction-links
-        />
+        <q-pagination v-model="currentPage" :max="lastPage" @update:model-value="updatePage" direction-links />
       </div>
     </div>
   </q-page>
@@ -88,6 +64,7 @@ export default {
       currentPage: 1,
       pageSize: 12,
       lastPage: 1,
+      activeVoter: 1,
       debounceTimeout: null,
       isEditing: false,
       editedCounts: {},
@@ -132,6 +109,7 @@ export default {
           search: this.search,
           currentPage: this.currentPage,
           pageSize: this.pageSize,
+          activeVoter: this.activeVoter
         });
         this.meritData = response.data.body || [];
         this.lastPage = response.data.details.last_page || 1;
@@ -141,6 +119,8 @@ export default {
             this.editedCounts[item.id] = item.participation_count;
           }
         });
+
+        this.meritData.sort((a, b) => b.participation_count - a.participation_count);
       } catch (error) {
         console.error('Error fetching merit data:', error);
       }
@@ -186,4 +166,3 @@ export default {
   color: white;
 }
 </style>
-

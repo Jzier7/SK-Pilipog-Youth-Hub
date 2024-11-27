@@ -18,7 +18,7 @@ export default defineComponent({
         this.$router.push('/superadmin/dashboard');
       } else if (response?.role.slug === USER_ROLES.ADMIN) {
         this.$router.push('/admin/dashboard');
-      } else if (response?.role.slug === USER_ROLES.USER){
+      } else if (response?.role.slug === USER_ROLES.USER) {
         this.$router.push('/user/home');
       } else {
         return;

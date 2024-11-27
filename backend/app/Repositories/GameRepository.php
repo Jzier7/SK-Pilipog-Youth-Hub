@@ -22,12 +22,12 @@ class GameRepository extends JsonResponseFormat
 
         if (!empty($params['search'])) {
             $searchTerm = '%' . $params['search'] . '%';
-            $query->where(function($q) use ($searchTerm) {
+            $query->where(function ($q) use ($searchTerm) {
                 $q->where('name', 'like', $searchTerm)
-                    ->orWhereHas('team1', function($q) use ($searchTerm) {
+                    ->orWhereHas('team1', function ($q) use ($searchTerm) {
                         $q->where('name', 'like', $searchTerm);
                     })
-                    ->orWhereHas('team2', function($q) use ($searchTerm) {
+                    ->orWhereHas('team2', function ($q) use ($searchTerm) {
                         $q->where('name', 'like', $searchTerm);
                     });
             });
@@ -73,19 +73,21 @@ class GameRepository extends JsonResponseFormat
         $query->with([
             'event.category',
             'team1.teamLikes',
-            'team2.teamLikes'
+            'team2.teamLikes',
+            'team1.players:id,first_name,last_name',
+            'team2.players:id,first_name,last_name'
         ]);
 
         if (!empty($params['search'])) {
             $searchTerm = '%' . $params['search'] . '%';
-            $query->where(function($q) use ($searchTerm) {
+            $query->where(function ($q) use ($searchTerm) {
                 $q->where('name', 'like', $searchTerm)
-                  ->orWhereHas('team1', function($q) use ($searchTerm) {
-                      $q->where('name', 'like', $searchTerm);
-                  })
-                  ->orWhereHas('team2', function($q) use ($searchTerm) {
-                      $q->where('name', 'like', $searchTerm);
-                  });
+                    ->orWhereHas('team1', function ($q) use ($searchTerm) {
+                        $q->where('name', 'like', $searchTerm);
+                    })
+                    ->orWhereHas('team2', function ($q) use ($searchTerm) {
+                        $q->where('name', 'like', $searchTerm);
+                    });
             });
         }
 
@@ -99,11 +101,19 @@ class GameRepository extends JsonResponseFormat
 
         $games = $query->get();
 
-        // Add likes data for each team based on the game context
         $gamesWithLikes = $games->map(function ($game) {
-            // Count likes based on the game id and user_id relation for team1
             $team1Likes = $game->team1->teamLikes()->where('game_id', $game->id)->count();
             $team2Likes = $game->team2->teamLikes()->where('game_id', $game->id)->count();
+
+            $team1Players = $game->team1->players->map(function ($player) {
+                $player->name = $player->first_name . ' ' . $player->last_name;
+                return $player;
+            });
+
+            $team2Players = $game->team2->players->map(function ($player) {
+                $player->name = $player->first_name . ' ' . $player->last_name;
+                return $player;
+            });
 
             return [
                 'id' => $game->id,
@@ -112,14 +122,20 @@ class GameRepository extends JsonResponseFormat
                 'date' => $game->date,
                 'status' => $game->status,
                 'team1' => [
-                    'details' => $game->team1,
+                    'id' => $game->team1->id,
+                    'name' => $game->team1->name,
+                    'liked_by' => $game->team1->teamLikes,
                     'score' => $game->team1_score,
-                    'likes' => $team1Likes
+                    'likes_count' => $team1Likes,
+                    'players' => $team1Players
                 ],
                 'team2' => [
-                    'details' => $game->team2,
+                    'id' => $game->team2->id,
+                    'name' => $game->team2->name,
+                    'liked_by' => $game->team2->teamLikes,
                     'score' => $game->team2_score,
-                    'likes' => $team2Likes
+                    'likes_count' => $team2Likes,
+                    'players' => $team2Players
                 ],
             ];
         });
@@ -155,7 +171,6 @@ class GameRepository extends JsonResponseFormat
                 'message' => 'Game added successfully',
                 'body' => $game
             ];
-
         } catch (\Exception $e) {
             DB::rollBack();
             return [
@@ -190,7 +205,6 @@ class GameRepository extends JsonResponseFormat
                 'message' => 'Game updated successfully',
                 'body' => $game,
             ];
-
         } catch (\Exception $e) {
             DB::rollBack();
             return [
@@ -238,7 +252,6 @@ class GameRepository extends JsonResponseFormat
                 'message' => 'Game result updated successfully',
                 'body' => $game,
             ];
-
         } catch (\Exception $e) {
             DB::rollBack();
             return [
@@ -267,7 +280,6 @@ class GameRepository extends JsonResponseFormat
                 'message' => 'Game deleted successfully',
                 'body' => $game,
             ];
-
         } catch (\Exception $e) {
             DB::rollBack();
             return [
@@ -277,4 +289,3 @@ class GameRepository extends JsonResponseFormat
         }
     }
 }
-

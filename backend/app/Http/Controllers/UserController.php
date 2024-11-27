@@ -198,6 +198,4 @@ class UserController extends Controller
         $response = $this->userRepository->getCountPerPurok();
         return $this->userRepository->getJsonResponse($response);
     }
-
 }
-

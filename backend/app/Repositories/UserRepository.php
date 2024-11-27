@@ -150,7 +150,6 @@ class UserRepository extends JsonResponseFormat
                     'password' => $password,
                 ],
             ];
-
         } catch (\Exception $e) {
             DB::rollBack();
             return [
@@ -187,7 +186,6 @@ class UserRepository extends JsonResponseFormat
                 'message' => 'User updated successfully',
                 'body' => $user,
             ];
-
         } catch (\Exception $e) {
             DB::rollBack();
             return [
@@ -216,7 +214,6 @@ class UserRepository extends JsonResponseFormat
                 'message' => 'User deleted successfully',
                 'body' => $user,
             ];
-
         } catch (\Exception $e) {
             DB::rollBack();
             return [
@@ -241,7 +238,7 @@ class UserRepository extends JsonResponseFormat
 
             if ($data['status'] === 'approved') {
                 $user->update([
-                'active_voter' => 1,
+                    'active_voter' => 1,
                 ]);
 
                 DB::commit();
@@ -258,7 +255,6 @@ class UserRepository extends JsonResponseFormat
                     'body' => $user,
                 ];
             }
-
         } catch (\Exception $e) {
             DB::rollBack();
             return [
@@ -298,7 +294,6 @@ class UserRepository extends JsonResponseFormat
                 'message' => 'Users updated successfully',
                 'body' => $responses,
             ];
-
         } catch (\Exception $e) {
             DB::rollBack();
             return [
@@ -343,4 +338,3 @@ class UserRepository extends JsonResponseFormat
         ];
     }
 }
-

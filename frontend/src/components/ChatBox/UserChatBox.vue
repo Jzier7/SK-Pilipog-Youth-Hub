@@ -8,19 +8,14 @@
       <q-card-section ref="messageList" class="message-list">
         <div v-if="messages.length > 0">
           <div v-for="(conversation, index) in messages" :key="index" class="conversation">
-            <q-chat-message
-              v-for="(message, idx) in conversation.messages"
-              :key="idx"
-              :name="message.sender_id === userId ? 'me' : conversation.chat_mate"
-              :text="[message.content]"
+            <q-chat-message v-for="(message, idx) in conversation.messages" :key="idx"
+              :name="message.sender_id === userId ? 'me' : conversation.chat_mate" :text="[message.content]"
               :text-color="message.sender_id === userId ? 'white' : 'black'"
-              :bg-color="message.sender_id === userId ? 'secondary' : 'grey-4'"
-              :sent="message.sender_id === userId"
+              :bg-color="message.sender_id === userId ? 'secondary' : 'grey-4'" :sent="message.sender_id === userId"
               :class="{
                 'my-message': message.sender_id === userId,
                 'other-message': message.sender_id !== userId
-              }"
-            />
+              }" />
           </div>
         </div>
         <div v-else>
@@ -29,36 +24,14 @@
       </q-card-section>
       <q-separator />
       <q-card-section>
-        <q-input
-          v-model="newMessage"
-          placeholder="Type your message..."
-          type="textarea"
-          outlined
-          dense
-          auto-grow
-          @keyup.enter="sendMessage"
-        >
+        <q-input v-model="newMessage" placeholder="Type your message..." type="textarea" outlined dense auto-grow
+          @keyup.enter="sendMessage">
           <template v-slot:append>
-            <q-btn
-              icon="send"
-              color="primary"
-              round
-              dense
-              flat
-              @click="sendMessage"
-            />
+            <q-btn icon="send" color="primary" round dense flat @click="sendMessage" />
           </template>
         </q-input>
       </q-card-section>
-      <q-btn
-        icon="close"
-        round
-        dense
-        flat
-        color="primary"
-        class="close-btn"
-        @click="closeMessageBox"
-      />
+      <q-btn icon="close" round dense flat color="primary" class="close-btn" @click="closeMessageBox" />
     </q-card>
   </div>
 </template>
@@ -159,11 +132,13 @@ export default {
   bottom: 18px;
   right: 18px;
   z-index: 1000;
-  width: 500px;
+  width: 100%;
+  max-width: 500px;
+  box-sizing: border-box;
 }
 
 .q-card {
-  min-width: 500px;
+  min-width: 100%;
   position: relative;
   max-height: 700px;
   border: 2px solid #ccc;
@@ -210,5 +185,27 @@ export default {
 .other-message {
   margin-right: 150px;
 }
-</style>
 
+/* Media Queries for Responsiveness */
+@media (max-width: 600px) {
+  .floating-chatbox {
+    width: 90%;
+    right: 10px;
+    bottom: 10px;
+  }
+
+  .q-card {
+    min-width: 100%;
+  }
+}
+
+@media (max-width: 400px) {
+  .my-message {
+    margin-left: 100px;
+  }
+
+  .other-message {
+    margin-right: 100px;
+  }
+}
+</style>

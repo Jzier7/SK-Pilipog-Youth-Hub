@@ -1,4 +1,3 @@
-// src/router/index.js
 import { route } from 'quasar/wrappers';
 import { createRouter, createWebHistory } from 'vue-router';
 import routes from './routes';

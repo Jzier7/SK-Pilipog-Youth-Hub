@@ -1,22 +1,17 @@
 <template>
-  <div v-if="isVisible" class="floating-chatbox" :class="{'single-conversation-width': !selectedConversation}">
-    <q-card class="bg-white text-black" :class="{'single-conversation-card': !selectedConversation}">
+  <div v-if="isVisible" class="floating-chatbox" :class="{ 'single-conversation-width': !selectedConversation }">
+    <q-card class="bg-white text-black" :class="{ 'single-conversation-card': !selectedConversation }">
       <q-card-section class="m-4">
         <div class="text-h6">Chat Support</div>
       </q-card-section>
       <q-separator />
 
-      <div :class="{'chat-layout': selectedConversation, 'single-column-layout': !selectedConversation}">
+      <div :class="{ 'chat-layout': selectedConversation, 'single-column-layout': !selectedConversation }">
         <q-card-section class="conversation-list">
           <q-list class="p-2">
-            <q-item
-              v-for="conversation in sortedConversations"
-              :key="conversation.chat_mate_id"
-              clickable
-              :active="conversation.selected"
-              @click="selectConversation(conversation.chat_mate_id)"
-              :class="{'bg-grey-4 rounded-lg': conversation.selected}"
-            >
+            <q-item v-for="conversation in sortedConversations" :key="conversation.chat_mate_id" clickable
+              :active="conversation.selected" @click="selectConversation(conversation.chat_mate_id)"
+              :class="{ 'bg-grey-4 rounded-lg': conversation.selected }">
               <q-item-section>
                 <div class="text-subtitle1 text-bold text-primary">{{ conversation.chat_mate }}</div>
                 <div class="text-caption text-grey-7">{{ timeAgo(conversation.recent_message_date) }}</div>
@@ -25,59 +20,34 @@
           </q-list>
         </q-card-section>
 
-        <q-card-section v-if="selectedConversation" ref="messageList" class="message-list" >
-          <div class="sticky-input-container">
-            <q-input
-              v-model="newMessage"
-              placeholder="Type your message..."
-              type="textarea"
-              outlined
-              dense
-              auto-grow
-              @keyup.enter="sendMessage"
-            >
-              <template v-slot:append>
-                <q-btn
-                  icon="send"
-                  color="primary"
-                  round
-                  dense
-                  flat
-                  @click="sendMessage"
-                />
-              </template>
-            </q-input>
-          </div>
-          <div v-if="selectedConversation.messages.length > 0" class="p-6">
-            <q-chat-message
-                v-for="(message, idx) in selectedConversation.messages"
-                :key="idx"
-                :name="message.sender_id === userId ? userName : (message.sender_role === 'super-admin' || message.sender_role === 'admin' ? message.sender_name : selectedConversation.chat_mate)"
-                :text="[message.content]"
-                :text-color="message.sender_id === userId || message.sender_role === 'super-admin' || message.sender_role === 'admin' ? 'white' : 'black'"
-                :bg-color="message.sender_id === userId || message.sender_role === 'super-admin' || message.sender_role === 'admin' ? 'secondary' : 'grey-4'"
-                :sent="message.sender_id === userId || message.sender_role === 'super-admin' || message.sender_role === 'admin'"
-                :class="{
-                        'my-message': message.sender_id === userId || message.sender_role === 'super-admin' || message.sender_role === 'admin',
-                        'other-message': message.sender_id !== userId && message.sender_role !== 'super-admin' && message.sender_role !== 'admin'
-                        }"
-                />
+        <q-card-section v-if="selectedConversation" ref="messageList">
+          <div v-if="selectedConversation.messages.length > 0" class="p-6 message-list">
+            <q-chat-message v-for="(message, idx) in selectedConversation.messages" :key="idx"
+              :name="message.sender_id === userId ? userName : (message.sender_role === 'super-admin' || message.sender_role === 'admin' ? message.sender_name : selectedConversation.chat_mate)"
+              :text="[message.content]"
+              :text-color="message.sender_id === userId || message.sender_role === 'super-admin' || message.sender_role === 'admin' ? 'white' : 'black'"
+              :bg-color="message.sender_id === userId || message.sender_role === 'super-admin' || message.sender_role === 'admin' ? 'secondary' : 'grey-4'"
+              :sent="message.sender_id === userId || message.sender_role === 'super-admin' || message.sender_role === 'admin'"
+              :class="{
+                'my-message': message.sender_id === userId || message.sender_role === 'super-admin' || message.sender_role === 'admin',
+                'other-message': message.sender_id !== userId && message.sender_role !== 'super-admin' && message.sender_role !== 'admin'
+              }" />
           </div>
           <div v-else>
             <p>No messages.</p>
           </div>
+          <div class="sticky-input-container">
+            <q-input v-model="newMessage" placeholder="Type your message..." type="textarea" outlined dense auto-grow
+              @keyup.enter="sendMessage">
+              <template v-slot:append>
+                <q-btn icon="send" color="primary" round dense flat @click="sendMessage" />
+              </template>
+            </q-input>
+          </div>
         </q-card-section>
       </div>
 
-      <q-btn
-        icon="close"
-        round
-        dense
-        flat
-        color="primary"
-        class="close-btn"
-        @click="closeMessageBox"
-      />
+      <q-btn icon="close" round dense flat color="primary" class="close-btn" @click="closeMessageBox" />
     </q-card>
   </div>
 </template>
@@ -208,6 +178,7 @@ export default {
   right: 18px;
   z-index: 1000;
   width: 800px;
+  max-width: 100%;
 
   &.single-conversation-width {
     width: 300px;
@@ -243,7 +214,7 @@ export default {
   flex-direction: row;
 
   .conversation-list {
-    width: 30%;
+    width: 100%;
     max-height: 400px;
     overflow-y: auto;
     padding-right: 10px;
@@ -252,7 +223,6 @@ export default {
   }
 
   .message-list {
-    width: 70%;
     max-height: 400px;
     overflow-y: auto;
     display: flex;
@@ -306,5 +276,28 @@ export default {
   background: white;
   padding: 10px;
 }
-</style>
 
+@media (max-width: 1024px) {
+  .floating-chatbox {
+    width: 90%;
+  }
+
+  .q-card {
+    min-width: 100%;
+  }
+
+  .chat-layout {
+    flex-direction: column;
+  }
+
+  .conversation-list {
+    width: 100%;
+    max-height: 200px;
+    border-right: none;
+  }
+
+  .message-list {
+    max-height: 300px;
+  }
+}
+</style>

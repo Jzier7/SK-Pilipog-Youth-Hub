@@ -23,7 +23,7 @@ class Team extends Model
         return $this->morphMany(File::class, 'fileable');
     }
 
-    public function users(): BelongsToMany
+    public function players(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'user_team', 'team_id', 'player_id');
     }

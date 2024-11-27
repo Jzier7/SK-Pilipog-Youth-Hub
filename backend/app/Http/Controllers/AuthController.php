@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\LogoutRequest;
 use App\Http\Requests\Auth\RegisterRequest;
+use App\Http\Requests\Auth\ForgotPassword;
+use App\Http\Requests\Auth\UpdatePassword;
 use App\Repositories\AuthRepository;
 use Illuminate\Http\JsonResponse;
 
@@ -75,6 +77,45 @@ class AuthController extends Controller
     {
         $data = $request->validated();
         $response = $this->authRepository->register($data);
+        return $this->authRepository->getJsonResponse($response);
+    }
+
+    /**
+     * Checks if user exist.
+     *
+     * @return Illuminate\Http\JsonResponse The user's data in JSON format.
+     */
+    public function forgotPassword(ForgotPassword $request): JsonResponse
+    {
+
+        $data = [
+            'first_name' => $request->input('first_name'),
+            'middle_name' => $request->input('middle_name'),
+            'last_name' => $request->input('last_name'),
+            'birthdate' => $request->input('birthdate'),
+            'gender' => $request->input('gender'),
+            'username' => $request->input('username'),
+        ];
+
+        $response = $this->authRepository->forgotPassword($data);
+        return $this->authRepository->getJsonResponse($response);
+    }
+
+    /**
+     * Update password.
+     *
+     * @return Illuminate\Http\JsonResponse The user's data in JSON format.
+     */
+    public function updatePassword(UpdatePassword $request): JsonResponse
+    {
+
+        $data = [
+            'userId' => $request->input('userId'),
+            'password' => $request->input('password'),
+            'confirm_password' => $request->input('confirm_password'),
+        ];
+
+        $response = $this->authRepository->updatePassword($data);
         return $this->authRepository->getJsonResponse($response);
     }
 

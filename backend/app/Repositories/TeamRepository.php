@@ -18,7 +18,7 @@ class TeamRepository extends JsonResponseFormat
      */
     public function retrievePaginate(array $params): array
     {
-        $query = Team::with('users');
+        $query = Team::with('players');
 
         if (!empty($params['search'])) {
             $searchTerm = '%' . $params['search'] . '%';
@@ -43,10 +43,10 @@ class TeamRepository extends JsonResponseFormat
                 'id' => $team->id,
                 'name' => $team->name,
                 'event_id' => $team->event_id,
-                'players' => $team->users->map(function ($user) {
+                'players' => $team->players->map(function ($player) {
                     return [
-                        'id' => $user->id,
-                        'name' => "{$user->first_name} {$user->last_name}",
+                        'id' => $player->id,
+                        'name' => "{$player->first_name} {$player->last_name}",
                     ];
                 }),
             ];
@@ -114,7 +114,6 @@ class TeamRepository extends JsonResponseFormat
                 'message' => 'Team added successfully with players',
                 'body' => $team
             ];
-
         } catch (\Exception $e) {
             DB::rollBack();
             return [
@@ -152,7 +151,6 @@ class TeamRepository extends JsonResponseFormat
                 'message' => 'Team updated successfully with players',
                 'body' => $team,
             ];
-
         } catch (\Exception $e) {
             DB::rollBack();
             return [
@@ -183,7 +181,6 @@ class TeamRepository extends JsonResponseFormat
                 'message' => 'Team liked successfully',
                 'body' => $teamLike,
             ];
-
         } catch (\Exception $e) {
             DB::rollBack();
             return [
@@ -215,7 +212,6 @@ class TeamRepository extends JsonResponseFormat
                 'message' => 'Team unliked successfully',
                 'body' => $teamLike,
             ];
-
         } catch (\Exception $e) {
             DB::rollBack();
             return [
@@ -244,7 +240,6 @@ class TeamRepository extends JsonResponseFormat
                 'message' => 'Team deleted successfully',
                 'body' => $team,
             ];
-
         } catch (\Exception $e) {
             DB::rollBack();
             return [

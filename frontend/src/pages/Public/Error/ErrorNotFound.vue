@@ -9,15 +9,7 @@
         Oops. Nothing here...
       </div>
 
-      <q-btn
-        class="q-mt-xl"
-        color="white"
-        text-color="primary"
-        unelevated
-        label="Close"
-        :onClick="logout"
-        no-caps
-      />
+      <q-btn class="q-mt-xl" color="white" text-color="primary" unelevated label="Close" :onClick="logout" no-caps />
     </div>
   </div>
 </template>
