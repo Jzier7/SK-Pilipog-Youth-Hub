@@ -9,7 +9,6 @@
 
     <q-page-sticky position="bottom-right" :offset="[18, 18]" v-if="!modalStore.showChatBox">
       <q-btn fab icon="chat" color="secondary" @click="toggleChatBox">
-        <q-badge v-if="unreadMessages > 0" color="negative" floating label="!" />
       </q-btn>
     </q-page-sticky>
 
@@ -18,7 +17,7 @@
 </template>
 
 <script>
-import { defineComponent, ref, defineAsyncComponent } from 'vue';
+import { defineComponent, defineAsyncComponent } from 'vue';
 import { useModalStore } from 'src/stores/modules/modalStore';
 
 const menuList = [
@@ -62,6 +61,12 @@ const menuList = [
     icon: 'recent_actors',
     label: 'User Registry',
     path: '/admin/user-registry',
+    separator: false
+  },
+  {
+    icon: 'place',
+    label: 'Purok',
+    path: '/admin/purok',
     separator: true
   },
   {
@@ -101,4 +106,3 @@ export default defineComponent({
   }
 });
 </script>
-

@@ -42,6 +42,10 @@ export const useModalStore = defineStore('modal', {
     showEditCategoryModal: false,
     showDeleteCategoryModal: false,
 
+    showAddPurokModal: false,
+    showEditPurokModal: false,
+    showDeletePurokModal: false,
+
     showChatBox: false,
   }),
   actions: {
@@ -155,6 +159,17 @@ export const useModalStore = defineStore('modal', {
     },
     setShowDeleteCategoryModal(params) {
       this.showDeleteCategoryModal = params;
+    },
+
+    //Purok
+    setShowAddPurokModal(params) {
+      this.showAddPurokModal = params;
+    },
+    setShowEditPurokModal(params) {
+      this.showEditPurokModal = params;
+    },
+    setShowDeletePurokModal(params) {
+      this.showDeletePurokModal = params;
     },
 
     //ChatBox

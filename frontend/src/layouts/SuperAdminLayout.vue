@@ -9,7 +9,6 @@
 
     <q-page-sticky position="bottom-right" :offset="[18, 18]" v-if="!modalStore.showChatBox">
       <q-btn fab icon="chat" color="secondary" @click="toggleChatBox">
-        <q-badge v-if="unreadMessages > 0" color="negative" floating label="!" />
       </q-btn>
     </q-page-sticky>
 
@@ -47,6 +46,12 @@ const menuList = [
     separator: true
   },
   {
+    icon: 'place',
+    label: 'Purok',
+    path: '/superadmin/purok',
+    separator: false
+  },
+  {
     icon: 'assignment_ind',
     label: 'SK Official',
     path: '/superadmin/sk-official',
@@ -76,6 +81,7 @@ const menuList = [
     path: '/superadmin/user-accounts',
     separator: false
   },
+
 ]
 
 export default defineComponent({
@@ -107,4 +113,3 @@ export default defineComponent({
   }
 });
 </script>
-

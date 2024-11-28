@@ -61,6 +61,7 @@ const routes = [
       { path: 'sk-official', component: () => import('pages/Admin/SKOfficial/MainPage.vue') },
       { path: 'merit-board', component: () => import('pages/Public/MeritBoard.vue') },
       { path: 'user-registry', component: () => import('pages/Admin/UserRegistry.vue') },
+      { path: 'purok', component: () => import('pages/Admin/AdminPurok.vue') },
       { path: 'my-account', component: () => import('pages/User/MyAccount.vue') },
     ]
   },
@@ -80,6 +81,7 @@ const routes = [
       { path: 'user-registry', component: () => import('pages/Admin/UserRegistry.vue') },
       { path: 'admin-accounts', component: () => import('pages/SuperAdmin/AdminAccounts.vue') },
       { path: 'user-accounts', component: () => import('pages/SuperAdmin/UserAccounts.vue') },
+      { path: 'purok', component: () => import('pages/Admin/AdminPurok.vue') },
     ]
   },
 

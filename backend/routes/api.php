@@ -194,6 +194,13 @@ Route::middleware(['auth:sanctum', 'role.guard'])->group(function () {
             Route::get('admin', [MessageController::class, 'retrieveAdmin']);
         });
     });
+
+    Route::prefix('purok')->group(function () {
+        Route::post('store', [PurokController::class, 'store']);
+        Route::patch('update', [PurokController::class, 'update']);
+        Route::delete('delete', [PurokController::class, 'delete']);
+        Route::get('retrieve/paginated', [PurokController::class, 'retrievePaginate']);
+    });
 });
 
 Route::prefix('auth')->group(function () {

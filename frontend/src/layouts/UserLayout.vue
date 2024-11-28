@@ -9,7 +9,6 @@
 
     <q-page-sticky position="bottom-right" :offset="[18, 18]" v-if="!modalStore.showChatBox">
       <q-btn fab icon="chat" color="secondary" @click="toggleChatBox">
-        <q-badge v-if="unreadMessages > 0" color="negative" floating label="!" />
       </q-btn>
     </q-page-sticky>
 
@@ -89,4 +88,3 @@ export default defineComponent({
   }
 });
 </script>
-

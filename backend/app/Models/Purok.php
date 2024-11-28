@@ -10,6 +10,10 @@ class Purok extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'name',
+    ];
+
     public function user(): HasMany
     {
         return $this->HasMany(User::class, 'id', 'user_id');
