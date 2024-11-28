@@ -14,7 +14,7 @@ class UpdateResult extends FormRequest
     {
         $user = Auth::user();
 
-        if ($user && $user->isSuperAdmin()) {
+        if ($user && ($user->isSuperAdmin() || $user->isAdmin())) {
             return true;
         }
 
@@ -43,4 +43,3 @@ class UpdateResult extends FormRequest
         ];
     }
 }
-

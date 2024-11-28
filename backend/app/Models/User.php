@@ -109,6 +109,11 @@ class User extends Authenticatable
         return $this->role_id === 1;
     }
 
+    public function isAdmin(): bool
+    {
+        return $this->role_id === 2;
+    }
+
     public function isUser(): bool
     {
         return $this->role_id === 3;
@@ -118,5 +123,4 @@ class User extends Authenticatable
     {
         return $this->active_voter === 1;
     }
-
 }

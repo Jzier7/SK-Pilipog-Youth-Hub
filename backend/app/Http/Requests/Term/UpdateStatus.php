@@ -14,11 +14,11 @@ class UpdateStatus extends FormRequest
     {
         $user = Auth::user();
 
-        if ($user && $user->isSuperAdmin()) {
+        if ($user && ($user->isSuperAdmin() || $user->isAdmin())) {
             return true;
         }
 
-        return false; // Return false if not a super admin
+        return false;
     }
 
     /**

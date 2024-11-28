@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Announcement;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Auth;
 
 class Store extends FormRequest
 {
@@ -11,7 +12,13 @@ class Store extends FormRequest
      */
     public function authorize(): bool
     {
-        return true;
+        $user = Auth::user();
+
+        if ($user && ($user->isSuperAdmin() || $user->isAdmin())) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -29,4 +36,3 @@ class Store extends FormRequest
         ];
     }
 }
-
