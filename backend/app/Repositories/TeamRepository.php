@@ -106,7 +106,7 @@ class TeamRepository extends JsonResponseFormat
             ]);
 
             if (!empty($data['players']) && is_array($data['players'])) {
-                $team->users()->attach($data['players']);
+                $team->players()->attach($data['players']);
             }
 
             DB::commit();
@@ -141,9 +141,9 @@ class TeamRepository extends JsonResponseFormat
             ]);
 
             if (!empty($data['players']) && is_array($data['players'])) {
-                $team->users()->sync($data['players']);
+                $team->players()->sync($data['players']);
             } else {
-                $team->users()->detach();
+                $team->players()->detach();
             }
 
             DB::commit();
