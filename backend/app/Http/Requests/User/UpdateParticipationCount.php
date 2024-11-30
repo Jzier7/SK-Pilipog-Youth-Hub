@@ -14,7 +14,7 @@ class UpdateParticipationCount extends FormRequest
     {
         $user = Auth::user();
 
-        return $user && $user->isSuperAdmin();
+        return $user && $user->isSuperAdmin() || $user->isAdmin();
     }
 
     /**
@@ -41,4 +41,3 @@ class UpdateParticipationCount extends FormRequest
         ];
     }
 }
-

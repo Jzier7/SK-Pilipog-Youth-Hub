@@ -8,20 +8,14 @@
         <CustomInput v-model="localForm.last_name" label="Last Name" />
         <CustomInput v-model="localForm.email" label="Email" type="email" />
 
-        <CustomSelect
-          v-model="localForm.purok"
-          :options="purokData.map(purok => ({ label: purok.name, value: purok.id }))"
-          label="Purok"
-          :errorMessage="errors.purok ? errors.purok[0] : ''"
-        />
+        <CustomSelect v-model="localForm.purok"
+          :options="purokData.map(purok => ({ label: purok.name, value: purok.id }))" label="Purok"
+          :errorMessage="errors.purok ? errors.purok[0] : ''" />
 
         <CustomInput v-model="localForm.birthdate" label="Birthdate" type="date" />
 
-        <CustomSelect
-          v-model="localForm.gender"
-          :options="[{ label: 'Male', value: 'Male' }, { label: 'Female', value: 'Female' }]"
-          label="Gender"
-        />
+        <CustomSelect v-model="localForm.gender"
+          :options="[{ label: 'Male', value: 'Male' }, { label: 'Female', value: 'Female' }]" label="Gender" />
 
         <CustomInput v-model="localForm.username" label="Username" />
 
@@ -38,10 +32,7 @@
       <h3 class="text-primary pb-4">User Password</h3>
       <div class="q-mb-md">
         <p>Your created user's password is:</p>
-        <q-input
-          v-model="generatedPassword"
-          readonly
-        >
+        <q-input v-model="generatedPassword" readonly>
           <template v-slot:append>
             <q-btn round dense flat icon="content_copy" @click="copyPassword" />
           </template>
@@ -181,4 +172,3 @@ export default {
   },
 };
 </script>
-

@@ -14,11 +14,7 @@ class UpdateData extends FormRequest
     {
         $user = Auth::user();
 
-        if ($user && ($user->isSuperAdmin() || $user->id === (int) $this->input('id'))) {
-            return true;
-        }
-
-        return false;
+        return $user && $user->isSuperAdmin() || $user->isAdmin() || $user->id === (int) $this->input('id');
     }
 
     /**
@@ -35,7 +31,7 @@ class UpdateData extends FormRequest
             'last_name' => ['required', 'string', 'max:255'],
             'birthdate' => ['required', 'date', 'before:today'],
             'gender' => ['required', 'string', 'in:male,female'],
-            'purok' => ['required' , 'integer', 'exists:puroks,id'],
+            'purok' => ['required', 'integer', 'exists:puroks,id'],
             'username' => ['required', 'string', 'max:255', 'unique:users,username,' . $this->id],
         ];
     }
@@ -50,4 +46,3 @@ class UpdateData extends FormRequest
         ];
     }
 }
-

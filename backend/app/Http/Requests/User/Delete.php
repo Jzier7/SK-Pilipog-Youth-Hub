@@ -14,11 +14,7 @@ class Delete extends FormRequest
     {
         $user = Auth::user();
 
-        if ($user && $user->isSuperAdmin()) {
-            return true;
-        }
-
-        return false; // Return false if not a super admin
+        return $user && $user->isSuperAdmin() || $user->isAdmin();
     }
 
     /**

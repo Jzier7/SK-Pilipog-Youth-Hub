@@ -14,11 +14,7 @@ class Like extends FormRequest
     {
         $user = Auth::user();
 
-        if ($user && $user->isUser() && $user->isActiveVoter()) {
-            return true;
-        }
-
-        return false;
+        return $user && $user->isUser() || $user->isActiveVoter();
     }
 
     /**
@@ -42,4 +38,3 @@ class Like extends FormRequest
         ];
     }
 }
-

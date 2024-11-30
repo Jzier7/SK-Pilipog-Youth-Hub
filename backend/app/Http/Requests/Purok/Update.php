@@ -14,11 +14,7 @@ class Update extends FormRequest
     {
         $user = Auth::user();
 
-        if ($user && ($user->isSuperAdmin() || $user->isAdmin())) {
-            return true;
-        }
-
-        return false;
+        return $user && $user->isSuperAdmin() || $user->isAdmin();
     }
 
     /**

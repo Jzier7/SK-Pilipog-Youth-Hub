@@ -1,69 +1,23 @@
 <template>
   <div class="q-pa-none">
     <div class="q-mb-md q-gutter-sm flex items-center">
-      <q-btn
-        label="Add Official"
-        color="primary"
-        @click="openAddModal"
-        class="q-mr-sm"
-      />
+      <q-btn label="Add Official" color="primary" @click="openAddModal" class="q-mr-sm" />
       <q-space />
-      <q-select
-        v-model="selectedPosition"
-        :options="positionOptions"
-        dense
-        outlined
-        color="primary"
-        :clearable="selectedPosition !== null"
-        emit-value
-        map-options
-        use-input
-        input-debounce="0"
-        label="Select Position"
-        @filter="filterPositions"
-        option-label="name"
-        option-value="id"
-      />
-      <q-select
-        v-model="selectedTerm"
-        :options="termOptions"
-        dense
-        outlined
-        color="primary"
-        :clearable="selectedTerm !== null"
-        emit-value
-        map-options
-        use-input
-        input-debounce="0"
-        label="Select Term"
-        @filter="filterTerms"
-        option-label="date_range"
-        option-value="id"
-      />
-      <q-input
-        rounded
-        outlined
-        dense
-        color="primary"
-        v-model="search"
-        placeholder="Search by name"
-        class="q-mr-sm"
-      >
+      <q-select v-model="selectedPosition" :options="positionOptions" dense outlined color="primary"
+        :clearable="selectedPosition !== null" emit-value map-options use-input input-debounce="0"
+        label="Select Position" @filter="filterPositions" option-label="name" option-value="id" />
+      <q-select v-model="selectedTerm" :options="termOptions" dense outlined color="primary"
+        :clearable="selectedTerm !== null" emit-value map-options use-input input-debounce="0" label="Select Term"
+        @filter="filterTerms" option-label="date_range" option-value="id" />
+      <q-input rounded outlined dense color="primary" v-model="search" placeholder="Search by name" class="q-mr-sm">
         <template v-slot:prepend>
           <q-icon name="search" />
         </template>
       </q-input>
     </div>
 
-    <q-table
-      flat
-      bordered
-      :rows="officials"
-      :columns="columns"
-      row-key="id"
-      :pagination="{ rowsPerPage: pageSize }"
-      hide-bottom
-    >
+    <q-table flat bordered :rows="officials" :columns="columns" row-key="id" :pagination="{ rowsPerPage: pageSize }"
+      hide-bottom>
       <template v-slot:header="props">
         <q-tr :props="props">
           <q-th v-for="col in props.cols" :key="col.name" :props="props" class="text-primary text-bold">
@@ -74,31 +28,14 @@
 
       <template v-slot:body-cell-actions="props">
         <q-td :props="props" align="center">
-          <q-btn
-            flat
-            dense
-            icon="edit"
-            color="primary"
-            @click="openEditModal(props.row)"
-          />
-          <q-btn
-            flat
-            dense
-            icon="delete"
-            color="negative"
-            @click="openDeleteModal(props.row)"
-          />
+          <q-btn flat dense icon="edit" color="primary" @click="openEditModal(props.row)" />
+          <q-btn flat dense icon="delete" color="negative" @click="openDeleteModal(props.row)" />
         </q-td>
       </template>
     </q-table>
 
-    <div class="row justify-end q-mt-md">
-      <q-pagination
-        v-model="currentPage"
-        :max="lastPage"
-        @update:model-value="updatePage"
-        direction-links
-      />
+    <div class="row justify-center q-mt-md">
+      <q-pagination v-model="currentPage" :max="lastPage" @update:model-value="updatePage" direction-links />
     </div>
   </div>
 

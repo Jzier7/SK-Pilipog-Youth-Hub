@@ -1,39 +1,20 @@
 <template>
   <div class="q-pa-none">
     <div class="q-mb-md q-gutter-sm flex items-center">
-      <q-btn
-        label="Add Term"
-        color="primary"
-        @click="openAddModal"
-        class="q-mr-sm"
-      />
+      <q-btn label="Add Term" color="primary" @click="openAddModal" class="q-mr-sm" />
 
       <q-space />
 
-      <q-input
-        v-model="search"
-        rounded
-        outlined
-        dense
-        color="primary"
-        placeholder="Search by term date"
-        class="q-mt-md"
-      >
+      <q-input v-model="search" rounded outlined dense color="primary" placeholder="Search by term date"
+        class="q-mt-md">
         <template v-slot:prepend>
           <q-icon name="search" />
         </template>
       </q-input>
     </div>
 
-    <q-table
-      flat
-      bordered
-      :rows="filteredTerms"
-      :columns="columns"
-      row-key="id"
-      :pagination="{ rowsPerPage: pageSize }"
-      hide-bottom
-    >
+    <q-table flat bordered :rows="filteredTerms" :columns="columns" row-key="id" :pagination="{ rowsPerPage: pageSize }"
+      hide-bottom>
       <template v-slot:header="props">
         <q-tr :props="props">
           <q-th v-for="col in props.cols" :key="col.name" :props="props" class="text-primary text-bold">
@@ -44,42 +25,16 @@
 
       <template v-slot:body-cell-actions="props">
         <q-td :props="props" align="center">
-          <q-btn
-            flat
-            dense
-            icon="edit"
-            color="primary"
-            @click="openEditModal(props.row)"
-            title="Edit"
-          />
-          <q-btn
-            flat
-            dense
-            icon="delete"
-            color="negative"
-            @click="openDeleteModal(props.row)"
-            title="Delete"
-          />
-          <q-btn
-            flat
-            dense
-            icon="star"
-            color="green"
-            v-if="!props.row.is_active"
-            @click="setActiveTerm(props.row)"
-            title="Set Active"
-          />
+          <q-btn flat dense icon="edit" color="primary" @click="openEditModal(props.row)" title="Edit" />
+          <q-btn flat dense icon="delete" color="negative" @click="openDeleteModal(props.row)" title="Delete" />
+          <q-btn flat dense icon="star" color="green" v-if="!props.row.is_active" @click="setActiveTerm(props.row)"
+            title="Set Active" />
         </q-td>
       </template>
     </q-table>
 
-    <div class="row justify-end q-mt-md">
-      <q-pagination
-        v-model="currentPage"
-        :max="lastPage"
-        @update:model-value="updatePage"
-        direction-links
-      />
+    <div class="row justify-center q-mt-md">
+      <q-pagination v-model="currentPage" :max="lastPage" @update:model-value="updatePage" direction-links />
     </div>
 
     <AddTermModal :fetchTerms="fetchTerms" />
@@ -166,7 +121,7 @@ export default {
     },
     async setActiveTerm(term) {
       try {
-        const response = await termService.setActiveTerm({id: term.id});
+        const response = await termService.setActiveTerm({ id: term.id });
 
         Notify.create({
           type: 'positive',
@@ -204,4 +159,3 @@ export default {
   font-weight: bold;
 }
 </style>
-

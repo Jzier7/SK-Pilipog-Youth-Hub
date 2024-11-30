@@ -44,7 +44,7 @@
         </template>
       </q-table>
 
-      <div class="row justify-end q-mt-md">
+      <div class="row justify-center q-mt-md">
         <q-pagination v-model="currentPage" :max="lastPage" @update:model-value="updatePage" direction-links />
       </div>
     </div>

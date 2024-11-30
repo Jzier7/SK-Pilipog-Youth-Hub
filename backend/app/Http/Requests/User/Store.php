@@ -14,11 +14,7 @@ class Store extends FormRequest
     {
         $user = Auth::user();
 
-        if ($user && $user->isSuperAdmin()) {
-            return true;
-        }
-
-        return false;
+        return $user && $user->isSuperAdmin() || $user->isAdmin();
     }
 
     /**
@@ -49,4 +45,3 @@ class Store extends FormRequest
         ];
     }
 }
-
